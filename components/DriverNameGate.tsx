@@ -2,15 +2,25 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Flag } from 'lucide-react';
+import { Flag, Sparkles, ArrowRight } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { datadogRum } from '@datadog/browser-rum';
+
+// ── Rainbow gradient cycle used on the AI button ──────────────────────────────
+const RAINBOW_GRADIENT =
+  'linear-gradient(135deg,#ff6b6b,#ffa94d,#ffd43b,#69db7c,#4dabf7,#9775fa,#f783ac,#ff6b6b)';
 
 export function DriverNameGate() {
   const { hasSetName, setUsername, initialize } = useUserStore();
   const [show, setShow] = useState(false);
   const [input, setInput] = useState('');
   const [shaking, setShaking] = useState(false);
+
+  // AI name generator state
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [suggestion, setSuggestion] = useState<{ driverName: string; nickname: string } | null>(null);
+  const [genError, setGenError] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -24,6 +34,40 @@ export function DriverNameGate() {
     }
   }, [hasSetName]);
 
+  // Clear suggestion when user edits the input manually
+  const handleInputChange = (val: string) => {
+    setInput(val);
+    if (suggestion) setSuggestion(null);
+    if (genError) setGenError(false);
+  };
+
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    setSuggestion(null);
+    setGenError(false);
+    try {
+      const res = await fetch('/api/generate-driver-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ realName: input.trim() || '' }),
+      });
+      if (!res.ok) throw new Error('generate failed');
+      const data = await res.json();
+      setSuggestion({ driverName: data.driverName, nickname: data.nickname });
+    } catch {
+      setGenError(true);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const useSuggestion = () => {
+    if (!suggestion) return;
+    setInput(suggestion.driverName);
+    setSuggestion(null);
+    inputRef.current?.focus();
+  };
+
   const handleConfirm = () => {
     const name = input.trim();
     if (!name || name.length < 2) {
@@ -36,7 +80,7 @@ export function DriverNameGate() {
     if (datadogRum.getInitConfiguration()) {
       datadogRum.setUser({ id: useUserStore.getState().userId, name });
       datadogRum.setGlobalContextProperty('usr.name', name);
-      datadogRum.addAction('driver_name_set', { driver_name: name });
+      datadogRum.addAction('driver_name_set', { driver_name: name, ai_generated: !!suggestion });
     }
     setShow(false);
   };
@@ -78,31 +122,128 @@ export function DriverNameGate() {
               </div>
 
               <p className="muted-copy mb-6 text-sm leading-7">
-                Every driver in the paddock needs a callsign. Enter yours to unlock the pitwall, quiz, and Dream Team builder.
+                Every driver in the paddock needs a callsign. Type your name — or let AI generate a legendary one.
               </p>
 
               <div className="telemetry-divider mb-6" />
 
-              {/* Input */}
+              {/* Input row */}
               <motion.div
                 animate={shaking ? { x: [0, -10, 10, -8, 8, -4, 0] } : { x: 0 }}
                 transition={{ duration: 0.4 }}
-                className="mb-4"
+                className="mb-3"
               >
                 <label className="mb-2 block font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
                   Driver Name
                 </label>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
-                  placeholder="e.g. Foxy McRaceFace"
-                  maxLength={20}
-                  className="w-full rounded-2xl border border-white/12 bg-black/40 px-5 py-4 text-base text-white placeholder-white/28 outline-none transition-colors focus:border-[color:var(--border-strong)] focus:bg-black/60"
-                />
+                <div className="flex gap-2">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
+                    placeholder="Your name or callsign…"
+                    maxLength={24}
+                    className="min-w-0 flex-1 rounded-2xl border border-white/12 bg-black/40 px-5 py-4 text-base text-white placeholder-white/28 outline-none transition-colors focus:border-[color:var(--border-strong)] focus:bg-black/60"
+                  />
+
+                  {/* AI Generate button — rainbow gradient border */}
+                  <motion.button
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    whileTap={{ scale: 0.93 }}
+                    title="Generate AI driver name"
+                    className="relative flex-shrink-0 overflow-hidden rounded-2xl p-[2px] disabled:opacity-70"
+                    style={{ background: RAINBOW_GRADIENT, backgroundSize: '200% 200%' }}
+                    animate={isGenerating ? { backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'] } : {}}
+                    transition={isGenerating ? { duration: 1.4, repeat: Infinity, ease: 'linear' } : {}}
+                  >
+                    {/* Inner surface */}
+                    <div className="flex h-full items-center justify-center rounded-[calc(1rem-2px)] bg-[#0a0b0f] px-4 py-3">
+                      <motion.div
+                        animate={isGenerating ? { rotate: 360 } : { rotate: 0 }}
+                        transition={isGenerating ? { duration: 1, repeat: Infinity, ease: 'linear' } : {}}
+                      >
+                        <Sparkles
+                          className="h-5 w-5"
+                          style={isGenerating ? {} : {
+                            background: RAINBOW_GRADIENT,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                            color: 'transparent',
+                          }}
+                        />
+                      </motion.div>
+                    </div>
+
+                    {/* Glow pulse when idle */}
+                    {!isGenerating && (
+                      <motion.div
+                        className="pointer-events-none absolute inset-0 rounded-2xl"
+                        style={{ background: RAINBOW_GRADIENT, opacity: 0 }}
+                        animate={{ opacity: [0, 0.35, 0] }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                      />
+                    )}
+                  </motion.button>
+                </div>
+
+                {/* Hint text below input */}
+                <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--text-faint)]">
+                  ✦ Hit the sparkle button — AI will forge your F1 identity
+                </p>
               </motion.div>
+
+              {/* AI Suggestion card */}
+              <AnimatePresence>
+                {suggestion && (
+                  <motion.div
+                    key="suggestion"
+                    initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="mb-4 overflow-hidden rounded-2xl p-[1.5px]"
+                    style={{ background: RAINBOW_GRADIENT }}
+                  >
+                    <div className="rounded-[calc(1rem-1.5px)] bg-[#0d0e12] px-5 py-4">
+                      <div className="mb-3 flex items-center gap-2">
+                        <Sparkles className="h-3.5 w-3.5 text-[var(--brand-secondary)]" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[var(--brand-secondary)]">
+                          AI Suggestion
+                        </span>
+                      </div>
+                      <p className="brand-wordmark text-[1.9rem] leading-none text-white">
+                        {suggestion.driverName}
+                      </p>
+                      <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.24em] text-white/52">
+                        {suggestion.nickname}
+                      </p>
+                      <button
+                        onClick={useSuggestion}
+                        className="mt-4 flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10"
+                      >
+                        Use this name
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {genError && (
+                  <motion.p
+                    key="gen-error"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-red-400/70"
+                  >
+                    Radio static — try again or type a name manually.
+                  </motion.p>
+                )}
+              </AnimatePresence>
 
               <button
                 onClick={handleConfirm}
@@ -113,7 +254,7 @@ export function DriverNameGate() {
               </button>
 
               <p className="mt-4 text-center font-mono text-[10px] text-[var(--text-faint)]">
-                Your name appears on the live scoreboard
+                Your callsign appears on the live scoreboard
               </p>
             </div>
           </motion.div>
