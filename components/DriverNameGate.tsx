@@ -2,13 +2,45 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Flag, Sparkles, ArrowRight } from 'lucide-react';
+import { Flag, ArrowRight } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { datadogRum } from '@datadog/browser-rum';
 
 // ── Rainbow gradient cycle used on the AI button ──────────────────────────────
 const RAINBOW_GRADIENT =
   'linear-gradient(135deg,#ff6b6b,#ffa94d,#ffd43b,#69db7c,#4dabf7,#9775fa,#f783ac,#ff6b6b)';
+
+/**
+ * GenAI 4-pointed star icon with an embedded rainbow SVG gradient.
+ * Uses an inline <linearGradient> so the fill works regardless of CSS context —
+ * background-clip:text does NOT work on SVG icon elements.
+ */
+function GenAiIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="genai-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stopColor="#ff6b6b" />
+          <stop offset="25%"  stopColor="#ffd43b" />
+          <stop offset="55%"  stopColor="#4dabf7" />
+          <stop offset="80%"  stopColor="#9775fa" />
+          <stop offset="100%" stopColor="#f783ac" />
+        </linearGradient>
+      </defs>
+      {/* Primary 4-pointed star — standard GenAI / Gemini symbol */}
+      <path
+        d="M12 2L13.9 10.1L22 12L13.9 13.9L12 22L10.1 13.9L2 12L10.1 10.1Z"
+        fill="url(#genai-grad)"
+      />
+      {/* Small accent sparkle — top-right corner */}
+      <path
+        d="M19.5 3L20.2 5.8L23 6.5L20.2 7.2L19.5 10L18.8 7.2L16 6.5L18.8 5.8Z"
+        fill="url(#genai-grad)"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
 
 export function DriverNameGate() {
   const { hasSetName, setUsername, initialize } = useUserStore();
@@ -165,16 +197,7 @@ export function DriverNameGate() {
                         animate={isGenerating ? { rotate: 360 } : { rotate: 0 }}
                         transition={isGenerating ? { duration: 1, repeat: Infinity, ease: 'linear' } : {}}
                       >
-                        <Sparkles
-                          className="h-5 w-5"
-                          style={isGenerating ? {} : {
-                            background: RAINBOW_GRADIENT,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
-                            color: 'transparent',
-                          }}
-                        />
+                        <GenAiIcon />
                       </motion.div>
                     </div>
 
@@ -192,7 +215,7 @@ export function DriverNameGate() {
 
                 {/* Hint text below input */}
                 <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--text-faint)]">
-                  ✦ Hit the sparkle button — AI will forge your F1 identity
+                  ✦ Hit the GenAI button — AI will forge your F1 identity
                 </p>
               </motion.div>
 
@@ -210,7 +233,7 @@ export function DriverNameGate() {
                   >
                     <div className="rounded-[calc(1rem-1.5px)] bg-[#0d0e12] px-5 py-4">
                       <div className="mb-3 flex items-center gap-2">
-                        <Sparkles className="h-3.5 w-3.5 text-[var(--brand-secondary)]" />
+                        <GenAiIcon />
                         <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[var(--brand-secondary)]">
                           AI Suggestion
                         </span>
