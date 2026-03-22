@@ -51,6 +51,110 @@ const SUBMISSION_STAGES = [
   },
 ] as const;
 
+type RoleId =
+  | 'principal'
+  | 'driver1'
+  | 'driver2'
+  | 'engineer1'
+  | 'engineer2'
+  | 'strategy'
+  | 'techDirector';
+
+const ROLE_ORDER: RoleId[] = [
+  'principal',
+  'driver1',
+  'driver2',
+  'engineer1',
+  'engineer2',
+  'strategy',
+  'techDirector',
+];
+
+const ROLE_STYLES: Record<
+  RoleId,
+  {
+    label: string;
+    title: string;
+    subtitle: string;
+    hint: string;
+    dotClass: string;
+    borderClass: string;
+    bgClass: string;
+    textClass: string;
+  }
+> = {
+  principal: {
+    label: 'P1',
+    title: 'The Captain',
+    subtitle: 'Team Principal',
+    hint: 'Pick the leader who shapes the whole garage tone.',
+    dotClass: 'bg-violet-400',
+    borderClass: 'border-violet-400/35',
+    bgClass: 'bg-violet-500/10',
+    textClass: 'text-violet-300',
+  },
+  driver1: {
+    label: 'D1',
+    title: 'The Ace',
+    subtitle: 'First Driver',
+    hint: 'Choose the headline act who carries the pace ceiling.',
+    dotClass: 'bg-orange-400',
+    borderClass: 'border-orange-400/35',
+    bgClass: 'bg-orange-500/10',
+    textClass: 'text-orange-300',
+  },
+  driver2: {
+    label: 'D2',
+    title: 'The Wingman',
+    subtitle: 'Second Driver',
+    hint: 'Balance the lineup with support, tension, or chaos.',
+    dotClass: 'bg-sky-400',
+    borderClass: 'border-sky-400/35',
+    bgClass: 'bg-sky-500/10',
+    textClass: 'text-sky-300',
+  },
+  engineer1: {
+    label: 'E1',
+    title: 'The Brains',
+    subtitle: 'Race Engineer 1',
+    hint: 'Match the first driver with the right radio voice.',
+    dotClass: 'bg-cyan-400',
+    borderClass: 'border-cyan-400/35',
+    bgClass: 'bg-cyan-500/10',
+    textClass: 'text-cyan-300',
+  },
+  engineer2: {
+    label: 'E2',
+    title: 'The Voice',
+    subtitle: 'Race Engineer 2',
+    hint: 'Give the second driver a different engineering mood.',
+    dotClass: 'bg-emerald-400',
+    borderClass: 'border-emerald-400/35',
+    bgClass: 'bg-emerald-500/10',
+    textClass: 'text-emerald-300',
+  },
+  strategy: {
+    label: 'STR',
+    title: 'The Mastermind',
+    subtitle: 'Head of Strategy',
+    hint: 'Choose the pitwall brain that makes or breaks Sunday.',
+    dotClass: 'bg-amber-400',
+    borderClass: 'border-amber-400/35',
+    bgClass: 'bg-amber-500/10',
+    textClass: 'text-amber-300',
+  },
+  techDirector: {
+    label: 'TD',
+    title: 'The Innovator',
+    subtitle: 'Technical Director',
+    hint: 'Lock in the architect behind the whole machine.',
+    dotClass: 'bg-fuchsia-400',
+    borderClass: 'border-fuchsia-400/35',
+    bgClass: 'bg-fuchsia-500/10',
+    textClass: 'text-fuchsia-300',
+  },
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function DreamTeamPage() {
@@ -85,6 +189,7 @@ function DreamTeamContent() {
   const [finalScore, setFinalScore] = useState<number | null>(null);
   const [submissionStage, setSubmissionStage] =
     useState<(typeof SUBMISSION_STAGES)[number]['id']>('locked');
+  const [expandedRoleId, setExpandedRoleId] = useState<RoleId>('principal');
 
   // Countdown
   const [countdownMs, setCountdownMs] = useState(POLE_TIME_MS);
@@ -96,6 +201,27 @@ function DreamTeamContent() {
   const engineers    = charactersData.filter(c => c.role === 'Race Engineer');
   const strategists  = charactersData.filter(c => c.role === 'Head of Strategy');
   const techDirectors = charactersData.filter(c => c.role === 'Technical Director');
+  const sectionRefs = useRef<Record<RoleId, HTMLElement | null>>({
+    principal: null,
+    driver1: null,
+    driver2: null,
+    engineer1: null,
+    engineer2: null,
+    strategy: null,
+    techDirector: null,
+  });
+
+  const selectedByRole: Record<RoleId, Character | null> = {
+    principal: selectedPrincipal,
+    driver1: selectedDriver,
+    driver2: selectedDriver2,
+    engineer1: selectedEngineer,
+    engineer2: selectedEngineer2,
+    strategy: selectedStrategy,
+    techDirector: selectedTechDirector,
+  };
+
+  const allRolesLocked = ROLE_ORDER.every((role) => selectedByRole[role]);
 
   // Base score calculation
   useEffect(() => {
@@ -134,6 +260,42 @@ function DreamTeamContent() {
     }
     return () => { if (countdownRef.current) clearInterval(countdownRef.current); };
   }, [countdownActive]);
+
+  useEffect(() => {
+    if (phase !== 'selection') return;
+    const firstIncomplete = ROLE_ORDER.find((role) => !selectedByRole[role]);
+    if (!firstIncomplete) return;
+    setExpandedRoleId((current) => (selectedByRole[current] ? firstIncomplete : current));
+  }, [
+    phase,
+    selectedPrincipal,
+    selectedDriver,
+    selectedDriver2,
+    selectedEngineer,
+    selectedEngineer2,
+    selectedStrategy,
+    selectedTechDirector,
+  ]);
+
+  const focusRole = (roleId: RoleId) => {
+    setExpandedRoleId(roleId);
+    requestAnimationFrame(() => {
+      sectionRefs.current[roleId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
+  const commitSelection = (roleId: RoleId, character: Character, setter: (value: Character) => void) => {
+    setter(character);
+    const nextState = {
+      ...selectedByRole,
+      [roleId]: character,
+    };
+    const nextRole = ROLE_ORDER.find((candidate) => !nextState[candidate]) ?? roleId;
+    setExpandedRoleId(nextRole);
+    requestAnimationFrame(() => {
+      sectionRefs.current[nextRole]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
 
   const startRace = async () => {
     if (!selectedPrincipal || !selectedDriver || !selectedDriver2 ||
@@ -214,76 +376,188 @@ function DreamTeamContent() {
   };
 
   // ── Selection card ──────────────────────────────────────────────────────────
-  const SelectionCard = ({
-    title, options, selected, onSelect,
-  }: { title: string; options: Character[]; selected: Character | null; onSelect: (c: Character) => void }) => (
-    <section className="border-t border-white/8 py-6 first:border-t-0 first:pt-0">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <h3 className="section-title text-[1.5rem] text-white">{title}</h3>
-        {selected && (
-          <div className="rounded-full border border-[color:var(--border-strong)] px-3 py-2 font-mono text-[10px] uppercase tracking-[0.24em] text-white">
-            Locked: {selected.name.split(' ')[0]}
+  const SelectionSection = ({
+    roleId,
+    options,
+    selected,
+    onSelect,
+  }: {
+    roleId: RoleId;
+    options: Character[];
+    selected: Character | null;
+    onSelect: (c: Character) => void;
+  }) => {
+    const role = ROLE_STYLES[roleId];
+    const isExpanded = expandedRoleId === roleId;
+
+    return (
+      <motion.section
+        layout
+        ref={(node) => {
+          sectionRefs.current[roleId] = node;
+        }}
+        className={`border-t border-white/8 py-5 first:border-t-0 first:pt-0 ${selected && !isExpanded ? 'opacity-92' : ''}`}
+      >
+        <button
+          type="button"
+          onClick={() => focusRole(roleId)}
+          className={`flex w-full items-start justify-between gap-4 rounded-[1.6rem] border px-4 py-4 text-left transition-all ${
+            isExpanded
+              ? `${role.borderClass} ${role.bgClass}`
+              : selected
+                ? 'border-white/10 bg-white/4 hover:bg-white/6'
+                : 'border-white/8 bg-black/20 hover:bg-white/5'
+          }`}
+        >
+          <div className="min-w-0">
+            <div className="flex items-center gap-3">
+              <span className={`h-2.5 w-2.5 rounded-full ${role.dotClass}`} />
+              <p className={`font-mono text-[10px] uppercase tracking-[0.28em] ${role.textClass}`}>
+                {role.label}
+              </p>
+            </div>
+            <h3 className="section-title mt-3 text-[1.45rem] text-white">
+              {role.title}
+            </h3>
+            <p className="mt-1 text-sm uppercase leading-none text-white/56">
+              {role.subtitle}
+            </p>
+            <p className="muted-copy mt-3 max-w-xl text-sm leading-6">
+              {selected && !isExpanded
+                ? `Locked in: ${selected.name}`
+                : role.hint}
+            </p>
           </div>
-        )}
-      </div>
-      <div className="grid gap-3 lg:grid-cols-2">
-        {(selected ? [selected, ...options.filter(o => o.id !== selected.id)] : options).map(c => (
-          <motion.button
-            layout key={c.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            onClick={() => onSelect(c)}
-            className={`group relative overflow-hidden rounded-[1.6rem] border text-left transition-all duration-300 ${
-              selected?.id === c.id
-                ? 'border-[color:var(--border-strong)] bg-[color:var(--brand-secondary)]/10'
-                : 'border-white/10 bg-white/4 hover:bg-white/7'
-            }`}
-          >
-            <div className="flex h-full flex-col p-5">
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div>
-                  <div className="brand-wordmark text-[1.4rem] uppercase leading-none text-white mb-1">
-                    {c.name.split(' ')[0]}
-                  </div>
-                  <div className="text-sm uppercase leading-none text-white/56">
-                    {c.name.split(' ').slice(1).join(' ')}
-                  </div>
-                </div>
-                <div className="rounded-full border border-white/10 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-white/76">
-                  {c.breed.split(' ')[0]}
-                </div>
-              </div>
-              <div className="mt-auto space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  {Object.entries(c.visible_stats).map(([key, val]) => (
-                    <div key={key} className="surface-rail rounded-2xl px-2 py-3 text-center">
-                      <div className="mb-1 font-mono text-[8px] uppercase tracking-[0.2em] text-[var(--text-faint)]">
-                        {key.split('_')[0]}
-                      </div>
-                      <div className="font-mono text-sm font-bold text-[var(--brand-secondary)]">{val}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="surface-rail rounded-full p-1">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(Object.values(c.visible_stats).reduce((a, b) => a + b, 0) / 300) * 100}%` }}
-                    className="h-2 rounded-full bg-[var(--brand-secondary)]"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className={`absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/12 bg-black/28 transition-all ${
-              selected?.id === c.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+
+          <div className="shrink-0">
+            <div className={`rounded-full border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.24em] ${
+              selected ? `${role.borderClass} ${role.textClass}` : 'border-white/12 text-white/52'
             }`}>
-              <Zap className="h-4 w-4 fill-current text-[var(--brand-secondary)]" />
+              {selected ? 'Change' : 'Choose'}
             </div>
-          </motion.button>
-        ))}
-      </div>
-    </section>
-  );
+          </div>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {isExpanded ? (
+            <motion.div
+              key={`${roleId}-options`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="mt-4 grid gap-3 lg:grid-cols-2"
+            >
+              {(selected ? [selected, ...options.filter((option) => option.id !== selected.id)] : options).map((c) => (
+                <motion.button
+                  layout
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.2 }}
+                  key={c.id}
+                  onClick={() => onSelect(c)}
+                  className={`group relative overflow-hidden rounded-[1.45rem] border text-left transition-all duration-300 ${
+                    selected?.id === c.id
+                      ? `${role.borderClass} ${role.bgClass}`
+                      : 'border-white/10 bg-white/4 hover:bg-white/7'
+                  }`}
+                >
+                  <div className="flex h-full flex-col p-5">
+                    <div className="mb-5 flex items-start justify-between gap-4">
+                      <div>
+                        <div className="brand-wordmark mb-1 text-[1.35rem] uppercase leading-none text-white">
+                          {c.name.split(' ')[0]}
+                        </div>
+                        <div className="text-sm uppercase leading-none text-white/56">
+                          {c.name.split(' ').slice(1).join(' ')}
+                        </div>
+                      </div>
+                      <div className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase tracking-[0.24em] ${
+                        selected?.id === c.id ? `${role.borderClass} ${role.textClass}` : 'border-white/10 text-white/76'
+                      }`}>
+                        {c.breed.split(' ')[0]}
+                      </div>
+                    </div>
+
+                    <div className="mt-auto space-y-4">
+                      <div className="grid grid-cols-3 gap-3">
+                        {Object.entries(c.visible_stats).map(([key, val]) => (
+                          <div key={key} className="surface-rail rounded-2xl px-2 py-3 text-center">
+                            <div className="mb-1 font-mono text-[8px] uppercase tracking-[0.2em] text-[var(--text-faint)]">
+                              {key.split('_')[0]}
+                            </div>
+                            <div className={`font-mono text-sm font-bold ${role.textClass}`}>{val}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="surface-rail rounded-full p-1">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(Object.values(c.visible_stats).reduce((a, b) => a + b, 0) / 300) * 100}%` }}
+                          className={`h-2 rounded-full ${role.dotClass}`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/12 bg-black/28 transition-all ${
+                    selected?.id === c.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}>
+                    <Zap className={`h-4 w-4 fill-current ${role.textClass}`} />
+                  </div>
+                </motion.button>
+              ))}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </motion.section>
+    );
+  };
+
+  const roleSections = [
+    {
+      roleId: 'principal' as const,
+      options: principals,
+      selected: selectedPrincipal,
+      onSelect: (c: Character) => commitSelection('principal', c, setPrincipal),
+    },
+    {
+      roleId: 'driver1' as const,
+      options: drivers.filter((d) => d.id !== selectedDriver2?.id),
+      selected: selectedDriver,
+      onSelect: (c: Character) => commitSelection('driver1', c, setDriver),
+    },
+    {
+      roleId: 'driver2' as const,
+      options: drivers.filter((d) => d.id !== selectedDriver?.id),
+      selected: selectedDriver2,
+      onSelect: (c: Character) => commitSelection('driver2', c, setDriver2),
+    },
+    {
+      roleId: 'engineer1' as const,
+      options: engineers.filter((e) => e.id !== selectedEngineer2?.id),
+      selected: selectedEngineer,
+      onSelect: (c: Character) => commitSelection('engineer1', c, setEngineer),
+    },
+    {
+      roleId: 'engineer2' as const,
+      options: engineers.filter((e) => e.id !== selectedEngineer?.id),
+      selected: selectedEngineer2,
+      onSelect: (c: Character) => commitSelection('engineer2', c, setEngineer2),
+    },
+    {
+      roleId: 'strategy' as const,
+      options: strategists,
+      selected: selectedStrategy,
+      onSelect: (c: Character) => commitSelection('strategy', c, setStrategy),
+    },
+    {
+      roleId: 'techDirector' as const,
+      options: techDirectors,
+      selected: selectedTechDirector,
+      onSelect: (c: Character) => commitSelection('techDirector', c, setTechDirector),
+    },
+  ];
 
   // ── Synergy class badge ─────────────────────────────────────────────────────
   const synergyConf = SYNERGY_CONFIG[synergyClass] ?? SYNERGY_CONFIG['AVERAGE'];
@@ -292,7 +566,9 @@ function DreamTeamContent() {
     <>
       <DriverNameGate />
 
-      <div className="page-shell pb-32 md:pb-14 selection:bg-[var(--brand-secondary)] selection:text-black">
+      <div className={`page-shell selection:bg-[var(--brand-secondary)] selection:text-black ${
+        phase === 'selection' ? 'pb-48 md:pb-40' : 'pb-32 md:pb-14'
+      }`}>
         <PageIntro
           eyebrow="Lineup Builder"
           title="Dream"
@@ -350,18 +626,18 @@ function DreamTeamContent() {
               className="grid gap-6 pt-6 lg:grid-cols-[18rem_minmax(0,1fr)]"
             >
               <aside className="surface-panel rounded-[1.8rem] p-5">
-                <p className="section-kicker">Garage Status</p>
-                <h2 className="section-title mt-3 text-[1.8rem]">Build the full paddock wall.</h2>
+                <p className="section-kicker">Draft Flow</p>
+                <h2 className="section-title mt-3 text-[1.8rem]">Choose one role at a time.</h2>
                 <p className="muted-copy mt-3 text-sm leading-7">
-                  Pick one principal, two drivers, two engineers, one strategist, and one
-                  technical director before the race-start sequence unlocks.
+                  Finished roles collapse into roster strips, and the next open slot becomes the active choice.
                 </p>
                 <div className="mt-6 grid gap-3">
                   {[
                     ['Roles locked', [selectedPrincipal, selectedDriver, selectedDriver2,
                       selectedEngineer, selectedEngineer2, selectedStrategy, selectedTechDirector]
                       .filter(Boolean).length],
-                    ['Ready to launch', baseScore > 0 ? 'Yes' : 'No'],
+                    ['Live slot', ROLE_STYLES[expandedRoleId].label],
+                    ['Ready to launch', allRolesLocked ? 'Yes' : 'No'],
                   ].map(([label, value]) => (
                     <div key={String(label)} className="surface-rail rounded-2xl px-4 py-4">
                       <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">{label}</p>
@@ -379,19 +655,20 @@ function DreamTeamContent() {
               </aside>
 
               <section className="surface-panel-strong rounded-[2rem] p-5 md:p-6">
-                <SelectionCard title="The Captain // Team Principal" options={principals} selected={selectedPrincipal} onSelect={setPrincipal} />
-                <SelectionCard title="The Ace // First Driver" options={drivers.filter(d => d.id !== selectedDriver2?.id)} selected={selectedDriver} onSelect={setDriver} />
-                <SelectionCard title="The Wingman // Second Driver" options={drivers.filter(d => d.id !== selectedDriver?.id)} selected={selectedDriver2} onSelect={setDriver2} />
-                <SelectionCard title="The Brains // Race Engineer 1" options={engineers.filter(e => e.id !== selectedEngineer2?.id)} selected={selectedEngineer} onSelect={setEngineer} />
-                <SelectionCard title="The Voice // Race Engineer 2" options={engineers.filter(e => e.id !== selectedEngineer?.id)} selected={selectedEngineer2} onSelect={setEngineer2} />
-                <SelectionCard title="The Mastermind // Head of Strategy" options={strategists} selected={selectedStrategy} onSelect={setStrategy} />
-                <SelectionCard title="The Innovator // Technical Director" options={techDirectors} selected={selectedTechDirector} onSelect={setTechDirector} />
+                {roleSections.map((section) => (
+                  <SelectionSection
+                    key={section.roleId}
+                    roleId={section.roleId}
+                    options={section.options}
+                    selected={section.selected}
+                    onSelect={section.onSelect}
+                  />
+                ))}
 
                 <div className="pt-6">
                   <button
                     onClick={startRace}
-                    disabled={!selectedPrincipal || !selectedDriver || !selectedDriver2 ||
-                      !selectedEngineer || !selectedEngineer2 || !selectedStrategy || !selectedTechDirector}
+                    disabled={!allRolesLocked}
                     className="group flex w-full items-center justify-center gap-3 rounded-full border border-[color:var(--border-strong)] bg-[var(--brand-secondary)]/14 px-6 py-5 text-sm font-semibold uppercase tracking-[0.22em] text-white disabled:opacity-45"
                   >
                     <span>Confirm Lineup</span>
@@ -552,6 +829,59 @@ function DreamTeamContent() {
           )}
         </AnimatePresence>
       </div>
+
+      {phase === 'selection' ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-20 z-40 px-3 md:bottom-6">
+          <div className="pointer-events-auto mx-auto max-w-[min(var(--page-max),100%)]">
+            <div className="surface-panel rounded-[1.6rem] px-3 py-3 shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+              <div className="mb-3 flex items-center justify-between gap-3 px-1">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                  Lineup Preview
+                </p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/56">
+                  Tap any slot to edit
+                </p>
+              </div>
+
+              <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                {ROLE_ORDER.map((roleId) => {
+                  const role = ROLE_STYLES[roleId];
+                  const selected = selectedByRole[roleId];
+                  const isActive = expandedRoleId === roleId;
+
+                  return (
+                    <button
+                      key={roleId}
+                      type="button"
+                      onClick={() => focusRole(roleId)}
+                      className={`min-w-[10.5rem] rounded-[1.2rem] border px-3 py-3 text-left transition-all ${
+                        isActive
+                          ? `${role.borderClass} ${role.bgClass}`
+                          : selected
+                            ? 'border-white/12 bg-white/6'
+                            : 'border-white/8 bg-black/25'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`h-2.5 w-2.5 rounded-full ${role.dotClass}`} />
+                        <span className={`font-mono text-[9px] uppercase tracking-[0.24em] ${role.textClass}`}>
+                          {role.label}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-white/52">
+                        {role.subtitle}
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-white">
+                        {selected ? selected.name : 'Pending'}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
