@@ -59,6 +59,9 @@ export async function POST(req: Request) {
           config: {
             systemInstruction: SYSTEM_INSTRUCTION,
             tools: [{ googleSearch: {} }],
+            // Disable thinking tokens for faster pitwall chat responses.
+            // thinkingBudget: 0 eliminates the thinking phase entirely.
+            thinkingConfig: { thinkingBudget: 0 },
           },
         });
         return chat.sendMessage({ message });

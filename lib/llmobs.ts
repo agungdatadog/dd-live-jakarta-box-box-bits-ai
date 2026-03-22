@@ -27,6 +27,12 @@ interface LlmObsAnnotation {
   outputData?: unknown;
   metadata?: Record<string, unknown>;
   metrics?: Record<string, unknown>;
+  /**
+   * Structured prompt metadata for Datadog LLMObs Prompt Tracking.
+   * Attaching it here (on a manually-created LLM span) is the correct approach;
+   * annotationContext() is only for auto-instrumented provider spans.
+   */
+  prompt?: unknown;
 }
 interface LlmObsSDK {
   trace: <T>(options: LlmObsTraceOptions, fn: (span: unknown) => Promise<T>) => Promise<T>;
@@ -164,20 +170,23 @@ export async function withLlmObsSpan<T>(
       ...(input.sessionId ? { sessionId: input.sessionId } : {}),
     },
     async (span: unknown) => {
-    // ── Annotate input ───────────────────────────────────────────────────────
+    // ── Annotate input + prompt ──────────────────────────────────────────────
+    // IMPORTANT: prompt must be included here in annotate(), not via
+    // annotationContext(). annotationContext() only attaches metadata to
+    // auto-instrumented provider spans (openai, anthropic, etc.). For
+    // manually-created spans (llmobs.trace), annotate() is the correct path.
     if (llmobs.annotate) {
       try {
         llmobs.annotate(span, {
           inputData: input.inputMessages,
           metadata: { model: input.modelName ?? 'unknown', ...input.metadata },
+          ...(input.prompt ? { prompt: input.prompt } : {}),
         });
       } catch (_) { /* annotation best-effort */ }
     }
 
-    // ── Execute provider call (with prompt annotation context if provided) ───
-    const result: T = input.prompt && llmobs.annotationContext
-      ? await llmobs.annotationContext({ prompt: input.prompt }, fn)
-      : await fn();
+    // ── Execute provider call ────────────────────────────────────────────────
+    const result: T = await fn();
 
     // ── Annotate output + token metrics + USD cost ───────────────────────────
     if (llmobs.annotate && getOutput) {
