@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json();
-    const { userId, username, selection, baseTeamStats } = data;
+    const { userId, username, selection, baseTeamStats, sessionId } = data;
 
     span.setTag('usr.id', userId);
     span.setTag('usr.name', username ?? '');
@@ -185,7 +185,9 @@ Return ONLY valid JSON with exactly these keys:
           { role: 'system', content: systemInstruction },
           { role: 'user', content: userPrompt },
         ],
-        modelName: MODEL,
+        modelName:     MODEL,
+        modelProvider: 'google',
+        sessionId:     sessionId ?? '',
         metadata: {
           userId: userId ?? '',
           username: username ?? '',

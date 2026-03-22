@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   };
 
   try {
-    const { message, userId, username } = await req.json();
+    const { message, userId, username, sessionId } = await req.json();
 
     span.setTag('usr.id', userId);
     span.setTag('app.username', username);
@@ -34,7 +34,9 @@ export async function POST(req: Request) {
           { role: 'system', content: SYSTEM_INSTRUCTION },
           { role: 'user', content: message },
         ],
-        modelName: MODEL,
+        modelName:     MODEL,
+        modelProvider: 'google',
+        sessionId:     sessionId ?? '',
         metadata: { userId: userId ?? '', username: username ?? '' },
         // ── Prompt tracking (dd-trace v5.83.0+) ───────────────────────────
         // Template is static; variables hold the runtime user message.

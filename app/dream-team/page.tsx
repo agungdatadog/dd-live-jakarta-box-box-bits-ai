@@ -147,6 +147,7 @@ function DreamTeamContent() {
         body: JSON.stringify({
           userId,
           username,
+          sessionId: datadogRum.getInternalContext()?.session_id ?? '',
           selection: {
             team_principal: selectedPrincipal.id,
             driver_1: selectedDriver.id,

@@ -7,6 +7,7 @@ import { useUserStore } from '@/store/userStore';
 import Markdown from 'react-markdown';
 import { PageIntro } from '@/components/PageIntro';
 import { DriverNameGate } from '@/components/DriverNameGate';
+import { datadogRum } from '@datadog/browser-rum';
 
 interface Message {
   id: string;
@@ -70,6 +71,7 @@ function PitwallContent({ userId, username }: { userId: string; username: string
           message: userMsg.content,
           userId,
           username,
+          sessionId: datadogRum.getInternalContext()?.session_id ?? '',
         }),
       });
 

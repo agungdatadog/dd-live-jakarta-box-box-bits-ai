@@ -12,6 +12,28 @@
  */
 import tracer from '@/lib/datadog-server';
 
+// ── Internal type for the dd-trace LLMObs SDK surface ────────────────────────
+// dd-trace does not export its LLMObs types publicly; we define the minimal
+// interface we rely on so the rest of the file remains strongly typed.
+interface LlmObsTraceOptions {
+  name: string;
+  kind: string;
+  modelName?: string;
+  modelProvider?: string;
+  sessionId?: string;
+}
+interface LlmObsAnnotation {
+  inputData?: unknown;
+  outputData?: unknown;
+  metadata?: Record<string, unknown>;
+  metrics?: Record<string, unknown>;
+}
+interface LlmObsSDK {
+  trace: <T>(options: LlmObsTraceOptions, fn: (span: unknown) => Promise<T>) => Promise<T>;
+  annotate: (span: unknown, annotation: LlmObsAnnotation) => void;
+  annotationContext?: <T>(ctx: { prompt: unknown }, fn: () => Promise<T>) => Promise<T>;
+}
+
 // ── Gemini pricing (USD per 1M tokens, paid tier, text/image/video) ──────────
 // Source: https://ai.google.dev/gemini-api/docs/pricing  (retrieved 2026-03)
 const GEMINI_PRICING: Record<string, { inputPerM: number; outputPerM: number }> = {
@@ -61,7 +83,24 @@ export interface LlmObsPrompt {
 
 export interface LlmObsInput {
   inputMessages: ChatMessage[];
+  /**
+   * The name of the invoked LLM (e.g. 'gemini-3-flash-preview').
+   * Passed directly to llmobs.trace() as modelName.
+   */
   modelName?: string;
+  /**
+   * The model provider name (e.g. 'google', 'openai', 'anthropic').
+   * Passed directly to llmobs.trace() as modelProvider.
+   * Note: Datadog built-in cost estimates only activate for openai / azure_openai / anthropic;
+   * we compute Google costs manually via computeGeminiCost().
+   */
+  modelProvider?: string;
+  /**
+   * The Datadog RUM session ID for the current user session.
+   * Passed to llmobs.trace() as sessionId so LLMObs traces are linked to
+   * the corresponding RUM session and Session Replay recording.
+   */
+  sessionId?: string;
   metadata?: Record<string, string | number | boolean>;
   prompt?: LlmObsPrompt;
 }
@@ -107,13 +146,24 @@ export async function withLlmObsSpan<T>(
   fn: () => Promise<T>,
   getOutput?: (result: T) => LlmObsOutput,
 ): Promise<T> {
-  const llmobs = (tracer as any)?.llmobs;
+  // dd-trace exposes llmobs on the tracer singleton; its type is not exported publicly.
+  const llmobs: LlmObsSDK | undefined = (tracer as unknown as { llmobs?: LlmObsSDK })?.llmobs;
 
   if (!llmobs?.trace) {
     return fn();
   }
 
-  return llmobs.trace({ name: spanName, kind: 'llm' }, async (span: unknown) => {
+  return llmobs.trace(
+    {
+      name: spanName,
+      kind: 'llm',
+      // modelName and modelProvider surface in the LLMObs span details panel.
+      modelName:     input.modelName    ?? 'custom',
+      modelProvider: input.modelProvider ?? 'custom',
+      // sessionId links this LLM span to the user's RUM session and Session Replay.
+      ...(input.sessionId ? { sessionId: input.sessionId } : {}),
+    },
+    async (span: unknown) => {
     // ── Annotate input ───────────────────────────────────────────────────────
     if (llmobs.annotate) {
       try {
@@ -167,5 +217,6 @@ export async function withLlmObsSpan<T>(
     }
 
     return result;
-  });
+  }); // end llmobs.trace callback
 }
+

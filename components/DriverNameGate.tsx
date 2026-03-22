@@ -81,7 +81,10 @@ export function DriverNameGate() {
       const res = await fetch('/api/generate-driver-name', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ realName: input.trim() || '' }),
+        body: JSON.stringify({
+          realName:  input.trim() || '',
+          sessionId: datadogRum.getInternalContext()?.session_id ?? '',
+        }),
       });
       if (!res.ok) throw new Error('generate failed');
       const data = await res.json();

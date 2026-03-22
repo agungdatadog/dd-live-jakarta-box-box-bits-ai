@@ -11,7 +11,7 @@ const SYSTEM_INSTRUCTION =
 
 export async function POST(req: Request) {
   try {
-    const { realName } = await req.json();
+    const { realName, sessionId } = await req.json();
 
     const userPrompt = `The person's real name (or hint) is: "${realName || 'unknown driver'}"
 
@@ -38,7 +38,9 @@ Return ONLY valid JSON: {"driver_name": "...", "nickname": "..."}`;
           { role: 'system', content: SYSTEM_INSTRUCTION },
           { role: 'user',   content: userPrompt },
         ],
-        modelName: MODEL,
+        modelName:     MODEL,
+        modelProvider: 'google',
+        sessionId:     sessionId ?? '',
         metadata: { real_name_hint: realName ?? '' },
         prompt: {
           id: 'driver-name-generator',
