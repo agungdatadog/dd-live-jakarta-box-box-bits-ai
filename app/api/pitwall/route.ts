@@ -63,8 +63,9 @@ export async function POST(req: Request) {
       },
       (res) => ({
         outputContent: res.text ?? '',
-        inputTokens: Math.round((SYSTEM_INSTRUCTION.length + (message?.length || 0)) / 4),
-        outputTokens: Math.round((res.text?.length || 0) / 4),
+        // Prefer actual token counts from Gemini usageMetadata for accurate cost annotation.
+        inputTokens:  res.usageMetadata?.promptTokenCount     ?? Math.round((SYSTEM_INSTRUCTION.length + (message?.length || 0)) / 4),
+        outputTokens: res.usageMetadata?.candidatesTokenCount ?? Math.round((res.text?.length || 0) / 4),
       }),
     );
 

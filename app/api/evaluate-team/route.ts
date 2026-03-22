@@ -163,7 +163,8 @@ Return ONLY valid JSON with exactly these keys:
 
     // ── LLM call with full LLMObs annotation ─────────────────────────────────
     const ai = getServerGeminiClient();
-    const MODEL = 'gemini-2.5-flash';
+    // gemini-3-flash-preview: $0.50/1M input, $3.00/1M output — main LLM model
+    const MODEL = 'gemini-3-flash-preview';
     const startTime = Date.now();
 
     let llmResult = {
@@ -210,8 +211,9 @@ Return ONLY valid JSON with exactly these keys:
       (res) => {
         const text = res.text ?? '';
         const latencyMs = Date.now() - startTime;
-        const inputTokens = Math.round((systemInstruction.length + userPrompt.length) / 4);
-        const outputTokens = Math.round(text.length / 4);
+        // Prefer actual token counts from usageMetadata; fall back to char-length estimate.
+        const inputTokens  = res.usageMetadata?.promptTokenCount     ?? Math.round((systemInstruction.length + userPrompt.length) / 4);
+        const outputTokens = res.usageMetadata?.candidatesTokenCount ?? Math.round(text.length / 4);
         return {
           outputContent: text,
           inputTokens,

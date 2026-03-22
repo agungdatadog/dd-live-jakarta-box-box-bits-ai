@@ -1,103 +1,104 @@
 /**
  * Helpers for Datadog LLM Observability span creation and annotation.
  *
- * Each LLM call gets a properly annotated span with:
+ * Each LLM call is annotated with:
  *  - inputData  : messages sent to the model
  *  - outputData : model response content
- *  - metrics    : token counts
- *  - metadata   : model name + any custom evaluation keys (weirdness_rating, etc.)
+ *  - metrics    : token counts + computed USD cost
  *  - prompt     : structured prompt metadata for version tracking (dd-trace v5.83.0+)
  *
- * These fields are what Datadog's custom evaluator pipeline reads when you
- * run "Custom Evaluations" in LLM Observability.
+ * Cost is computed automatically from the model name and token counts using
+ * the official Gemini API pricing table (https://ai.google.dev/gemini-api/docs/pricing).
  */
 import tracer from '@/lib/datadog-server';
+
+// ── Gemini pricing (USD per 1M tokens, paid tier, text/image/video) ──────────
+// Source: https://ai.google.dev/gemini-api/docs/pricing  (retrieved 2026-03)
+const GEMINI_PRICING: Record<string, { inputPerM: number; outputPerM: number }> = {
+  'gemini-3-flash-preview':        { inputPerM: 0.50,  outputPerM: 3.00  },
+  'gemini-3.1-flash-lite-preview': { inputPerM: 0.25,  outputPerM: 1.50  },
+  'gemini-3.1-pro-preview':        { inputPerM: 2.00,  outputPerM: 12.00 },
+  'gemini-2.5-flash':              { inputPerM: 0.30,  outputPerM: 2.50  },
+  'gemini-2.5-pro':                { inputPerM: 1.25,  outputPerM: 10.00 },
+  'gemini-2.0-flash':              { inputPerM: 0.10,  outputPerM: 0.40  },
+  'gemini-2.0-flash-lite':         { inputPerM: 0.075, outputPerM: 0.30  },
+};
+
+/** Returns input_cost, output_cost, total_cost in USD for a given call. */
+function computeGeminiCost(
+  model: string,
+  inputTokens: number,
+  outputTokens: number,
+): { inputCost: number; outputCost: number; totalCost: number } {
+  const p = GEMINI_PRICING[model] ?? { inputPerM: 0.50, outputPerM: 3.00 };
+  const inputCost  = (inputTokens  / 1_000_000) * p.inputPerM;
+  const outputCost = (outputTokens / 1_000_000) * p.outputPerM;
+  return { inputCost, outputCost, totalCost: inputCost + outputCost };
+}
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 /** Chat message shape accepted by both inputData and prompt templates. */
 export type ChatMessage = { role: string; content: string };
 
 /**
  * Structured prompt metadata attached via llmobs.annotationContext.
- * See: https://docs.datadoghq.com/llm_observability/prompt_tracking/
- *
  * Omit `version` to enable auto-versioning (hash of template content).
+ * See: https://docs.datadoghq.com/llm_observability/prompt_tracking/
  */
 export interface LlmObsPrompt {
-  /** Unique logical identifier for this prompt within the ml_app. */
   id: string;
-  /**
-   * Chat template as an array of messages with {{placeholder}} syntax.
-   * Used by LLM Observability for version tracking and diff views.
-   */
+  /** Chat template with {{placeholder}} syntax — used for version tracking. */
   template: ChatMessage[];
-  /** Runtime values substituted into template placeholders. */
   variables?: Record<string, string>;
-  /** Optional explicit version label — omit for automatic hash-based versioning. */
   version?: string;
-  /** Arbitrary tags attached to each prompt run. */
   tags?: Record<string, string>;
-  /**
-   * Variable keys whose values are the user's question/query.
-   * Used by LLM Observability hallucination detection.
-   */
+  /** Variable keys containing the user query — used for hallucination detection. */
   queryVariables?: string[];
-  /**
-   * Variable keys whose values supply ground-truth context.
-   * Used by LLM Observability hallucination detection.
-   */
+  /** Variable keys containing ground-truth context — used for hallucination detection. */
   contextVariables?: string[];
 }
 
 export interface LlmObsInput {
-  /** Messages sent to the model — appears as inputData in the Datadog span. */
   inputMessages: ChatMessage[];
-  /** Model name — stored in span metadata. */
   modelName?: string;
-  /** Any extra metadata to attach to the span (user IDs, selection data, etc.). */
   metadata?: Record<string, string | number | boolean>;
-  /**
-   * Optional structured prompt metadata.
-   * When provided, `llmobs.annotationContext` is used to attach it to the LLM
-   * span, enabling prompt version tracking and diff views in the Datadog UI.
-   */
   prompt?: LlmObsPrompt;
 }
 
 export interface LlmObsOutput {
-  /** Full text of the model response. */
   outputContent: string;
+  /** Actual token count from response.usageMetadata.promptTokenCount when available. */
   inputTokens?: number;
+  /** Actual token count from response.usageMetadata.candidatesTokenCount when available. */
   outputTokens?: number;
-  /** Additional metadata to merge in after we have the response (e.g. computed scores). */
+  /** Additional metadata to merge post-call (e.g. computed evaluation scores). */
   metadata?: Record<string, string | number | boolean>;
 }
 
+// ── Main helper ───────────────────────────────────────────────────────────────
+
 /**
- * Wraps an async LLM call in a Datadog LLMObs span.
- *
- * When `input.prompt` is provided, the provider call (`fn`) is wrapped in
- * `llmobs.annotationContext` so the prompt metadata (id, template, variables)
- * is attached to the span for version tracking.
+ * Wraps an async LLM call in a Datadog LLMObs span with full annotation:
+ *  - inputData / outputData
+ *  - token counts + automatically computed USD cost metrics
+ *  - prompt version tracking via annotationContext (when prompt is provided)
  *
  * Usage:
  *   const result = await withLlmObsSpan(
  *     'pitwall_chat',
  *     {
- *       inputMessages: [...],
+ *       inputMessages: [{ role: 'user', content: message }],
  *       modelName: 'gemini-3-flash-preview',
  *       metadata: { userId },
- *       prompt: {
- *         id: 'pitwall-chat',
- *         template: [
- *           { role: 'system', content: SYSTEM_INSTRUCTION },
- *           { role: 'user',   content: '{{message}}' },
- *         ],
- *         variables: { message },
- *         queryVariables: ['message'],
- *       },
+ *       prompt: { id: 'pitwall-chat', template: [...], variables: { message } },
  *     },
- *     () => callGemini(prompt),
- *     (res) => ({ outputContent: res.text }),
+ *     () => callGemini(),
+ *     (res) => ({
+ *       outputContent: res.text ?? '',
+ *       inputTokens:  res.usageMetadata?.promptTokenCount,
+ *       outputTokens: res.usageMetadata?.candidatesTokenCount,
+ *     }),
  *   );
  */
 export async function withLlmObsSpan<T>(
@@ -113,7 +114,7 @@ export async function withLlmObsSpan<T>(
   }
 
   return llmobs.trace({ name: spanName, kind: 'llm' }, async (span: unknown) => {
-    // ── Annotate input before the LLM call ──────────────────────────────────
+    // ── Annotate input ───────────────────────────────────────────────────────
     if (llmobs.annotate) {
       try {
         llmobs.annotate(span, {
@@ -123,18 +124,23 @@ export async function withLlmObsSpan<T>(
       } catch (_) { /* annotation best-effort */ }
     }
 
-    // ── Execute the provider call ────────────────────────────────────────────
-    // If a prompt is provided, wrap fn in annotationContext so LLM Observability
-    // attaches the prompt metadata (template, variables, id) to this span.
-    // This enables prompt version tracking and hallucination detection.
+    // ── Execute provider call (with prompt annotation context if provided) ───
     const result: T = input.prompt && llmobs.annotationContext
       ? await llmobs.annotationContext({ prompt: input.prompt }, fn)
       : await fn();
 
-    // ── Annotate output + metrics ────────────────────────────────────────────
+    // ── Annotate output + token metrics + USD cost ───────────────────────────
     if (llmobs.annotate && getOutput) {
       try {
         const out = getOutput(result);
+        const inTok  = out.inputTokens  ?? 0;
+        const outTok = out.outputTokens ?? 0;
+        const { inputCost, outputCost, totalCost } = computeGeminiCost(
+          input.modelName ?? '',
+          inTok,
+          outTok,
+        );
+
         const annotation: Record<string, unknown> = {
           outputData: [{ role: 'assistant', content: out.outputContent }],
           metadata: {
@@ -143,13 +149,19 @@ export async function withLlmObsSpan<T>(
             ...out.metadata,
           },
         };
-        if (out.inputTokens !== undefined || out.outputTokens !== undefined) {
+
+        if (inTok || outTok) {
           annotation.metrics = {
-            inputTokens: out.inputTokens ?? 0,
-            outputTokens: out.outputTokens ?? 0,
-            totalTokens: (out.inputTokens ?? 0) + (out.outputTokens ?? 0),
+            inputTokens:  inTok,
+            outputTokens: outTok,
+            totalTokens:  inTok + outTok,
+            // USD cost — visible in Datadog LLM Observability cost views
+            inputCost,
+            outputCost,
+            totalCost,
           };
         }
+
         llmobs.annotate(span, annotation);
       } catch (_) { /* annotation best-effort */ }
     }
