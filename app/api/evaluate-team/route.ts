@@ -1,81 +1,329 @@
 import { NextResponse } from 'next/server';
 import tracer from '@/lib/datadog-server';
 import charactersData from '@/data/characters.json';
+import { getServerGeminiClient } from '@/lib/gemini-server';
+import { logger } from '@/lib/logger';
+import { withLlmObsSpan } from '@/lib/llmobs';
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+type Character = (typeof charactersData)[0];
+
+/** Format a single character into a readable block for the LLM context. */
+function formatCharacter(c: Character): string {
+  const stats = Object.entries(c.visible_stats)
+    .map(([k, v]) => `${k}=${v}`)
+    .join(', ');
+  const lore = (c as Character & { lore?: { career_arc?: string; infamous_for?: string } }).lore ?? {};
+  return [
+    `[${c.id}] ${c.name} (${c.breed})`,
+    `Role: ${c.role} | Team: ${c.team} | Stats: ${stats}`,
+    `Background: ${c.hidden_persona}`,
+    lore.career_arc ? `Career: ${lore.career_arc}` : '',
+    lore.infamous_for ? `Notorious for: ${lore.infamous_for}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+// ── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
   const span = tracer?.startSpan('api.dream_team.evaluate') || {
-    setTag: () => {},
-    finish: () => {},
+    setTag: () => undefined,
+    finish: () => undefined,
   };
 
   try {
     const data = await req.json();
-    const { userId, selection, baseTeamStats, evaluation } = data;
-    
+    const { userId, username, selection, baseTeamStats } = data;
+
     span.setTag('usr.id', userId);
+    span.setTag('usr.name', username ?? '');
     span.setTag('team.base_stats', baseTeamStats);
 
-    const principal = charactersData.find(c => c.id === selection.team_principal);
-    const driver = charactersData.find(c => c.id === selection.driver_1);
-    const driver2 = charactersData.find(c => c.id === selection.driver_2);
-    const engineer = charactersData.find(c => c.id === selection.race_engineer_1);
-    const strategy = charactersData.find(c => c.id === selection.head_of_strategy);
-    const techDirector = charactersData.find(c => c.id === selection.technical_director);
+    // ── Resolve selected characters ─────────────────────────────────────────
+    const engineer2 = charactersData.find(c => c.id === selection.race_engineer_2);
+    const selectedIds = [
+      selection.team_principal,
+      selection.driver_1,
+      selection.driver_2,
+      selection.race_engineer_1,
+      selection.race_engineer_2,
+      selection.head_of_strategy,
+      selection.technical_director,
+    ];
+    const selected = selectedIds.map(id => {
+      const c = charactersData.find(c => c.id === id);
+      if (!c) throw new Error(`Character not found: ${id}`);
+      return c;
+    });
+    const [principal, driver, driver2, engineer, , strategy, techDirector] = selected;
 
-    if (!principal || !driver || !driver2 || !engineer || !strategy || !techDirector) {
-      throw new Error('Invalid team selection');
+    // ── Build full roster context ────────────────────────────────────────────
+    // Every character is included so the LLM can cross-reference rival histories,
+    // team affinities, and synergy bonuses that span the entire paddock.
+    const rosterContext = charactersData.map(formatCharacter).join('\n\n');
+
+    // ── Build selected lineup detail ─────────────────────────────────────────
+    const lineupContext = [
+      `Team Principal: ${formatCharacter(principal)}`,
+      `Driver 1: ${formatCharacter(driver)}`,
+      `Driver 2: ${formatCharacter(driver2)}`,
+      `Race Engineer 1 (assigned to ${driver.name}): ${formatCharacter(engineer)}`,
+      `Race Engineer 2 (assigned to ${driver2.name}): ${formatCharacter(engineer2!)}`,
+      `Head of Strategy: ${formatCharacter(strategy)}`,
+      `Technical Director: ${formatCharacter(techDirector)}`,
+      `\nBase Stats Total (sum of all visible stat values): ${baseTeamStats}`,
+    ].join('\n\n');
+
+    // ── Prompt ───────────────────────────────────────────────────────────────
+    const systemInstruction = `You are the AI judge for the Dream Team Game at Datadog Live Bangkok 2026.
+Your job: evaluate a fantasy F1 team of dog-named characters for a live audience competition.
+
+The audience is watching a SCOREBOARD. There are THREE prize categories:
+1. BEST SCORE     — Highest final_score (base_stats × synergy_multiplier)
+2. WEIRDEST TEAM  — Most unusual / unexpected / chaotic combination
+3. MOST CONFLICT  — Team with the most internal dysfunction and paddock warfare
+
+You will receive the FULL PADDOCK ROSTER (all available characters with complete hidden data)
+and the SELECTED LINEUP for this submission. Use the full roster to cross-check rivalries,
+synergy bonuses, team histories, and career conflicts that the user may not know about.`;
+
+    const userPrompt = `## FULL PADDOCK ROSTER (all available characters — use this for cross-referencing)
+
+${rosterContext}
+
+---
+
+## SELECTED TEAM LINEUP FOR THIS SUBMISSION
+
+${lineupContext}
+
+---
+
+## SCORING INSTRUCTIONS
+
+### synergy_multiplier (Float 0.25 – 1.5)
+Start at 1.0. Then:
+- Apply every explicit CONFLICT penalty from the selected characters' backgrounds.
+  e.g. "-40 synergy with X" means subtract 0.40 from the running total.
+- Apply every explicit SYNERGY BONUS from their backgrounds.
+  e.g. "+25 with Y" means add 0.25 to the running total.
+- If characters are from rival teams with documented historical feuds (even without explicit numbers), apply a -0.10 to -0.20 penalty based on severity.
+- Cap final multiplier between 0.25 and 1.5.
+
+### weirdness_rating (Integer 0–100)
+Score HIGH if:
+- Characters are from rival teams (cross-team combinations with known bad blood)
+- Historical enemies are literally on the same team (e.g. Gas-leash + O-corgi, Hamilton + Verstappen)
+- Someone is paired with the driver/engineer who replaced them or caused their demotion
+- The combination is so improbable that no real F1 owner would ever assemble it
+- Roles are filled by people who are philosophically opposed to each other's methods
+Score LOW if the team is a natural, same-team, coherent combination.
+
+### conflict_index (Integer 0–100)
+Score HIGH if:
+- Explicit conflict pairs are present (Gas-leash + O-corgi alone = 80+; add more = 90+)
+- Multiple alpha personalities across Principal, both Drivers, and Strategy
+- The strategist has a documented history of errors that infuriate this specific driver
+- The engineer and driver communication styles are explicitly incompatible
+Score LOW if the team has clean chain-of-command and complementary personalities.
+
+### sneak_peek (String, 2–3 sentences)
+Write like a Sky Sports F1 pundit whispering paddock gossip to the audience.
+- TEASE the drama without revealing numeric scores
+- Reference specific character names and hint at the chaos (or unlikely brilliance)
+- Make the audience NEED to know what happens next
+- NO dry analysis — this is live event entertainment
+
+### team_codename (String)
+A short, dramatic, F1-flavoured team name that hints at this team's defining characteristic.
+Examples: "Operation Controlled Chaos", "The Paddock Fire Starters", "Silent Running FC",
+"The Diplomatic Impossibility", "Maximum Verbal Damage Racing"
+
+### synergy_class (Exactly one of: LEGENDARY | STRONG | AVERAGE | VOLATILE | TOXIC)
+- LEGENDARY  : multiplier > 1.25  (miracle match, historical greatness)
+- STRONG     : 1.0 < multiplier ≤ 1.25  (coherent team, positive chemistry)
+- AVERAGE    : 0.70 < multiplier ≤ 1.0  (functional but complicated)
+- VOLATILE   : 0.45 < multiplier ≤ 0.70  (high drama, marginal performance)
+- TOXIC      : multiplier ≤ 0.45  (catastrophic dysfunction, spectacular failure)
+
+---
+
+Return ONLY valid JSON with exactly these keys:
+{
+  "synergy_multiplier": <float>,
+  "weirdness_rating": <int 0-100>,
+  "conflict_index": <int 0-100>,
+  "sneak_peek": "<2-3 sentence paddock commentary>",
+  "team_codename": "<short dramatic team name>",
+  "synergy_class": "<LEGENDARY|STRONG|AVERAGE|VOLATILE|TOXIC>"
+}`;
+
+    // ── LLM call with full LLMObs annotation ─────────────────────────────────
+    const ai = getServerGeminiClient();
+    const MODEL = 'gemini-2.5-flash';
+    const startTime = Date.now();
+
+    let llmResult = {
+      synergy_multiplier: 1.0,
+      weirdness_rating: 50,
+      conflict_index: 50,
+      sneak_peek: 'Radio comms lost. Default synergy applied.',
+      team_codename: 'Unknown Quantity Racing',
+      synergy_class: 'AVERAGE' as string,
+    };
+    let rawResponseText = '';
+
+    const response = await withLlmObsSpan(
+      // Task name — visible in Datadog LLMObs; used to scope custom evaluations.
+      'dream_team_game_evaluation',
+      {
+        inputMessages: [
+          { role: 'system', content: systemInstruction },
+          { role: 'user', content: userPrompt },
+        ],
+        modelName: MODEL,
+        metadata: {
+          userId: userId ?? '',
+          username: username ?? '',
+          base_stats: baseTeamStats,
+          selected_principal: selection.team_principal,
+          selected_driver_1: selection.driver_1,
+          selected_driver_2: selection.driver_2,
+          selected_engineer_1: selection.race_engineer_1,
+          selected_engineer_2: selection.race_engineer_2 ?? '',
+          selected_strategy: selection.head_of_strategy,
+          selected_tech_director: selection.technical_director,
+        },
+      },
+      async () =>
+        ai.models.generateContent({
+          model: MODEL,
+          contents: [
+            { role: 'user', parts: [{ text: `${systemInstruction}\n\n${userPrompt}` }] },
+          ],
+          config: { responseMimeType: 'application/json' },
+        }),
+      // Post-call output annotation — this is what Datadog custom evaluators will read.
+      (res) => {
+        const text = res.text ?? '';
+        const latencyMs = Date.now() - startTime;
+        const inputTokens = Math.round((systemInstruction.length + userPrompt.length) / 4);
+        const outputTokens = Math.round(text.length / 4);
+        return {
+          outputContent: text,
+          inputTokens,
+          outputTokens,
+          metadata: {
+            latency_ms: latencyMs,
+            // These three values are the ones Datadog evaluators use to judge
+            // Best Score / Weirdest / Most Conflict — intentionally not sent to UI.
+            weirdness_rating: llmResult.weirdness_rating,
+            conflict_index: llmResult.conflict_index,
+            synergy_class: llmResult.synergy_class,
+            synergy_multiplier: llmResult.synergy_multiplier,
+            final_score: Math.round(baseTeamStats * llmResult.synergy_multiplier),
+            team_codename: llmResult.team_codename,
+          },
+        };
+      },
+    );
+
+    rawResponseText = response.text ?? '';
+    const latencyMs = Date.now() - startTime;
+
+    // Parse LLM JSON response
+    try {
+      const parsed = JSON.parse(rawResponseText);
+      llmResult = {
+        synergy_multiplier: Number(parsed.synergy_multiplier) || 1.0,
+        weirdness_rating: Math.min(100, Math.max(0, parseInt(parsed.weirdness_rating) || 50)),
+        conflict_index: Math.min(100, Math.max(0, parseInt(parsed.conflict_index) || 50)),
+        sneak_peek: String(parsed.sneak_peek || 'No commentary available.'),
+        team_codename: String(parsed.team_codename || 'Unknown Quantity Racing'),
+        synergy_class: ['LEGENDARY', 'STRONG', 'AVERAGE', 'VOLATILE', 'TOXIC'].includes(
+          String(parsed.synergy_class)
+        )
+          ? String(parsed.synergy_class)
+          : 'AVERAGE',
+      };
+    } catch {
+      logger.warn({ message: 'Failed to parse LLM JSON response', raw: rawResponseText });
     }
 
-    const synergyMultiplier = evaluation?.synergyMultiplier || 1.0;
-    const feedback = evaluation?.feedback || "Default synergy applied.";
-    const latency = evaluation?.latency || 0;
-    const promptTokens = evaluation?.promptTokens || 0;
-    const completionTokens = evaluation?.completionTokens || 0;
+    const finalScore = Math.round(baseTeamStats * llmResult.synergy_multiplier);
 
-    const finalScore = Math.round(baseTeamStats * synergyMultiplier);
+    // ── APM span tags ────────────────────────────────────────────────────────
+    span.setTag('team.final_score', finalScore);
+    span.setTag('team.synergy_class', llmResult.synergy_class);
+    span.setTag('team.weirdness_rating', llmResult.weirdness_rating);
+    span.setTag('team.conflict_index', llmResult.conflict_index);
+    span.setTag('team.codename', llmResult.team_codename);
 
-    // EXACT JSON structure for Datadog LLMObs as requested
-    const llmObsPayload = {
-      event_type: "dream_team_evaluation",
+    // ── Structured log (full data for Datadog log-based analysis) ────────────
+    logger.info({
+      event_type: 'dream_team_game_evaluation',
       timestamp: new Date().toISOString(),
-      user: {
-        usr_id: userId
-      },
+      game: 'datadog-live-bangkok-2026',
+      user: { usr_id: userId, username },
       selection: {
         team_principal: selection.team_principal,
         driver_1: selection.driver_1,
         driver_2: selection.driver_2,
         race_engineer_1: selection.race_engineer_1,
+        race_engineer_2: selection.race_engineer_2,
         head_of_strategy: selection.head_of_strategy,
-        technical_director: selection.technical_director
+        technical_director: selection.technical_director,
       },
-      scoring_metrics: {
-        base_team_stats: baseTeamStats,
-        synergy_multiplier: synergyMultiplier,
-        final_calculated_score: finalScore
+      scoring: {
+        base_stats: baseTeamStats,
+        synergy_multiplier: llmResult.synergy_multiplier,
+        final_score: finalScore,
+        synergy_class: llmResult.synergy_class,
+        // Hidden from UI — visible in Datadog logs / LLMObs for prize judging
+        weirdness_rating: llmResult.weirdness_rating,
+        conflict_index: llmResult.conflict_index,
       },
-      datadog_llm_obs: {
-        model_name: "gemini-3.1-flash-lite-preview",
-        prompt_tokens: Math.round(promptTokens),
-        completion_tokens: Math.round(completionTokens),
-        total_tokens: Math.round(promptTokens + completionTokens),
-        latency_ms: latency,
-        custom_evaluation_feedback: feedback
-      }
-    };
+      llm: {
+        model: MODEL,
+        latency_ms: latencyMs,
+        input_chars: systemInstruction.length + userPrompt.length,
+        output_chars: rawResponseText.length,
+        team_codename: llmResult.team_codename,
+      },
+      request: { path: '/api/evaluate-team' },
+    });
 
-    console.log(JSON.stringify(llmObsPayload));
-
-    span.setTag('team.final_score', finalScore);
     span.finish();
 
-    return NextResponse.json({ success: true });
+    // ── Response to UI: glimpse only — no weirdness/conflict numbers ─────────
+    return NextResponse.json({
+      success: true,
+      // Shown to user
+      teamCodename: llmResult.team_codename,
+      sneakPeek: llmResult.sneak_peek,
+      synergyClass: llmResult.synergy_class,
+      synergyMultiplier: llmResult.synergy_multiplier,
+      finalScore,
+      // Legacy field kept for RaceStartSequence compatibility
+      feedback: llmResult.sneak_peek,
+      latencyMs,
+    });
   } catch (error) {
     try {
       span?.setTag('error', true);
       span?.setTag('error.message', error instanceof Error ? error.message : String(error));
       span?.finish();
-    } catch (e) {}
-    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    } catch (_) { /* span cleanup best-effort */ }
+    logger.error({
+      event_type: 'dream_team_game_evaluation_error',
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
   }
 }

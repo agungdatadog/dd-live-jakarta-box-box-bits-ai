@@ -1,0 +1,26 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_IMAGE_URI}
+      - --build-arg
+      - NEXT_PUBLIC_DATADOG_CLIENT_TOKEN=${_NEXT_PUBLIC_DATADOG_CLIENT_TOKEN}
+      - --build-arg
+      - NEXT_PUBLIC_DATADOG_APPLICATION_ID=${_NEXT_PUBLIC_DATADOG_APPLICATION_ID}
+      - --build-arg
+      - NEXT_PUBLIC_DATADOG_SITE=${_NEXT_PUBLIC_DATADOG_SITE}
+      - --build-arg
+      - NEXT_PUBLIC_DATADOG_SERVICE=${_NEXT_PUBLIC_DATADOG_SERVICE}
+      - --build-arg
+      - NEXT_PUBLIC_DATADOG_ENV=${_NEXT_PUBLIC_DATADOG_ENV}
+      - --build-arg
+      - NEXT_PUBLIC_DD_VERSION=${_NEXT_PUBLIC_DD_VERSION}
+      - .
+
+images:
+  - ${_IMAGE_URI}
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8

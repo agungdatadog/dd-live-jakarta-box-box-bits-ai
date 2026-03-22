@@ -1,0 +1,102 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: box-box-bits-ai
+
+# ── Default build (used by all profiles unless overridden) ────────────────────
+build:
+  local:
+    push: true
+    useBuildkit: true
+    concurrency: 1
+  artifacts:
+    - image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/box-box-bits-ai
+      # Force linux/amd64 — Cloud Run rejects multi-arch OCI index images.
+      platforms:
+        - linux/amd64
+      docker:
+        dockerfile: Dockerfile
+        # NEXT_PUBLIC_* must be baked into the client bundle at build time.
+        buildArgs:
+          NEXT_PUBLIC_DATADOG_CLIENT_TOKEN: "{{.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN}}"
+          NEXT_PUBLIC_DATADOG_APPLICATION_ID: "{{.NEXT_PUBLIC_DATADOG_APPLICATION_ID}}"
+          NEXT_PUBLIC_DATADOG_SITE: "{{.NEXT_PUBLIC_DATADOG_SITE}}"
+          NEXT_PUBLIC_DATADOG_SERVICE: "{{.NEXT_PUBLIC_DATADOG_SERVICE}}"
+          NEXT_PUBLIC_DATADOG_ENV: "{{.NEXT_PUBLIC_DATADOG_ENV}}"
+          NEXT_PUBLIC_DD_VERSION: "{{.NEXT_PUBLIC_DD_VERSION}}"
+
+# ── Default deploy target ─────────────────────────────────────────────────────
+deploy:
+  cloudrun:
+    projectid: datadog-ese-sandbox
+    region: asia-southeast1
+
+manifests:
+  rawYaml:
+    - k8s/cloudrun.yaml
+
+# ── Profiles ──────────────────────────────────────────────────────────────────
+profiles:
+
+  # --------------------------------------------------------------------------
+  # local — fast inner-loop dev/test
+  #   skaffold run  --profile=local
+  #   skaffold dev  --profile=local      (auto-rebuild on file change)
+  #
+  #   What it does:
+  #     • Builds for the host architecture (no cross-compile → much faster)
+  #     • Does NOT push to Artifact Registry
+  #     • Deploys the container locally via `docker run`
+  #     • Mounts env from .env (reads at deploy time by deploy.sh --local)
+  #     • Overrides APP_URL, DD_ENV, NEXT_PUBLIC_DATADOG_ENV for local use
+  # --------------------------------------------------------------------------
+  - name: local
+    build:
+      local:
+        push: false
+        useBuildkit: true
+        concurrency: 1
+      artifacts:
+        - image: box-box-bits-ai-local
+          # No platform override — use the host arch for faster builds.
+          docker:
+            dockerfile: Dockerfile
+            buildArgs:
+              NEXT_PUBLIC_DATADOG_CLIENT_TOKEN: "{{.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN}}"
+              NEXT_PUBLIC_DATADOG_APPLICATION_ID: "{{.NEXT_PUBLIC_DATADOG_APPLICATION_ID}}"
+              NEXT_PUBLIC_DATADOG_SITE: "{{.NEXT_PUBLIC_DATADOG_SITE}}"
+              NEXT_PUBLIC_DATADOG_SERVICE: "{{.NEXT_PUBLIC_DATADOG_SERVICE}}"
+              NEXT_PUBLIC_DATADOG_ENV: "dev"
+              NEXT_PUBLIC_DD_VERSION: "local"
+    deploy:
+      docker:
+        useCompose: true
+        images:
+          - box-box-bits-ai-local
+    manifests:
+      rawYaml:
+        - docker-compose.local.yaml
+
+  # --------------------------------------------------------------------------
+  # prod — build linux/amd64 locally, push to Artifact Registry, deploy Cloud Run
+  #   skaffold run --profile=prod        (called by deploy.sh)
+  # --------------------------------------------------------------------------
+  - name: prod
+    build:
+      local:
+        push: true
+        useBuildkit: true
+        concurrency: 1
+      artifacts:
+        - image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/box-box-bits-ai
+          platforms:
+            - linux/amd64
+          docker:
+            dockerfile: Dockerfile
+            buildArgs:
+              NEXT_PUBLIC_DATADOG_CLIENT_TOKEN: "{{.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN}}"
+              NEXT_PUBLIC_DATADOG_APPLICATION_ID: "{{.NEXT_PUBLIC_DATADOG_APPLICATION_ID}}"
+              NEXT_PUBLIC_DATADOG_SITE: "{{.NEXT_PUBLIC_DATADOG_SITE}}"
+              NEXT_PUBLIC_DATADOG_SERVICE: "{{.NEXT_PUBLIC_DATADOG_SERVICE}}"
+              NEXT_PUBLIC_DATADOG_ENV: "{{.NEXT_PUBLIC_DATADOG_ENV}}"
+              NEXT_PUBLIC_DD_VERSION: "{{.NEXT_PUBLIC_DD_VERSION}}"

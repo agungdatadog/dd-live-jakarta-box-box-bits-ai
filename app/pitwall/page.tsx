@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { Send, Bot, User } from 'lucide-react';
+import { Bot, Radio, Send, User } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
-import { GoogleGenAI } from '@google/genai';
-import Image from 'next/image';
 import Markdown from 'react-markdown';
+import { PageIntro } from '@/components/PageIntro';
+import { DriverNameGate } from '@/components/DriverNameGate';
 
 interface Message {
   id: string;
@@ -17,6 +17,15 @@ interface Message {
 
 export default function PitwallPage() {
   const { userId, username } = useUserStore();
+  return (
+    <>
+      <DriverNameGate />
+      <PitwallContent userId={userId} username={username} />
+    </>
+  );
+}
+
+function PitwallContent({ userId, username }: { userId: string; username: string }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -27,7 +36,6 @@ export default function PitwallPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatRef = useRef<any>(null);
 
   const SUGGESTED_QUERIES = [
     "Who won the last F1 race?",
@@ -48,54 +56,30 @@ export default function PitwallPage() {
     if (!input.trim() || isLoading) return;
 
     const userMsg: Message = { id: Date.now().toString(), role: 'user', content: input.trim() };
-    setMessages(prev => [...prev, userMsg]);
+    startTransition(() => {
+      setMessages(prev => [...prev, userMsg]);
+    });
     setInput('');
     setIsLoading(true);
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error('Missing Gemini API Key');
-      }
-
-      if (!chatRef.current) {
-        const ai = new GoogleGenAI({ apiKey });
-        chatRef.current = ai.chats.create({
-          model: 'gemini-3-flash-preview',
-          config: {
-            systemInstruction: "You are Bits AI, the Datadog mascot acting as an F1 race engineer on the pitwall. You have access to Google Search to find real-time F1 data, race stats, driver information, and historical data. Always use search to provide accurate, up-to-date F1 statistics when asked. Keep answers concise, engaging, and include occasional dog/racing puns (e.g., 'woof', 'bark', 'box box', 'apex').",
-            tools: [{ googleSearch: {} }],
-          }
-        });
-      }
-      
-      const response = await chatRef.current.sendMessage({ message: userMsg.content });
-
-      const replyText = response.text || "Bark! I couldn't process that.";
-
-      const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-      const sources: { uri: string; title: string }[] = [];
-      if (chunks) {
-        chunks.forEach((chunk: any) => {
-          if (chunk.web?.uri && chunk.web?.title) {
-            if (!sources.find(s => s.uri === chunk.web.uri)) {
-              sources.push({ uri: chunk.web.uri, title: chunk.web.title });
-            }
-          }
-        });
-      }
-
-      // Log to Datadog LLMObs via API route
-      fetch('/api/pitwall', {
+      const response = await fetch('/api/pitwall', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: userMsg.content, 
-          reply: replyText,
-          userId, 
-          username 
+        body: JSON.stringify({
+          message: userMsg.content,
+          userId,
+          username,
         }),
-      }).catch(err => console.error('Failed to log to LLMObs:', err));
+      });
+
+      if (!response.ok) {
+        throw new Error(`Pitwall request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      const replyText = data.reply || "Bark! I couldn't process that.";
+      const sources = Array.isArray(data.sources) ? data.sources : undefined;
 
       setMessages(prev => [...prev, { 
         id: Date.now().toString(), 
@@ -116,116 +100,171 @@ export default function PitwallPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen relative bg-black text-white">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0 opacity-20">
-        <Image 
-          src="/pitwall-bg.png" 
-          alt="Pitwall Background" 
-          fill 
-          unoptimized
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-black" />
-      </div>
+    <div className="page-shell pb-32 md:pb-14">
+      <PageIntro
+        eyebrow="Race Engineer Channel"
+        title="Pitwall"
+        accent="Radio"
+        summary="Talk to Bits AI like a live race engineer. The answers stay concise, search-grounded, and logged like a telemetry feed."
+        aside={
+          <div className="surface-panel rounded-[1.4rem] px-5 py-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+              Driver Link
+            </p>
+            <p className="mt-2 brand-wordmark text-[1.7rem] leading-none text-white">{username}</p>
+          </div>
+        }
+      />
 
-      <div className="relative z-10 flex flex-col h-full pt-6 pb-20 px-4">
-        <header className="mb-4 text-center">
-          <h1 className="font-display text-2xl font-bold uppercase tracking-tighter">
-            The <span className="text-datadog-purple-light">Pitwall</span>
-          </h1>
-          <p className="text-zinc-400 font-mono text-xs uppercase tracking-widest">Team Radio</p>
-        </header>
-
-        <div className="flex-1 overflow-y-auto bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-2xl p-4 mb-4 flex flex-col gap-4">
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                msg.role === 'user' ? 'bg-zinc-800' : 'bg-datadog-purple'
-              }`}>
-                {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-              </div>
-              <div className={`px-4 py-3 rounded-2xl max-w-[80%] ${
-                msg.role === 'user' 
-                  ? 'bg-zinc-800 text-white rounded-tr-sm' 
-                  : 'bg-datadog-purple/20 border border-datadog-purple/30 text-zinc-100 rounded-tl-sm'
-              }`}>
-                <div className="text-sm leading-relaxed prose prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-none">
-                  <Markdown>{msg.content}</Markdown>
-                </div>
-                {msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-datadog-purple/30">
-                    <p className="text-[10px] text-datadog-purple-light mb-2 font-bold uppercase tracking-wider">Sources:</p>
-                    <ul className="flex flex-col gap-1">
-                      {msg.sources.map((source, idx) => (
-                        <li key={idx}>
-                          <a href={source.uri} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 underline truncate block">
-                            {source.title}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex gap-3"
-            >
-              <div className="w-8 h-8 rounded-full bg-datadog-purple flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4" />
-              </div>
-              <div className="px-4 py-3 rounded-2xl bg-datadog-purple/20 border border-datadog-purple/30 rounded-tl-sm flex items-center gap-1">
-                <span className="w-2 h-2 bg-datadog-purple-light rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-datadog-purple-light rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-datadog-purple-light rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-            </motion.div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {messages.length === 1 && (
-          <div className="flex flex-wrap gap-2 mb-4 justify-center">
+      <div className="grid gap-6 pt-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
+        <aside className="surface-panel rounded-[1.8rem] p-5">
+          <p className="section-kicker">Prompt Stack</p>
+          <h2 className="section-title mt-3 text-[1.8rem]">Open with a fast radio call.</h2>
+          <p className="muted-copy mt-3 text-sm leading-7">
+            Use a direct question and let the assistant pull recent results,
+            standings, or historical race notes into one response.
+          </p>
+          <div className="mt-6 space-y-3">
             {SUGGESTED_QUERIES.map((query, idx) => (
               <button
                 key={idx}
                 onClick={() => setInput(query)}
-                className="bg-zinc-800/80 hover:bg-datadog-purple/40 border border-zinc-700 hover:border-datadog-purple/60 text-xs text-zinc-300 py-2 px-4 rounded-full transition-colors"
+                className="surface-rail block w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:text-white"
               >
                 {query}
               </button>
             ))}
           </div>
-        )}
+          <div className="telemetry-divider my-6" />
+          <div className="flex items-start gap-3">
+            <Radio className="mt-1 h-4 w-4 text-[var(--brand-primary)]" />
+            <p className="muted-copy text-sm leading-7">
+              Source links appear inline whenever live search grounding is available.
+            </p>
+          </div>
+        </aside>
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Radio check..."
-            className="flex-1 bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-datadog-purple transition-colors"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || isLoading}
-            className="bg-datadog-purple hover:bg-datadog-purple-light disabled:opacity-50 disabled:hover:bg-datadog-purple text-white w-12 h-12 rounded-xl flex items-center justify-center transition-colors shrink-0"
-          >
-            <Send className="w-5 h-5" />
-          </button>
-        </form>
+        <section className="surface-panel-strong rounded-[2rem] p-4 md:p-5">
+          <div className="surface-rail rounded-[1.4rem] px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--text-faint)]">
+                  Channel Status
+                </p>
+                <p className="mt-1 text-sm text-white">Pitwall open. Search-enabled commentary active.</p>
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-2">
+                <span className="h-2 w-2 rounded-full bg-[var(--brand-secondary)]" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/80">
+                  Live
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 flex max-h-[58svh] min-h-[26rem] flex-col gap-4 overflow-y-auto pr-1 no-scrollbar md:max-h-[62svh]">
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`grid gap-3 ${msg.role === 'user' ? 'justify-items-end' : ''}`}
+              >
+                <div
+                  className={`flex w-full max-w-3xl gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                >
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border ${
+                      msg.role === 'user'
+                        ? 'border-white/10 bg-white/6'
+                        : 'border-[color:var(--border-strong)] bg-[color:var(--brand-primary)]/16'
+                    }`}
+                  >
+                    {msg.role === 'user' ? (
+                      <User className="h-4 w-4 text-white/86" />
+                    ) : (
+                      <Bot className="h-4 w-4 text-white" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="surface-rail rounded-[1.6rem] px-4 py-4">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                        {msg.role === 'user' ? username : 'Bits AI'}
+                      </p>
+                      <div className="prose prose-invert prose-p:leading-7 prose-pre:p-0 mt-3 max-w-none text-sm">
+                        <Markdown>{msg.content}</Markdown>
+                      </div>
+                      {msg.sources && msg.sources.length > 0 ? (
+                        <div className="mt-4 border-t border-white/10 pt-4">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                            Search Sources
+                          </p>
+                          <div className="mt-3 flex flex-col gap-2">
+                            {msg.sources.map((source, idx) => (
+                              <a
+                                key={idx}
+                                href={source.uri}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-[var(--status-cool)] underline-offset-4 hover:underline"
+                              >
+                                {source.title}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+
+            {isLoading ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex max-w-3xl gap-3"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--brand-primary)]/16">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <div className="surface-rail flex rounded-[1.6rem] px-4 py-4">
+                  <div className="flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="h-2 w-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="h-2 w-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </motion.div>
+            ) : null}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-4">
+            <div className="surface-panel rounded-[1.6rem] p-3">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Radio check. Ask for standings, strategy, or history..."
+                  className="min-w-0 flex-1 rounded-[1.2rem] border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none focus:border-[color:var(--border-strong)]"
+                  disabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.2rem] border border-[color:var(--border-strong)] bg-[color:var(--brand-primary)]/18 text-white disabled:opacity-50"
+                >
+                  <Send className="h-4.5 w-4.5" />
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
       </div>
     </div>
   );
 }
+

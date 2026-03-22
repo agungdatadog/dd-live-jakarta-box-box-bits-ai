@@ -11,6 +11,12 @@ export default function DatadogInit() {
   useEffect(() => {
     initDatadog();
     initialize();
+
+    if (datadogRum.getInitConfiguration()) {
+      datadogRum.setGlobalContextProperty('app.name', 'box-box-bits-ai');
+      datadogRum.setGlobalContextProperty('app.applet_id', process.env.NEXT_PUBLIC_APPLET_ID || 'unknown');
+      datadogRum.setGlobalContextProperty('app.version', process.env.NEXT_PUBLIC_DD_VERSION || 'dev');
+    }
   }, [initialize]);
 
   useEffect(() => {
@@ -19,6 +25,8 @@ export default function DatadogInit() {
         id: userId,
         name: username,
       });
+      datadogRum.setGlobalContextProperty('usr.id', userId);
+      datadogRum.setGlobalContextProperty('usr.name', username);
     }
   }, [userId, username]);
 

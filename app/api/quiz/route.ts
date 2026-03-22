@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import tracer from '@/lib/datadog-server';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   const span = tracer?.startSpan('api.quiz.submit') || {
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
     span.setTag('quiz.time_taken_sec', data.timeTakenSec);
 
     // Mock logging the payload structure
-    console.log(JSON.stringify({
+    logger.info({
       event_type: "quiz_submission",
       timestamp: new Date().toISOString(),
       user: {
@@ -32,8 +33,11 @@ export async function POST(req: Request) {
         correct_answers: data.correctAnswers,
         total_questions: data.totalQuestions,
         base_score: data.baseScore
+      },
+      request: {
+        path: '/api/quiz',
       }
-    }));
+    });
 
     span.finish();
     return NextResponse.json({ success: true });

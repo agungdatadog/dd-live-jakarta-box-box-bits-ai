@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useUserStore } from '@/store/userStore';
-import { Timer, CheckCircle2, XCircle, Trophy } from 'lucide-react';
-import Image from 'next/image';
+import { CheckCircle2, Timer, Trophy, XCircle } from 'lucide-react';
+import { PageIntro } from '@/components/PageIntro';
+import { DriverNameGate } from '@/components/DriverNameGate';
 
 const ALL_QUIZ_QUESTIONS = [
   {
@@ -130,6 +131,15 @@ const ALL_QUIZ_QUESTIONS = [
 ];
 
 export default function QuizPage() {
+  return (
+    <>
+      <DriverNameGate />
+      <QuizContent />
+    </>
+  );
+}
+
+function QuizContent() {
   const { userId, username } = useUserStore();
   const [gameState, setGameState] = useState<'start' | 'playing' | 'results'>('start');
   const [activeQuestions, setActiveQuestions] = useState<typeof ALL_QUIZ_QUESTIONS>([]);
@@ -216,140 +226,196 @@ export default function QuizPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen relative bg-black text-white">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0 opacity-20">
-        <Image 
-          src="/quiz-bg.png" 
-          alt="Quiz Background" 
-          fill 
-          unoptimized
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-black" />
-      </div>
+    <div className="page-shell pb-32 md:pb-14">
+      <PageIntro
+        eyebrow="Timing Screen"
+        title="Racing Line"
+        accent="Quiz"
+        summary="A fast-response F1 challenge designed like a live timing panel. Answer quickly, score cleanly, and send the result to the event dashboard."
+        aside={
+          <div className="surface-panel rounded-[1.4rem] px-5 py-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+              Driver
+            </p>
+            <p className="mt-2 brand-wordmark text-[1.7rem] leading-none text-white">{username}</p>
+          </div>
+        }
+      />
 
-      <div className="relative z-10 flex flex-col h-full pt-6 pb-20 px-4">
-        <header className="mb-8 text-center">
-          <h1 className="font-display text-2xl font-bold uppercase tracking-tighter">
-            Racing Line <span className="text-blue-400">Quiz</span>
-          </h1>
-        </header>
-
-        <AnimatePresence mode="wait">
-          {gameState === 'start' && (
-            <motion.div
-              key="start"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex-1 flex flex-col items-center justify-center text-center"
-            >
-              <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
-                <Trophy className="w-12 h-12 text-blue-400" />
-              </div>
-              <h2 className="text-2xl font-bold mb-4">Ready to Race?</h2>
-              <p className="text-zinc-400 mb-8 max-w-xs">
-                Answer fast. Score points. Climb the live Datadog leaderboard.
+      <div className="grid gap-6 pt-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+        <aside className="surface-panel rounded-[1.8rem] p-5">
+          <p className="section-kicker">Race Format</p>
+          <h2 className="section-title mt-3 text-[1.8rem]">Ten prompts. Ten seconds each.</h2>
+          <p className="muted-copy mt-3 text-sm leading-7">
+            Score is based on correct answers and posted to Datadog once the run completes.
+          </p>
+          <div className="mt-6 space-y-3">
+            <div className="surface-rail rounded-2xl px-4 py-4">
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                Questions
               </p>
-              <button
-                onClick={startGame}
-                className="bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-wider px-8 py-4 rounded-full w-full max-w-xs transition-colors"
+              <p className="mt-2 text-3xl font-semibold text-white">10</p>
+            </div>
+            <div className="surface-rail rounded-2xl px-4 py-4">
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                Per Lap
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-white">00:10</p>
+            </div>
+          </div>
+        </aside>
+
+        <section className="surface-panel-strong rounded-[2rem] p-5 md:p-6">
+          <div className="surface-rail rounded-[1.5rem] px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--text-faint)]">
+                  Session Status
+                </p>
+                <p className="mt-1 text-sm text-white">
+                  {gameState === 'start'
+                    ? 'Grid forming'
+                    : gameState === 'playing'
+                      ? 'Hot lap in progress'
+                      : 'Checkered flag'}
+                </p>
+              </div>
+              {gameState === 'playing' ? (
+                <div className={`flex items-center gap-2 rounded-full border px-3 py-2 ${
+                  timeLeft <= 3 ? 'border-red-400/40 text-red-300' : 'border-[color:var(--status-cool)]/40 text-[var(--status-cool)]'
+                }`}>
+                  <Timer className="h-4 w-4" />
+                  <span className="font-mono text-xs uppercase tracking-[0.22em]">
+                    00:{timeLeft.toString().padStart(2, '0')}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {gameState === 'start' && (
+              <motion.div
+                key="start"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex min-h-[28rem] flex-col items-center justify-center text-center"
               >
-                Lights Out!
-              </button>
-            </motion.div>
-          )}
-
-          {gameState === 'playing' && (
-            <motion.div
-              key="playing"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="flex-1 flex flex-col"
-            >
-              <div className="flex justify-between items-center mb-8">
-                <div className="font-mono text-sm text-zinc-400">
-                  Q {currentQuestion + 1}/{activeQuestions.length}
+                <div className="surface-rail flex h-24 w-24 items-center justify-center rounded-full mb-6">
+                  <Trophy className="h-12 w-12 text-[var(--status-cool)]" />
                 </div>
-                <div className={`flex items-center gap-2 font-mono font-bold ${timeLeft <= 3 ? 'text-red-500' : 'text-blue-400'}`}>
-                  <Timer className="w-4 h-4" />
-                  00:{timeLeft.toString().padStart(2, '0')}
+                <h2 className="section-title text-[2.4rem]">Ready to race?</h2>
+                <p className="muted-copy mt-4 mb-8 max-w-md text-sm leading-7">
+                  Answer fast. Score points. Climb the live Datadog leaderboard.
+                </p>
+                <button
+                  onClick={startGame}
+                  className="rounded-full border border-[color:var(--status-cool)]/40 bg-[var(--status-cool)]/14 px-8 py-4 text-sm font-semibold uppercase tracking-[0.22em] text-white"
+                >
+                  Lights Out!
+                </button>
+              </motion.div>
+            )}
+
+            {gameState === 'playing' && (
+              <motion.div
+                key="playing"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="pt-6"
+              >
+                <div className="mb-6 flex items-center justify-between gap-4">
+                  <div className="font-mono text-sm text-[var(--text-muted)]">
+                    Q {currentQuestion + 1}/{activeQuestions.length}
+                  </div>
+                  <div className="text-sm font-medium text-white/72">
+                    Score {score}
+                  </div>
                 </div>
-              </div>
 
-              <div className="bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-2xl p-6 mb-8">
-                <h3 className="text-xl font-medium leading-relaxed">
-                  {activeQuestions[currentQuestion].question}
-                </h3>
-              </div>
+                <div className="surface-rail mb-4 rounded-full p-1">
+                  <motion.div
+                    className="h-2 rounded-full bg-[var(--status-cool)]"
+                    animate={{ width: `${((currentQuestion + 1) / activeQuestions.length) * 100}%` }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                  />
+                </div>
 
-              <div className="grid gap-3">
-                {activeQuestions[currentQuestion].options.map((option, idx) => {
-                  let btnClass = "bg-zinc-900/80 backdrop-blur-sm border-zinc-800 hover:bg-zinc-800 text-zinc-300";
-                  let Icon = null;
+                <div className="surface-panel rounded-[1.8rem] p-6 mb-6">
+                  <h3 className="text-2xl font-medium leading-relaxed text-white">
+                    {activeQuestions[currentQuestion].question}
+                  </h3>
+                </div>
 
-                  if (selectedAnswer !== null) {
-                    if (idx === activeQuestions[currentQuestion].answer) {
-                      btnClass = "bg-emerald-500/20 border-emerald-500 text-emerald-400";
-                      Icon = CheckCircle2;
-                    } else if (idx === selectedAnswer) {
-                      btnClass = "bg-red-500/20 border-red-500 text-red-400";
-                      Icon = XCircle;
-                    } else {
-                      btnClass = "bg-zinc-900/80 border-zinc-800 opacity-50";
+                <div className="grid gap-3">
+                  {activeQuestions[currentQuestion].options.map((option, idx) => {
+                    let btnClass = "border-white/10 bg-white/4 hover:bg-white/7 text-zinc-200";
+                    let Icon = null;
+
+                    if (selectedAnswer !== null) {
+                      if (idx === activeQuestions[currentQuestion].answer) {
+                        btnClass = "border-emerald-500/40 bg-emerald-500/16 text-emerald-300";
+                        Icon = CheckCircle2;
+                      } else if (idx === selectedAnswer) {
+                        btnClass = "border-red-500/40 bg-red-500/16 text-red-300";
+                        Icon = XCircle;
+                      } else {
+                        btnClass = "border-white/10 bg-white/4 opacity-50";
+                      }
                     }
-                  }
 
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => selectedAnswer === null && handleAnswer(idx)}
-                      disabled={selectedAnswer !== null}
-                      className={`relative border rounded-xl p-4 text-left transition-all flex items-center justify-between ${btnClass}`}
-                    >
-                      <span className="font-medium">{option}</span>
-                      {Icon && <Icon className="w-5 h-5" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => selectedAnswer === null && handleAnswer(idx)}
+                        disabled={selectedAnswer !== null}
+                        className={`relative flex items-center justify-between rounded-[1.4rem] border px-4 py-4 text-left transition-all ${btnClass}`}
+                      >
+                        <span className="font-medium">{option}</span>
+                        {Icon ? <Icon className="h-5 w-5" /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
 
-          {gameState === 'results' && (
-            <motion.div
-              key="results"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex-1 flex flex-col items-center justify-center text-center"
-            >
-              <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
-                <Trophy className="w-12 h-12 text-emerald-400" />
-              </div>
-              <h2 className="text-3xl font-display font-bold uppercase mb-2">Checkered Flag!</h2>
-              <p className="text-zinc-400 mb-8">
-                You scored {score} out of {activeQuestions.length}
-              </p>
-              
-              <div className="bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 w-full max-w-xs mb-8">
-                <div className="font-mono text-sm text-zinc-500 uppercase mb-2">Telemetry Synced</div>
-                <div className="text-2xl font-bold text-blue-400">{score * 100} PTS</div>
-                <p className="text-xs text-zinc-500 mt-2">Look at the Live Datadog Dashboard!</p>
-              </div>
-
-              <button
-                onClick={startGame}
-                disabled={isSubmitting}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold uppercase tracking-wider px-8 py-4 rounded-full w-full max-w-xs transition-colors disabled:opacity-50"
+            {gameState === 'results' && (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex min-h-[28rem] flex-col items-center justify-center text-center"
               >
-                Race Again
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <div className="surface-rail mb-6 flex h-24 w-24 items-center justify-center rounded-full">
+                  <Trophy className="h-12 w-12 text-emerald-300" />
+                </div>
+                <h2 className="section-title text-[2.8rem]">Checkered flag.</h2>
+                <p className="muted-copy mt-3 mb-8 text-sm leading-7">
+                  You scored {score} out of {activeQuestions.length}
+                </p>
+              
+                <div className="surface-panel rounded-[1.6rem] p-6 w-full max-w-sm mb-8">
+                  <div className="font-mono text-sm uppercase tracking-[0.28em] text-[var(--text-faint)] mb-2">Telemetry Synced</div>
+                  <div className="text-3xl font-semibold text-[var(--status-cool)]">{score * 100} PTS</div>
+                  <p className="muted-copy text-sm mt-3">Look for the run on the live Datadog dashboard.</p>
+                </div>
+
+                <button
+                  onClick={startGame}
+                  disabled={isSubmitting}
+                  className="rounded-full border border-white/10 bg-white/6 px-8 py-4 text-sm font-semibold uppercase tracking-[0.22em] text-white disabled:opacity-50"
+                >
+                  Race Again
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
       </div>
     </div>
   );
 }
+

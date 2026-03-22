@@ -6,7 +6,11 @@
     "role": "Driver",
     "team": "Oracle Red Bull Racing",
     "visible_stats": { "pace": 99, "aggression": 95, "tire_management": 85 },
-    "hidden_persona": "Relentlessly fast and aggressively competitive. Demands absolute perfection. CONFLICT: -30 synergy if paired with another alpha driver (like Fur-nando Alonso or Lewis Howl-milton). Refuses to listen to team orders."
+    "hidden_persona": "Four-time consecutive World Champion and the most dominant force in modern F1. The Malinois is bred for one purpose: hunting down the target and never letting go, by any means necessary. CONFLICTS: -40 synergy with Lewis Howl-milton (2021 Abu Dhabi Safety Car incident — Masi's 8-lap restart handed Max the title in what Lewis called 'manipulated'; they traded 160mph blows at Silverstone, Monza, and Jeddah; this is a generational grudge that never heals). -35 synergy with Fur-nando Alonso (2007 McLaren Spygate saga — Alonso held hostage information as leverage against the team, poisoning the well that Max's career later drank from; Max's 2021 title was controversially compared to Alonso's 2006 title by every pundit). -25 synergy with George Ruffell (Max publicly dismissed George's 'blue flag complaints' and considers him a PR-focused driver rather than a racer). -20 synergy with any Team Principal who uses team orders (Max publicly defied team orders at Brazil 2022 refusing to let Perez past, nearly costing Perez the runner-up championship). SYNERGY BONUSES: +25 with Hannah Schnauzer (the only strategist ice-cold enough to call 'push now' on dying tires without flinching — they share a ruthless, anti-conservative philosophy). +20 with GP Lam-bark-i (the most successful driver-engineer pairing since Schumacher/Brawn; minimal radio chatter, maximum lap time data). +15 with Christian Horndog (they co-built the Red Bull dynasty; 4 championships together). QUIRKS: Celebrates wins before the chequered flag, publicly pushes tires 15 laps past the engineer's 'box now' call, and considers tire management a sign of weakness rather than strategy.",
+    "lore": {
+      "career_arc": "Youngest World Champion in F1 history (2021, age 24), then dominated 2022-2024 with 3 further consecutive titles — including a 2023 season with 19 race wins out of 22, the most dominant season in F1 history. Red Bull's car performance declined sharply after Adrian Newfoundland departed mid-2024, leaving Max fighting a car not built for him.",
+      "infamous_for": "2021 Abu Dhabi title decider under controversial Safety Car restart, three high-speed crashes with Lewis Howl-milton in 2021 (Silverstone T3, Monza pitlane, Jeddah walls), and the Brazil 2022 team orders defiance."
+    }
   },
   {
     "id": "drv_liam_pawson",
@@ -15,7 +19,11 @@
     "role": "Driver",
     "team": "Oracle Red Bull Racing",
     "visible_stats": { "pace": 85, "aggression": 88, "tire_management": 82 },
-    "hidden_persona": "Eager to prove himself and highly adaptable. CONFLICT: -15 synergy if paired with a Team Principal who micromanages (like Toto Woof). Responds poorly to constant barking on the radio."
+    "hidden_persona": "A young New Zealand talent finally given his opportunity after years as a Red Bull reserve watching faster teammates get the nod. Eager, hungry, and deceptively quick on raw pace. CONFLICTS: -25 synergy with any Team Principal who has a history of favouring the #1 driver unconditionally (the Sergio Perez treatment — six years of being the support act — is Liam's nightmare scenario). -20 synergy with Max Fur-stappen as teammate (Max is genetically incapable of sharing any resource, airtime, or championship points with a teammate; Liam's data will be withheld). -15 synergy with engineers who micromanage via radio (the Huntaway breed responds poorly to constant barking instructions; Liam needs freedom to find rhythm). SYNERGY BONUSES: +20 with James Ur-woof (calm, precise engineer who empowers rather than over-coaches; the anti-Max partner Liam needs). +15 with Andrea Setter-la (methodical principal who gives rookies structured freedom to develop). QUIRKS: Obsessively reviews his own onboard footage at midnight before race day, and will almost certainly outqualify expectations but second-guess his tires at the critical moment.",
+    "lore": {
+      "career_arc": "Spent three years as a Red Bull reserve driver watching Sergio Perez hold his seat, then a single year at RB (junior team) before finally being promoted. His debut season will define whether the Huntaway can outrun the pack or gets buried in the kennel.",
+      "infamous_for": "Being serially overlooked by Red Bull despite strong results, becoming the symbol of the 'elevator that only goes down' Red Bull driver programme paradox."
+    }
   },
   {
     "id": "prin_christian_horndog",
@@ -24,7 +32,11 @@
     "role": "Team Principal",
     "team": "Oracle Red Bull Racing",
     "visible_stats": { "leadership": 92, "media_handling": 98, "politics": 99 },
-    "hidden_persona": "A master of media manipulation and team politics. CONFLICT: -25 synergy if paired with Toto Woof (Austrian Pinscher) due to a fierce, long-standing breed rivalry."
+    "hidden_persona": "A master of paddock theatre, media manipulation, and political warfare. Turns the most hostile press conference into an assault on his rivals. The Jack Russell never backs down from a fight, even when outgunned. CONFLICTS: -45 synergy with Toto Woof (the defining rivalry of modern F1 — from the 2021 championship battle walkouts to the 'Lewis's engineer Bono' radio leak war; they cannot be in the same hospitality suite). -20 synergy with any Technical Director who operates independently (when Adrian Newfoundland worked autonomously, it was fine; Christian craves credit for technical decisions). -15 synergy with drivers who bypass the team structure (the Alonso-McLaren leak saga of 2007 shaped his paranoia about driver leverage). SYNERGY BONUSES: +25 with Max Fur-stappen (they co-created the dynasty; Max wins, Christian delivers the narrative). +20 with Hannah Schnauzer (she executes his 'aggressive, never conservative' race strategy vision perfectly). +15 with Pierre Weimaraner (Weimaraner understands that politics and car performance are equally important). QUIRKS: Will invoke 'cost cap' regulations in any conversation where he's losing, and has a photographic memory for every time a rival broke a minor rule.",
+    "lore": {
+      "career_arc": "Led Red Bull to 6 Constructors' Championships and co-steered Max to 4 Drivers' titles. Navigated the cost cap breach scandal (2022), the Horner investigation (2024), and kept the team together through the Newey departure — all while maintaining a smile in front of every camera.",
+      "infamous_for": "The 2021 Abu Dhabi pit wall radio conversations, the FIA cost cap investigation, and for having the fastest comeback line in press conference history."
+    }
   },
   {
     "id": "eng_gp_lambarki",
@@ -33,7 +45,11 @@
     "role": "Race Engineer",
     "team": "Oracle Red Bull Racing",
     "visible_stats": { "composure": 99, "technical": 90, "clarity": 95 },
-    "hidden_persona": "Blunt, monotone, and completely unfazed by yelling. CONFLICT: -20 synergy if paired with highly emotional drivers (like Charles LeBark) who need constant reassurance."
+    "hidden_persona": "The most stoic race engineer in the paddock. Famously monotone, iceberg-calm under pressure, impossible to rattle. The Italian Greyhound delivers data with surgical precision and zero emotional inflation. CONFLICTS: -25 synergy with Charles LeBark (LeBark needs constant emotional reassurance and encouragement; GP's blank 'copy' after a high-speed near-miss will push LeBark into a spiral). -20 synergy with Kimi Antonell-hound (the young Italian prodigy needs a nurturing mentor, not a data robot). -20 synergy with Lando Nor-ruff (Lando's mental health requires paddock banter; GP's silence is a void that compounds Lando's self-criticism). -15 synergy with any driver whose car setup preference is based on 'feel' rather than telemetry. SYNERGY BONUSES: +25 with Max Fur-stappen (Max specifically requested GP because he doesn't want sympathy, just information; they share a binary 'go faster or explain why' relationship). +15 with Carlos Spaniel (the analytical driver who speaks GP's data language). QUIRKS: Has given the same 'you are in the zone, keep pushing' message exactly once in three years. Never changes tone from P1 to a safety car collision.",
+    "lore": {
+      "career_arc": "Became the benchmark race engineer by engineering Verstappen through 4 WDC campaigns. Elevated the role from 'radio comfort' to 'live data partner' with Max.",
+      "infamous_for": "Being the calmest voice in the most intense radio messages in F1 history, including multiple 'tires are gone, he needs to box NOW' moments delivered in the tone of someone ordering a coffee."
+    }
   },
   {
     "id": "drv_george_ruffell",
@@ -42,7 +58,11 @@
     "role": "Driver",
     "team": "Mercedes-AMG Petronas",
     "visible_stats": { "pace": 92, "aggression": 89, "tire_management": 88 },
-    "hidden_persona": "Highly analytical and articulate. Needs to feel like the team leader. CONFLICT: -25 synergy if paired with a rookie driver (like Kimi Antonell-hound) because he demands all the team's attention."
+    "hidden_persona": "Highly analytical, eloquent, and deeply strategic about his own career management. Finally the outright team leader at Mercedes after years in Hamilton's shadow. The Poodle is more intelligent than people give credit — and will let you know. CONFLICTS: -30 synergy with Lewis Howl-milton as teammate (2022 was the year George out-qualified Lewis multiple times; Lewis's 10-year gravitational pull on team resources is something George escaped from, and he will never willingly share resources again). -25 synergy with any rookie driver who attracts disproportionate team attention (Kimi Antonell-hound is his nightmare scenario — the Italian media circus around a rookie would pull Mercedes engineering resource away from George's setup programme). -20 synergy with Max Fur-stappen (Max publicly mocked George's complaints about blue flags; George is hyper-aware of this public humiliation). SYNERGY BONUSES: +25 with James Afghan (the Technical Director who rebuilt the Mercedes car around George's precise driving style feedback; they are co-architects of the post-Hamilton era). +20 with Toto Woof (George is Toto's chosen heir; their partnership is a generational project). +15 with Bono Bark (Bono transitioned from Hamilton to George and maintained the same calming radio relationship). QUIRKS: Sends detailed engineering debrief emails at 11pm on race night, and has been known to correct a journalist's F1 statistics mid-press-conference.",
+    "lore": {
+      "career_arc": "Three seasons at Williams building his reputation before Mercedes called him up as Hamilton's teammate in 2022. When Hamilton shocked the world by signing with Ferrari, George inherited the Mercedes #1 seat and the full weight of expectation.",
+      "infamous_for": "The 2022 Brazil podium celebration caught on camera having an argument with Hamilton, and for being the first driver to politely but devastatingly decline to accept blame for a team decision on live TV."
+    }
   },
   {
     "id": "drv_kimi_antonellhound",
@@ -51,7 +71,11 @@
     "role": "Driver",
     "team": "Mercedes-AMG Petronas",
     "visible_stats": { "pace": 88, "aggression": 90, "tire_management": 75 },
-    "hidden_persona": "A raw, prodigious talent. Extremely fast but prone to rookie mistakes. CONFLICT: -20 synergy if paired with a harsh Race Engineer (like GP Lam-bark-i). Needs a nurturing environment."
+    "hidden_persona": "The most hyped teenage talent since Max Fur-stappen, launched straight from Formula 2 into a Mercedes seat that Hamilton left warm. The Italian Greyhound is blindingly quick in short bursts but untested over a full race distance. CONFLICTS: -30 synergy with George Ruffell (Kimi is exactly the rookie George feared as teammate; the Italian media circus and Toto Woof's visible investment in Kimi as the next 10-year project creates institutional jealousy). -25 synergy with any blunt, monotone engineer (like GP Lam-bark-i) who gives zero emotional scaffolding to a 19-year-old in a world championship team. -20 synergy with Bernie Collie as strategist (Ferrari's chaos strategist would use Kimi's inexperience against him in pit stop timing battles). SYNERGY BONUSES: +20 with Bono Bark (Bono successfully managed two world champions; his calm pastoral engineering style is exactly what a prodigy needs). +15 with Toto Woof (Toto's intense investment in Kimi is total; he will overprotect to a fault, which could be good or catastrophically smothering). QUIRKS: Has set the fastest lap time in seven of his last nine qualifying sessions, then made a rookie mistake under race pressure in five of them. His crash helmet has a cartoon Greyhound on it.",
+    "lore": {
+      "career_arc": "Signed by Mercedes before he turned 18, bypassed most of the junior categories, and took Hamilton's seat directly. His speed is undeniable; his racecraft under pressure is an open question that the entire paddock is watching.",
+      "infamous_for": "His Q3 crash at Las Vegas 2025 when he was 0.3s faster than everyone and hit the wall on the final lap, costing Mercedes a pole position in front of the biggest audience in F1 history."
+    }
   },
   {
     "id": "prin_toto_woof",
@@ -60,7 +84,11 @@
     "role": "Team Principal",
     "team": "Mercedes-AMG Petronas",
     "visible_stats": { "leadership": 95, "media_handling": 95, "politics": 90 },
-    "hidden_persona": "Intensely passionate and demands total control. CONFLICT: -40 synergy if paired with Christian Horndog, or -20 synergy if the Technical Director ignores his micromanagement (like Adrian Newfoundland)."
+    "hidden_persona": "Intensely passionate, deeply political, and impossible to outmanoeuvre in the FIA boardroom. Controls every narrative Mercedes is involved in. The Austrian Pinscher is relentless — and unforgettable when wronged. CONFLICTS: -45 synergy with Christian Horndog (this is the Montague-Capulet rivalry of F1; 2021 Abu Dhabi is the wound that will never close; they have separate team motorhomes, separate paddock schedules, separate worlds). -35 synergy with Adrian Newfoundland (when Newey had too much autonomous power at Aston Martin, it terrified Toto — he needs to control all technical direction). -20 synergy with any driver who doesn't fully buy into the 'Mercedes family' philosophy (Max's team-first rebellion would be his ultimate nightmare). SYNERGY BONUSES: +30 with Lewis Howl-milton (12 years, 6 WDC titles, a partnership that rewrote F1 history; Lewis's move to Ferrari was Toto's greatest personal loss and greatest professional wound). +25 with George Ruffell (Toto's 7-year investment in George; he is Toto's chosen successor to carry the silver legacy). +20 with James Afghan (the tech brain to Toto's political brain; together they built the longest dominant era in F1 history). QUIRKS: Has memorised every protest the FIA ever ruled against his favour. Checks his phone during the podium interview of rival teams. Will bring up 2021 Abu Dhabi in any contractual negotiation.",
+    "lore": {
+      "career_arc": "Built Mercedes from 2013 into the most dominant team in F1 history (8 consecutive Constructors' titles, 2014-2021). Guided Hamilton through 6 WDC seasons. When Hamilton left for Ferrari, it was described by Toto as 'the most painful call I ever took'.",
+      "infamous_for": "2021 Abu Dhabi: throwing his headset across the pit wall in real-time frustration. The post-race podium where he refused to congratulate Verstappen. The legendary 'this is unacceptable' radio message."
+    }
   },
   {
     "id": "eng_bono_bark",
@@ -69,7 +97,11 @@
     "role": "Race Engineer",
     "team": "Mercedes-AMG Petronas",
     "visible_stats": { "composure": 95, "technical": 92, "clarity": 90 },
-    "hidden_persona": "Extremely supportive and calm under pressure. CONFLICT: -15 synergy if paired with an ice-cold driver (like Paw-scar Piastri) who finds his soothing voice annoying."
+    "hidden_persona": "The most famous voice in Formula 1. Pastoral, warm, and skilled at engineering the emotional state of a world champion as much as the car's setup. The Golden Retriever is the paddock's professional therapist on wheels. CONFLICTS: -20 synergy with Paw-scar Piastri (Piastri is ice-cold and finds Bono's supportive radio style patronising — 'I know I'm in the zone, stop telling me'). -20 synergy with Max Fur-stappen (Max prefers data over comfort; Bono's 'well done Lewis, keep pushing' style would feel synthetic to Max). -15 synergy with any driver who needs ruthlessly direct feedback rather than encouragement (Fur-nando Alonso would destroy Bono in a single debrief). SYNERGY BONUSES: +35 with Lewis Howl-milton (the 'Lewis, it's Bono, boxing day' radio relationship is the most famous partnership in sport; 6 WDC titles built on this frequency). +20 with Kimi Antonell-hound (a rookie prodigy needs exactly Bono's warmth and guidance). +15 with George Ruffell (transitioned successfully from Hamilton; the relationship works because George is emotionally stable). QUIRKS: Has never raised his voice on the radio in 14 years. Brings homemade biscuits to the driver debrief the morning after a DNF.",
+    "lore": {
+      "career_arc": "Became 'F1's most famous race engineer' via the Hamilton partnership (2013-2024). His 'boxing day' (pit in today) calls are used as memes. Stayed at Mercedes when Hamilton left, transitioning to Russell.",
+      "infamous_for": "The 2014 Monaco 'box, box, box' that Hamilton ignored, costing him the race win. The 2020 Bahrain 'Lewis, it's Bono, you've got a puncture' message that became a franchise unto itself."
+    }
   },
   {
     "id": "drv_charles_lebark",
@@ -78,7 +110,11 @@
     "role": "Driver",
     "team": "Scuderia Ferrari",
     "visible_stats": { "pace": 97, "aggression": 86, "tire_management": 89 },
-    "hidden_persona": "Incredibly fast over a single lap but highly emotional. CONFLICT: -25 synergy if paired with a blunt, monotone engineer (like GP Lam-bark-i) or a chaotic strategist (like Bernie Collie)."
+    "hidden_persona": "Breathtakingly fast in qualifying, heartbreakingly fragile when the race moment arrives. The Cavalier King Charles Spaniel is built for royalty but cursed to watch the crown slip away at the final corner. CONFLICTS: -30 synergy with Lewis Howl-milton as teammate (the most surreal teammate pairing in F1 history — Ferrari signed Hamilton as the 7x WDC coming out of retirement shadow to HELP Charles win, but every camera, every headline, every conversation follows Lewis; Charles's emotional needle swings from inspired to crushed within the same press conference). -30 synergy with Bernie Collie as strategist (Ferrari's Collie has historically called the wrong strategy at exactly the moment Charles was about to win — Monaco 2022, Monaco 2023, Monaco 2024; Charles visibly hates hearing 'stay out' from the pit wall). -25 synergy with GP Lam-bark-i (Lam-bark-i's dead-eyed 'copy, box next lap' message after Charles's self-described 'best lap of my life' is an emotional catastrophe). SYNERGY BONUSES: +25 with Bryan Bark-zzi (his Ferrari race engineer who matches his emotional wavelength and celebrates sector times like they're goals). +15 with Fred Basset-eur (Fred's warmth gives Charles a psychological safe space in the Ferrari pressure cooker). QUIRKS: Has cried openly after qualifying pole positions. Switches between French and Monégasque mid-radio when frustrated. Has an uncanny ability to go fastest on the last lap of Q3 by 0.001s.",
+    "lore": {
+      "career_arc": "Signed to Ferrari at 21 as their generational talent, spent 7 years as the fastest car-without-a-title driver in F1. Finally joined by Hamilton in 2025 — a dream partnership or a media circus depending on who you ask. Still seeking his first WDC.",
+      "infamous_for": "Monaco 2022: led every lap, told to stay out, tire exploded 5 laps from victory. Monaco 2023: mechanical failure while leading with 10 laps to go. Monaco 2024: strategy error while leading in the wet. Monaco: the forever curse."
+    }
   },
   {
     "id": "drv_lewis_howlmilton",
@@ -87,7 +123,11 @@
     "role": "Driver",
     "team": "Scuderia Ferrari",
     "visible_stats": { "pace": 96, "aggression": 85, "tire_management": 98 },
-    "hidden_persona": "A seasoned veteran who values smooth operations. CONFLICT: -30 synergy if paired with a young, aggressive teammate who doesn't respect his seniority (like Max Fur-stappen or Esteban O-corgi)."
+    "hidden_persona": "The greatest Formula 1 driver in history by every statistical measure, who shocked the world by ending his 12-year Mercedes marriage to sign with Ferrari at 40. The English Bulldog does not know how to retire; he knows how to win, and he came to Maranello for one last championship. CONFLICTS: -40 synergy with Max Fur-stappen (2021 Abu Dhabi stole what Lewis calls 'my 8th world title'; the wound is existential — Lewis's entire post-2021 career is about proving he's still the best, and every time Max wins, that argument loses ground). -30 synergy with George Ruffell as teammate (George is the first driver to consistently outqualify Lewis; the 2022 Mercedes season where a then-23-year-old Poodle beat Lewis on pace was a reckoning; 'never again' is the unstated subtext). -20 synergy with any engineer who had a long prior relationship with Charles LeBark (Charles's existing engineering culture at Ferrari is anti-Lewis; his team built the car for a young, attacking driver, not a 40-year-old who needs late-braking precision). SYNERGY BONUSES: +35 with Bono Bark (the 'Lewis, it's Bono' partnership is F1's greatest love story; Lewis specifically requested Bono follow him to Ferrari. Together they are unbeatable.). +25 with Toto Woof (if Toto were still his TP, this would be a 2nd dynasty; the chemistry is 12 years deep). QUIRKS: Takes 2 hours to leave the garage after a DNF, reviewing every data point personally. Posts cryptic philosophical quotes on social media after controversial race results.",
+    "lore": {
+      "career_arc": "7x World Champion (2008, 2014-2015, 2017-2020), 105 race wins — the sport's GOAT by statistics. His 2024 announcement that he was leaving Mercedes for Ferrari was the biggest F1 transfer story in a decade. He called it 'my final mission'.",
+      "infamous_for": "2021 Abu Dhabi: watching the championship slip away on the final lap under a controversial Safety Car decision. His post-race silence. The three-month disappearance from social media that followed."
+    }
   },
   {
     "id": "prin_fred_basseteur",
@@ -96,7 +136,11 @@
     "role": "Team Principal",
     "team": "Scuderia Ferrari",
     "visible_stats": { "leadership": 90, "media_handling": 85, "politics": 88 },
-    "hidden_persona": "Jovial and relaxed on the outside, but a shrewd operator inside. CONFLICT: -15 synergy if paired with high-stress, micromanaging Technical Directors."
+    "hidden_persona": "Jovial, warm-eared, and deceptively shrewd. Fred has survived longer at Ferrari than any TP in recent history precisely because he manages the impossible political landscape of Maranello without triggering a palace revolt. The Basset Hound has low ground clearance but incredible endurance. CONFLICTS: -20 synergy with any driver pairing where one driver is 10x more famous than the other (the Hamilton-LeBark dynamic is manageable; a total mismatch like Max + a junior driver would fracture Fred's careful balance). -15 synergy with Technical Directors who run fully autonomous technical programmes (Fred needs visibility into the car development trajectory for political survival). -15 synergy with overly aggressive strategists who create public controversies (Bernie Collie's errors have embarrassed Fred repeatedly). SYNERGY BONUSES: +20 with Charles LeBark (Fred has been Charles's shield against Ferrari's historical tendency to blame the driver; he understands the emotional architecture of working with LeBark). +15 with Bryan Bark-zzi (Fred enabled the LeBark/Bark-zzi partnership to survive despite internal pressure). QUIRKS: Somehow always has the most calming press conference quote regardless of the catastrophe that just happened. Reportedly never raises his voice, ever.",
+    "lore": {
+      "career_arc": "Survived 6 years as Ferrari TP — longer than any recent predecessor — by mastering the art of absorbing pressure from Maranello boardroom politics above and driver complaints below. The man who brought Hamilton to Ferrari.",
+      "infamous_for": "Issuing the statement 'we were a bit unlucky today' after Charles LeBark's Monaco brake failure while leading, which became an instant meme."
+    }
   },
   {
     "id": "eng_bryan_barkzzi",
@@ -105,7 +149,11 @@
     "role": "Race Engineer",
     "team": "Scuderia Ferrari",
     "visible_stats": { "composure": 88, "technical": 91, "clarity": 85 },
-    "hidden_persona": "Enthusiastic and deeply technical. CONFLICT: -15 synergy if paired with drivers who demand extremely concise radio messages (like Fur-nando Alonso)."
+    "hidden_persona": "Enthusiastic, technically deep, and genuinely excited by every sector time LeBark sets. The Maremma Sheepdog understands the emotional weight of Ferrari and uses that to fuel intensity rather than let it crush morale. CONFLICTS: -20 synergy with Fur-nando Alonso (Alonso demands brutal brevity on the radio — 'tell me what I need, nothing else'; Bark-zzi's technical monologues would earn him a public dressing-down). -15 synergy with Max Fur-stappen (Max requires data precision over emotional reinforcement; Bark-zzi's celebratory approach would confuse and irritate). -15 synergy with drivers who are uncomfortable being publicly encouraged mid-race. SYNERGY BONUSES: +30 with Charles LeBark (the most stable engineer-driver relationship at Ferrari in 20 years; Bark-zzi is the only engineer who keeps LeBark's emotional amplitude within functional range). +15 with Lewis Howl-milton (Lewis's Ferrari chapter requires someone who understands the historic weight; Bark-zzi has the cultural intelligence). QUIRKS: Always precedes a 'box box' call with a brief technical explanation, which has cost exactly 0.8s in pit entry speed on three occasions.",
+    "lore": {
+      "career_arc": "Joined Ferrari as a trackside engineer, rose to become LeBark's race engineer through 5 seasons of drama, near-misses, and mechanical failures that would have broken any other engineer-driver relationship.",
+      "infamous_for": "Being heard saying 'YESSSSS CHARLES!' over team radio after LeBark's Zandvoort Q3 pole time, which was picked up by the broadcast microphones and became the paddock's happiest meme."
+    }
   },
   {
     "id": "drv_lando_norruff",
@@ -114,7 +162,11 @@
     "role": "Driver",
     "team": "McLaren",
     "visible_stats": { "pace": 95, "aggression": 87, "tire_management": 92 },
-    "hidden_persona": "Playful and fast, but can be harsh on himself. CONFLICT: -20 synergy if paired with a completely humorless engineer (like Jörn Bark-er). Needs banter to stay relaxed."
+    "hidden_persona": "Explosively fast, mentally fragile without his support network, and capable of both the most spectacular drives and the most baffling errors in the same weekend. The Labrador has a huge heart and even bigger self-doubt. CONFLICTS: -30 synergy with any engineer who has no sense of humour or banter (Jörn Bark-er's silence would send Lando into a 5-lap introspective spiral about whether the engineer hates him). -25 synergy with GP Lam-bark-i (GP's data-only comms would erase the psychological safety net Lando needs to commit to overtakes). -20 synergy with Toto Woof as TP (Toto's intense, pressurized leadership style is the opposite of the warm McLaren environment Lando needs). SYNERGY BONUSES: +25 with Will Jo-sniff (they've done the exact same 1-hour kart session at the Woking factory every Tuesday; Will can read Lando's mental state from his radio tone within 3 words). +15 with Paw-scar Piastri (when team structure is clear, they are the most potent 1-2 in the paddock; the Australian keeps Lando grounded). +15 with Andrea Setter-la (Sett understands Lando's public persona vs private anxiety; gives him the space to just drive). QUIRKS: Plays sim racing with Max Fur-stappen three nights a week — despite being direct championship rivals. Has a streaming setup in his motorhome and takes questions from fans during Friday practice debrief.",
+    "lore": {
+      "career_arc": "Spent five seasons as the 'fastest driver without a win', then secured McLaren's first race victory since 2012. Nearly won the 2024 WDC, losing to Verstappen in the final race by 2 points after a strategy call that haunts both him and Andrea Setter-la.",
+      "infamous_for": "Miami 2024: Leading with 5 laps to go, mistakenly pitting under Safety Car while the rest of the field stayed out — handing the lead and race win to his rival, and triggering a 72-hour period where he didn't speak to the media."
+    }
   },
   {
     "id": "drv_pawscar_piastri",
@@ -123,7 +175,11 @@
     "role": "Driver",
     "team": "McLaren",
     "visible_stats": { "pace": 93, "aggression": 84, "tire_management": 94 },
-    "hidden_persona": "Ice-cold and unflappable. Rarely shows emotion. CONFLICT: -15 synergy if paired with a highly emotional Team Principal (like Toto Woof) or an overly chatty engineer."
+    "hidden_persona": "Ice-cold, systematically brilliant, and completely impervious to external pressure. The Australian Kelpie operates at the same emotional frequency whether he's P20 with a puncture or 0.1s from the lead with 2 laps to go. CONFLICTS: -20 synergy with any Team Principal who uses excessive emotional motivation (Toto Woof's intensity would confuse Piastri; he processes data, not speeches). -20 synergy with Bono Bark (Bono's warmth reads as noise to Piastri; he wants numbers, not narrative). -15 synergy with Hannah Schnauzer (Piastri's ice-cold execution means Hannah's daring one-stop calls could misfire — he needs multiple data confirmation before committing, which Hannah doesn't wait for). SYNERGY BONUSES: +25 with Will Jo-sniff (a technical, data-obsessed engineer perfectly matched to a technical, data-obsessed driver; they communicate in sector time deltas). +20 with Andrea Setter-la (Sett identifies Piastri's 'driver of the decade' potential and protects his development ruthlessly). +15 with Lando Nor-ruff when team structure is clear (the 1-2 that nearly took McLaren a WCC in 2024). QUIRKS: Has never been photographed showing strong emotion in the paddock. Has the fastest helmet-on-to-car-in-gear sequence in the paddock at 7.3 seconds. Reportedly reads engineering textbooks as recreational reading.",
+    "lore": {
+      "career_arc": "The quiet assassin. Spent one year as Alpine's reserve driver, shocked the world by publicly rejecting a 2023 Alpine seat to sign with McLaren instead, triggering a legal battle. Vindicated when McLaren's 2024 car became the fastest on the grid.",
+      "infamous_for": "His Twitter/X post 'I have not signed a contract with Alpine for 2023' — which contradicted Alpine's announcement and triggered the most dramatic contract dispute in F1 history. Showed the ice in his veins extends to career management."
+    }
   },
   {
     "id": "prin_andrea_setterla",
@@ -132,7 +188,11 @@
     "role": "Team Principal",
     "team": "McLaren",
     "visible_stats": { "leadership": 94, "media_handling": 88, "politics": 85 },
-    "hidden_persona": "Calm, methodical, and deeply technical. CONFLICT: -15 synergy if paired with highly political drivers who bring paddock drama into the garage."
+    "hidden_persona": "Methodical, deeply technical, and emotionally intelligent in a way that most F1 principals are not. The Irish Setter runs McLaren like a startup with world championship ambitions — agile decisions, open communication, no internal politics. CONFLICTS: -25 synergy with any driver who brings external political pressure into the garage (if Fur-nando Alonso's paddock gossip network started contaminating McLaren's calm culture, Andrea would face an existential threat to everything he's built). -15 synergy with Technical Directors who don't share performance data across the team (McLaren's culture is total information transparency; a secretive TD would poison the well). -10 synergy with strategies based on pure gamble rather than data (Andrea's mind is built on probability models, not hunches). SYNERGY BONUSES: +30 with Paw-scar Piastri (they co-built McLaren's championship challenger; their relationship is the pillar of McLaren's strategy). +25 with Lando Nor-ruff (Andrea protected Lando's mental health through multiple implosions and kept him at the team when external offers came). +15 with Will Jo-sniff (Andrea empowers his engineers completely; Jo-sniff thrives in this environment). QUIRKS: Bans the phrase 'we'll see' from the engineering debrief. Has a whiteboard in his office where he tracks 'decisions we made that were right but looked wrong at the time'.",
+    "lore": {
+      "career_arc": "Former McLaren CEO turned team principal, took the team from consistent midfield mediocrity to title contention in 3 seasons by rebuilding culture, engineering philosophy, and driver development infrastructure.",
+      "infamous_for": "Calmly and methodically taking full public blame for the Miami 2024 strategy error that cost Norris the race lead — a level of leadership accountability unprecedented in the F1 paddock."
+    }
   },
   {
     "id": "eng_will_josniff",
@@ -141,7 +201,11 @@
     "role": "Race Engineer",
     "team": "McLaren",
     "visible_stats": { "composure": 92, "technical": 94, "clarity": 91 },
-    "hidden_persona": "Highly intelligent and proactive. CONFLICT: -20 synergy if paired with a driver who easily gets overwhelmed by too much data on the radio."
+    "hidden_persona": "Hyper-intelligent, proactive, and capable of processing 12 data streams simultaneously without missing the racing line. The Border Collie's problem: he sometimes delivers information density that overwhelms less analytical drivers. CONFLICTS: -25 synergy with Yuki Tsu-dog-a (Yuki needs a therapist on the radio, not a live telemetry feed; Jo-sniff's data overload would trigger a radio meltdown). -20 synergy with Lance Stroll-hound (Lance's setup instincts are feel-based; Jo-sniff's 'the data says' response to every observation would create a massive disconnect). -15 synergy with emotionally volatile drivers in general (the Border Collie's efficiency reads as coldness). SYNERGY BONUSES: +30 with Paw-scar Piastri (two data machines working in perfect synchrony; their in-lap analysis calls are the fastest in the paddock). +25 with Lando Nor-ruff (the personal chemistry and weekly kart sessions mean Jo-sniff knows exactly when to switch from data mode to banter mode). QUIRKS: Has pre-loaded 6 different versions of the race strategy for every race based on weather probability models. His debrief notes are colour-coded by performance impact.",
+    "lore": {
+      "career_arc": "Joined McLaren from a junior engineering role, rose through the ranks as Norris's engineer for 4 seasons, and became the quiet architect of McLaren's technical resurgence.",
+      "infamous_for": "Delivering the calmest 'you might have a mechanical issue, Lando' radio call in history when Norris's front-right began physically disintegrating at 320km/h."
+    }
   },
   {
     "id": "drv_furnando_alonso",
@@ -150,7 +214,11 @@
     "role": "Driver",
     "team": "Aston Martin",
     "visible_stats": { "pace": 94, "aggression": 96, "tire_management": 95 },
-    "hidden_persona": "A cunning, experienced tactician. CONFLICT: -35 synergy if paired with a rookie teammate or a strategist who makes mistakes (like Bernie Collie). Will publicly shame them on the radio."
+    "hidden_persona": "The most complete racing driver alive, trapped in cars that have never matched his talent since 2006. The Spanish Mastiff is 44 years old, physically improbable, and psychologically unbreakable — with a memory for slights that spans decades. CONFLICTS: -40 synergy with Lance Stroll-hound as teammate (the son of the man who owns the team, paired against a 2x world champion — Lance takes Aston Martin's engineering resources and development tokens while Fur-nando is literally building a car for his teammate's benefit; the mutual contempt is barely contained). -35 synergy with Bernie Collie (Alonso will publicly mock a strategist on the radio in front of 600 million viewers — 'the strategy was a disaster, you know that'; Collie will crumble). -30 synergy with any junior driver who makes the same mistake twice (Alonso's carbon-fibre patience has a 0.0mm threshold for repeated errors). -25 synergy with Max Fur-stappen (2007 McLaren spy scandal — both teams implicated; the generational enmity when they first shared a track was palpable). SYNERGY BONUSES: +25 with Hannah Schnauzer (Alonso's aggressive, data-driven race style demands a strategist who calls pit windows decisively; Hannah's daring undercut calls match Alonso's philosophy perfectly). +20 with Mark Sla-dog (experienced, unflappable engineer who can absorb Alonso's demands without collapsing). QUIRKS: Has been given a time penalty for something in 17 consecutive seasons. Has publicly embarrassed a strategist on team radio in 9 of his last 10 seasons. Absolutely unbeatable in wet conditions, especially when angry.",
+    "lore": {
+      "career_arc": "2x World Champion (2005, 2006), then 18 years and counting without a 3rd title. McLaren Spygate (2007), Crashgate (2008 Singapore), Indy 500 attempts, a Le Mans win, a retirement that lasted one week. Now at Aston Martin with Lawrence Stroll as his boss — a situation of profound political complexity.",
+      "infamous_for": "2007 Spygate ('I have certain information about you and I will use it'), 2008 Crashgate (the orchestrated crash to create a Safety Car), the Monaco radio 'SUPER MAX, SUPER MAX' after Verstappen's pass, and being physically unable to conceal his opinion of bad strategy in real-time on live TV."
+    }
   },
   {
     "id": "drv_lance_strollhound",
@@ -159,7 +227,11 @@
     "role": "Driver",
     "team": "Aston Martin",
     "visible_stats": { "pace": 82, "aggression": 85, "tire_management": 80 },
-    "hidden_persona": "Inconsistent but capable of flashes of brilliance. CONFLICT: -20 synergy if paired with a harsh, demanding Team Principal who doesn't give him a structured environment."
+    "hidden_persona": "The most controversial grid position in F1: son of the billionaire who bought the team, given a seat that multiple faster drivers would have killed for. The Canadian Eskimo Dog has genuine talent in wet conditions and qualifying surprises, but operates permanently under the shadow of privilege. CONFLICTS: -35 synergy with Fur-nando Alonso as teammate (Alonso is on record suggesting Lance gets team resources because of his father; Lance drives in a car partly developed to his feedback while Fur-nando provides 90% of the engineering direction; the tension is constant, low-level, and occasionally breaks surface). -20 synergy with highly analytical engineers who use data to challenge his 'feel-based' driving approach (Jo-sniff's data overload would break Lance's confidence entirely). -20 synergy with any strategy that requires consistent lap-time execution under pressure. SYNERGY BONUSES: +20 with Chris Cro-sniff (patient, resilient, never condescending; the Beagle can manage Lance's emotional fluctuations without triggering the ownership complex). +10 with Mike Krack-en-hound (pragmatic TP who gives Lance structured sessions without making him feel judged). QUIRKS: Has three surprise front-row qualifications in his career that nobody can explain. Reportedly cried after being overtaken by Alonso on the in-lap at Bahrain 2023.",
+    "lore": {
+      "career_arc": "F1 debut at 18 via father Lawrence's team purchase (Force India/Racing Point/Aston Martin). Has 3 podiums in 7 seasons, all in unusual circumstances. His permanent seat is the paddock's most contentious topic after Verstappen's dominance.",
+      "infamous_for": "The 2023 Bahrain incident where Alonso passed him with so much time to spare that the camera operator thought it was a different lap. His post-race interviews where he consistently praises his engineers more than himself, which is either genuinely humble or deeply uncomfortable."
+    }
   },
   {
     "id": "prin_mike_krackenhound",
@@ -168,7 +240,11 @@
     "role": "Team Principal",
     "team": "Aston Martin",
     "visible_stats": { "leadership": 85, "media_handling": 82, "politics": 80 },
-    "hidden_persona": "Pragmatic and straightforward. CONFLICT: -15 synergy if paired with drivers who constantly bypass him to complain directly to team ownership."
+    "hidden_persona": "A technically focused, pragmatic engineer who ended up as a principal without the political infrastructure Aston Martin's boardroom dynamics require. The German Shorthaired Pointer is precise and hardworking but fundamentally under-armed for the Alonso-Stroll political battlefield he operates in. CONFLICTS: -30 synergy with Fur-nando Alonso (Alonso privately treats Mike as a factory manager rather than a Formula 1 principal; the experience gap is real and visible in strategic disagreements). -25 synergy with Toto Woof (Toto's political acumen makes Mike look like a regional sales manager by comparison). -15 synergy with drivers who bypass him to go directly to Lawrence Stroll with complaints (this happens; it destroys operational authority). SYNERGY BONUSES: +20 with Adrian Newfoundland (Mike gives Newey exactly the operational space to work on pure engineering without political interference; a Newey dream environment). +15 with Lance Stroll-hound (Mike has navigated the owner's-son dynamic with more grace than any of his predecessors). QUIRKS: Has a reputation for honest technical briefings that are sometimes too honest for a team that's falling short of expectations.",
+    "lore": {
+      "career_arc": "Engineer-turned-principal, previously at BMW and Alfa Romeo before being hired by Lawrence Stroll. Managing Fur-nando Alonso while Lawrence Stroll has direct ownership creates a structural political problem that no engineering degree can solve.",
+      "infamous_for": "The press conference where Alonso publicly corrected Mike's memory of a race strategy call in front of 50 journalists."
+    }
   },
   {
     "id": "eng_chris_crosniff",
@@ -177,7 +253,11 @@
     "role": "Race Engineer",
     "team": "Aston Martin",
     "visible_stats": { "composure": 89, "technical": 88, "clarity": 87 },
-    "hidden_persona": "Patient and resilient. CONFLICT: -10 synergy if paired with a driver who ignores his radio calls, as Beagles hate being ignored."
+    "hidden_persona": "Patient, resilient, and psychologically stable under the specific conditions required to work alongside Fur-nando Alonso's demands. The Beagle's tracking nose finds the performance detail in the data even when other engineers would have given up. CONFLICTS: -20 synergy with Max Fur-stappen (Max needs GP Lam-bark-i's zero-noise clarity; Cro-sniff's methodical 'let's work through this' style would drive Max to overrule every decision within 3 laps). -15 synergy with Charles LeBark (Charles needs emotional support; Cro-sniff's medium-tempo problem-solving is neither clinical enough for a data driver nor warm enough for an emotional one). -10 synergy with drivers who flat-out ignore his radio calls (Beagles hate being ignored above all things; it triggers a performance anxiety spiral). SYNERGY BONUSES: +25 with Lance Stroll-hound (the only engineer who gives Lance structured confidence without making him feel condescended to). +15 with Fur-nando Alonso (Chris is one of the few engineers who absorbs Alonso's demands without cracking — the Beagle's stubbornness becomes a strength). QUIRKS: His pre-race checklist has 387 items and he completes it in the same order every race, without exception.",
+    "lore": {
+      "career_arc": "Rose through Aston Martin's engineering ranks to become the primary race engineer during the team's midfield-to-top-3 transformation years.",
+      "infamous_for": "Calmly completing a 6-minute technical problem-solving session on the radio with Alonso while the Spaniard was simultaneously ranting about strategy. Multiple engineers present called it the most impressive engineering radio call they'd ever witnessed."
+    }
   },
   {
     "id": "drv_pierre_gasleash",
@@ -186,7 +266,11 @@
     "role": "Driver",
     "team": "Alpine",
     "visible_stats": { "pace": 87, "aggression": 88, "tire_management": 84 },
-    "hidden_persona": "Passionate and vocal. CONFLICT: -40 synergy if paired with Esteban O-corgi (Corgi). They have a legendary breed rivalry and will actively try to crash into each other."
+    "hidden_persona": "A naturally gifted driver who has spent most of his F1 career fighting for his place after Red Bull's devastating demotion from their senior team in 2019. The French Bulldog has a raw passion that can produce stunning drives or reckless contact — often depending on whether Esteban O-corgi is within visual range. CONFLICTS: -50 synergy with Esteban O-corgi as teammate (this is the most dangerous combination in F1 since Senna-Prost; both former Red Bull juniors, Gas-leash was demoted mid-season from Red Bull and O-corgi was given the seat; the grudge is a decade old, documented, mutual, and escalates every time they share track space; their 2024 Alpine crash at the Belgian GP cost the team 42 points and a team sponsor). -25 synergy with Oliver Oakes-hound as TP (Oliver's peacekeeping attempts between Gas-leash and O-corgi have all ended with both drivers giving contradictory accounts of the same incident to the FIA). SYNERGY BONUSES: +20 with Karel Loo-bark (direct, no-nonsense engineer who matches Pierre's emotional directness). +15 with Fred Basset-eur (Fred's diplomatic warmth can contain Pierre's volatility better than most). QUIRKS: Has an incredibly fast car to a wall-of-champions reaction time ratio. Sends apology messages to his engineer after radio outbursts but never to O-corgi.",
+    "lore": {
+      "career_arc": "2018 Bahrain race winner in his debut season with Toro Rosso (now RB). Promoted to Red Bull in 2019, demoted after Hungary that same year in the paddock's most brutal mid-season demotion. The demotion has defined his psychology and his relationship with O-corgi ever since.",
+      "infamous_for": "The 2019 Italian GP crash with Daniil Kvyat that got him demoted from Red Bull, and every subsequent on-track incident with Esteban O-corgi — especially Belgium 2021, Azerbaijan 2022, and Belgium 2024."
+    }
   },
   {
     "id": "drv_jack_doghan",
@@ -195,7 +279,11 @@
     "role": "Driver",
     "team": "Alpine",
     "visible_stats": { "pace": 83, "aggression": 85, "tire_management": 81 },
-    "hidden_persona": "Hardworking and determined rookie. CONFLICT: -20 synergy if paired with an unsupportive veteran teammate who refuses to share telemetry."
+    "hidden_persona": "Hard-working, determined, and deeply Australian in the sense that he thrives on being underestimated. The Australian Cattle Dog doesn't have the natural pace of the top-tier names but compensates with racecraft and tire management under pressure. CONFLICTS: -30 synergy with a veteran teammate who refuses to share telemetry as a status power play (if paired with Fur-nando Alonso, Jack would receive literally no data from the other garage and would be setup blind for most of the year). -20 synergy with engineers who prioritize the other car's development in wind tunnel allocation. -15 synergy with Team Principals who can't protect him from the internal politics of supporting a faster teammate. SYNERGY BONUSES: +20 with Oliver Oakes-hound (Jack and Oliver built their dynamic during Alpine's junior programme; Oliver gives Jack confidence that the team is genuinely invested in his development). +15 with Mark Sla-dog (an experienced engineer who treats every driver's racecraft as developable, not fixed). QUIRKS: Has a ritual of touching the rear wing before every qualifying session. Has never publicly complained about a team decision, which is either extreme professionalism or psychological suppression.",
+    "lore": {
+      "career_arc": "Worked through every level of Alpine's academy, earned his F1 seat through consistent podium finishes in F2 rather than raw pace. His first F1 season was defined more by reliability than speed — but he survived it.",
+      "infamous_for": "The Bahrain 2025 qualifying session where he was 1.2s faster than his teammate in Q1 and then spun on his Q2 entry lap. The footage is used in motorsport psychology seminars."
+    }
   },
   {
     "id": "prin_oliver_oakeshound",
@@ -204,7 +292,11 @@
     "role": "Team Principal",
     "team": "Alpine",
     "visible_stats": { "leadership": 84, "media_handling": 80, "politics": 82 },
-    "hidden_persona": "A young, ambitious leader trying to bring stability. CONFLICT: -25 synergy if paired with two drivers who hate each other (like Gas-leash and O-corgi), as it destroys team culture."
+    "hidden_persona": "The youngest Team Principal in F1 history, appointed at age 28 with a brief to modernise Alpine's chaotic culture. The English Foxhound is built for the long chase but is in a sprint situation. CONFLICTS: -30 synergy with both Gas-leash and O-corgi on the same team (Oliver's peacekeeping attempts between them are earnest, documented, and entirely ineffective; each incident costs him paddock credibility). -20 synergy with Fur-nando Alonso as driver (Oliver is young enough to be Alonso's son; the power dynamic is impossible without Lawrence Stroll explicitly backing Oliver in every dispute). -15 synergy with media-hungry Team Principals who undermine his credibility publicly (Christian Horndog's press conference one-liners about Alpine's chaos are aimed directly at Oliver). SYNERGY BONUSES: +25 with Jack Dog-han (Oliver believes in Dog-han genuinely; their shared Alpine academy journey gives this relationship authentic foundation). +15 with Karel Loo-bark (an engineer who understands Oliver's vision for rebuilding culture). QUIRKS: Youngest TP in history. Still gets IDed at hospitality bars on race weekends. Has an open-door policy that Alonso used to submit 14 formal engineering direction complaints in one season.",
+    "lore": {
+      "career_arc": "Former Hitech GP team owner, hired by Alpine at 28 as part of a cultural reset. His appointment was announced the week before the Belgian GP 2024 — the same race where Gas-leash and O-corgi crashed into each other.",
+      "infamous_for": "His first press conference as TP, asked about the Gas-leash/O-corgi situation, responded 'I am aware of the history and we will manage it' — a statement that had aged badly within 6 weeks."
+    }
   },
   {
     "id": "eng_karel_loobark",
@@ -213,7 +305,11 @@
     "role": "Race Engineer",
     "team": "Alpine",
     "visible_stats": { "composure": 86, "technical": 87, "clarity": 85 },
-    "hidden_persona": "Direct and no-nonsense. CONFLICT: -15 synergy if paired with a driver who constantly questions his instructions on the radio."
+    "hidden_persona": "Direct, no-nonsense, and willing to tell a driver something they don't want to hear in real-time. The Dutch Shepherd is among the most reliable engineers in the midfield — not flashy, but never makes the same mistake twice. CONFLICTS: -20 synergy with Pierre Gas-leash (Gas-leash's emotional volatility tests Loo-bark's directness to breaking point; Gas-leash has gone silent on the radio for 5 laps after a Loo-bark 'the data disagrees' message). -15 synergy with any driver who second-guesses engineering instructions mid-corner. -10 synergy with highly political team environments where engineering decisions are overridden by management. SYNERGY BONUSES: +20 with Paw-scar Piastri (Piastri's data focus matches Loo-bark's delivery style perfectly). +15 with Nico Howl-kenberg (Nico's experienced, clean approach to race management is the ideal environment for Loo-bark's precision). QUIRKS: Responds to every radio question with a second of silence before answering, which drivers who don't know him find alarming.",
+    "lore": {
+      "career_arc": "Built reputation as a midfield specialist engineer at Williams and Haas before Alpine. Known for maximising result from limited car performance — which is Alpine's permanent operating condition.",
+      "infamous_for": "The Singapore 2023 race where he called an overcut strategy for Gas-leash that gained 4 positions — while Gas-leash was simultaneously complaining on team radio that the strategy was wrong. It wasn't."
+    }
   },
   {
     "id": "drv_alex_albone",
@@ -222,7 +318,11 @@
     "role": "Driver",
     "team": "Williams",
     "visible_stats": { "pace": 89, "aggression": 84, "tire_management": 91 },
-    "hidden_persona": "Smooth, consistent, and an excellent tire whisperer. CONFLICT: -15 synergy if paired with an overly aggressive strategist who forces him into chaotic multi-stop races."
+    "hidden_persona": "Smooth, consistent, and arguably F1's most underrated driver over a full race distance. The Thai Ridgeback finds lines through corners that later become the blueprint other engineers study for the following year's design. CONFLICTS: -25 synergy with Rosie Bark-combe as strategist (Bark-combe's aggressive undercut philosophy forces Alex into multi-stop strategies; Alex's tire whispering talent is maximised by LONG stints, not aggressive pit windows). -20 synergy with any engineer who constantly adjusts his brake balance setup based on data rather than his feel (Al-bone's lap time is almost entirely feel-driven; data-heavy engineers disrupt his feedback loop). -15 synergy with Team Principals who demand aggressive driving that risks his consistency average. SYNERGY BONUSES: +20 with James Ur-woof (calm, precise, empowers Al-bone's feeling-based approach). +20 with James Vowles-hound (Vowles understands that Al-bone's consistency is worth more than occasional pace; he gives Alex the setup freedom he needs). QUIRKS: Has worn the same helmet design for 7 consecutive seasons. Claims to know from the first corner of FP1 whether the car will work on Sunday.",
+    "lore": {
+      "career_arc": "Spent 4 seasons at Red Bull Racing before losing his seat and spending 2 years as a reserve. Williams gave him his second chance and he's responded with the best driving of his career — particularly in races that deteriorate to tire management chess.",
+      "infamous_for": "The 2020 Red Bull demise — being dropped mid-contract despite consistent points finishes while the team struggled — which he never publicly discussed but which the entire paddock remembers as a reputational injustice."
+    }
   },
   {
     "id": "drv_carlos_spaniel",
@@ -231,7 +331,11 @@
     "role": "Driver",
     "team": "Williams",
     "visible_stats": { "pace": 92, "aggression": 88, "tire_management": 93 },
-    "hidden_persona": "A highly intelligent, strategic thinker. CONFLICT: -20 synergy if paired with a Head of Strategy who refuses to debate options with him during the race."
+    "hidden_persona": "Smooth, intelligent, and the most tactically brilliant strategist among the drivers themselves. Carlos can read a race unfolding 15 laps ahead and adapt his driving to match. The Cocker Spaniel left Ferrari for Williams in the most unexpected transfer of the decade. CONFLICTS: -30 synergy with Bernie Collie as strategist (Carlos's tactical sophistication is directly incompatible with Ferrari's chaos strategy culture; he left Ferrari partly because Collie's calls contradicted his race reads; being stuck with Collie again would reopen that wound). -25 synergy with George Ruffell (Carlos was Ruffell's teammate at Ferrari and the relationship was quietly competitive; George's resource hoarding and Carlos's methodical approach created a cold war in the garage). -20 synergy with engineers who won't debate strategy options with him mid-race (Carlos's best performances come when engineer and driver are solving the same problem together in real-time). SYNERGY BONUSES: +25 with James Ur-woof (the calmest, most analytically precise engineer — exactly how Carlos thinks through problems). +20 with James Vowles-hound (Vowles recruited Carlos knowing his strategic intelligence would accelerate Williams's car development culture). +15 with GP Lam-bark-i (Carlos actually enjoys GP's clinical data delivery; they speak the same language). QUIRKS: Has a pre-race ritual involving listening to specific playlists mapped to race circuits. Makes three strategy calls a race that are better than the official strategy team, and occasionally says so on the radio.",
+    "lore": {
+      "career_arc": "Multiple race wins with Ferrari (2022-2024), nearly won the WDC in 2022. When Ferrari signed Hamilton, Carlos was released — took the Williams seat that shocked the entire paddock. Many considered it a career step backward; Carlos views it as a 5-year project.",
+      "infamous_for": "The 2024 announcement that he was leaving Ferrari for Williams — which broke within hours of Ferrari confirming Hamilton — creating the most dramatic 24 hours in driver market history. His Instagram post that night: a single black square."
+    }
   },
   {
     "id": "prin_james_vowleshound",
@@ -240,7 +344,11 @@
     "role": "Team Principal",
     "team": "Williams",
     "visible_stats": { "leadership": 91, "media_handling": 93, "politics": 86 },
-    "hidden_persona": "Articulate, transparent, and deeply analytical. CONFLICT: -20 synergy if paired with drivers who rely purely on 'feel' rather than data."
+    "hidden_persona": "The most analytically transparent team principal in F1 — gives media briefings that include actual performance data and honest timelines. The Greyhound runs fast and communicates even faster. CONFLICTS: -25 synergy with drivers who reject data-driven feedback (Vowles expects his drivers to engage deeply with performance data; if they don't, he loses confidence in their career trajectory instantly). -20 synergy with Team Principals who use media to make underhanded political points (he called out three rival TPs publicly in his first year at Williams; his honesty is both his greatest strength and a social liability in F1). -15 synergy with strategists who can't defend their calls with probability analysis. SYNERGY BONUSES: +30 with Carlos Spaniel (Vowles recruited Carlos specifically to accelerate Williams's technical culture; their strategic intelligence partnership is Williams's biggest off-track asset). +20 with Alex Al-bone (gave Al-bone a second career when nobody else would; Al-bone's loyalty is total). +15 with James Ur-woof (two analytical minds who speak the same engineering language). QUIRKS: Publishes internal performance benchmarks in press conferences that rival teams consider classified information. Has given three press conferences in the history of Williams where he apologised to his own driver on camera.",
+    "lore": {
+      "career_arc": "Led strategy operations at Mercedes for over a decade, helping engineer Hamilton's 6 WDC seasons. Left to rebuild Williams from the ground up — the most famous midfield rebuilding project of his generation.",
+      "infamous_for": "A 2023 press conference where he admitted that Williams's car was '2.4 seconds per lap slower than it needed to be' with the level of calm honesty that made other TPs visibly uncomfortable."
+    }
   },
   {
     "id": "eng_james_urwoof",
@@ -249,7 +357,11 @@
     "role": "Race Engineer",
     "team": "Williams",
     "visible_stats": { "composure": 90, "technical": 89, "clarity": 92 },
-    "hidden_persona": "Calm and precise. CONFLICT: -15 synergy if paired with a highly volatile driver who screams on the radio (like Yuki Tsu-dog-a)."
+    "hidden_persona": "Calm, precise, and capable of taking a complex 12-variable race situation and delivering one clear instruction in 8 words. The Whippet is built for long-distance efficiency over short-burst intensity. CONFLICTS: -20 synergy with Yuki Tsu-dog-a (Yuki's explosive radio outbursts would test Ur-woof's composure; 'James, this car is IMPOSSIBLE' at 200mph requires a different emotional toolkit than Ur-woof carries). -15 synergy with drivers who require constant encouragement interspersed with data (he can do data, he can do encouragement, but not simultaneously — it disrupts his 12-stream processing). SYNERGY BONUSES: +30 with Carlos Spaniel (Carlos's analytical intelligence matches Ur-woof's perfectly; they finished three races this season where their combined in-race strategy adjustments gained 5+ positions). +25 with Alex Al-bone (empowers Al-bone's feel-based feedback loop without overriding it with data noise). QUIRKS: Has never been photographed smiling on the pit wall. Is universally described as 'brilliant to work with' by drivers who've worked with him, which creates a contradiction that nobody can explain.",
+    "lore": {
+      "career_arc": "Twelve seasons as a Williams engineer, survived the team's near-bankruptcy years, and emerged as one of the most trusted technical operators in the paddock.",
+      "infamous_for": "The Abu Dhabi 2022 race where he called six strategy adjustments in the final 15 laps that gained Carlos Spaniel 4 positions. The final call was made with 0.3 seconds before the pit lane entry and was correct."
+    }
   },
   {
     "id": "drv_yuki_tsudoga",
@@ -258,7 +370,11 @@
     "role": "Driver",
     "team": "RB",
     "visible_stats": { "pace": 88, "aggression": 92, "tire_management": 83 },
-    "hidden_persona": "Extremely fast but highly volatile. Prone to explosive radio outbursts. CONFLICT: -25 synergy if paired with a Race Engineer who cannot act as a calming therapist."
+    "hidden_persona": "Extraordinarily fast over a single lap, deeply unpredictable over race distance, and capable of the most spectacular radio outbursts in F1. The Shiba Inu is a Japanese icon of controlled chaos. CONFLICTS: -30 synergy with any engineer who communicates in technical jargon during heated moments (Yuki's 'WHAT ARE YOU SAYING' radio message — aired live on broadcast — is now an F1 meme; engineers who compound information density during his frustration spiral are creating a safety hazard). -25 synergy with James Ur-woof (precision without warmth is exactly the wrong toolkit for Yuki's emotional range). -20 synergy with any Team Principal who applies pressure through performance benchmarks (Yuki's performance tanks under institutional pressure and spikes under freedom). SYNERGY BONUSES: +25 with Mattia Spi-dog-i (the only engineer who has successfully navigated the 'Yuki meltdown' and 'Yuki breakthrough' cycles; patience and encouragement at the right moment is Spi-dog-i's specialty). +15 with Laurent Me-kies-hound (Laurent's diplomatic style means he never triggers Yuki's paranoia about his seat security). QUIRKS: Has the most viral team radio moments in F1 history. Switches between Japanese and English mid-radio when exceeding emotional capacity. Has driven from P18 to P6 twice this season, and DNF'd from P4 twice the same season.",
+    "lore": {
+      "career_arc": "Five seasons at AlphaTauri/RB, consistent points scorer despite a car that regularly couldn't support his ceiling. Became the face of F1's Japanese resurgence and an icon of the Shiba Inu fan community.",
+      "infamous_for": "The Monaco radio compilation. Every year, without fail, Yuki contributes 3-4 of F1's most broadcast-worthy radio moments. 'WHAT THE HELL WAS THAT' at Barcelona 2023 is required viewing."
+    }
   },
   {
     "id": "drv_isack_houndjar",
@@ -267,7 +383,11 @@
     "role": "Driver",
     "team": "RB",
     "visible_stats": { "pace": 84, "aggression": 89, "tire_management": 80 },
-    "hidden_persona": "Aggressive and hungry rookie. CONFLICT: -20 synergy if paired with another aggressive rookie, leading to guaranteed on-track collisions."
+    "hidden_persona": "Aggressive, ambitious, and operating under the full weight of being the F1 Academy pathway's most high-profile graduate. The Pug has an outsized racing spirit relative to body size. CONFLICTS: -30 synergy with any aggressive rookie teammate (combining two drivers with 'prove it' fuel burning means guaranteed contact before lap 30; the mathematics of aggression times aggression equals carbon fibre). -20 synergy with Team Principals who publicly compare him to Red Bull's top drivers before he's ready (the pressure amplifies his aggression beyond functional). -15 synergy with engineers who are data-only (Isack needs emotional investment from his technical partner to convert raw speed into race results). SYNERGY BONUSES: +20 with Mattia Spi-dog-i (patience-coach engineer who absorbs rookie energy and converts it into lap time). +15 with Laurent Me-kies-hound (supportive TP who sets development goals rather than performance ultimatums). QUIRKS: Has T-boned two safety cars in practice sessions this season. His fastest qualifying laps all come after incidents, as if the adrenaline optimises his neural processing.",
+    "lore": {
+      "career_arc": "French karting champion, Formula 2 winner, Red Bull junior academy graduate. His debut F1 season was described simultaneously as 'the future of F1' (after his Monaco qualifying run) and 'a liability to other drivers' (after his Silverstone first corner incident).",
+      "infamous_for": "The British Grand Prix 2025 Turn 1 incident that eliminated 3 drivers and briefly trended as 'the Pug Pile-Up' on social media."
+    }
   },
   {
     "id": "prin_laurent_mekieshound",
@@ -276,7 +396,11 @@
     "role": "Team Principal",
     "team": "RB",
     "visible_stats": { "leadership": 86, "media_handling": 84, "politics": 89 },
-    "hidden_persona": "Diplomatic and experienced. CONFLICT: -15 synergy if paired with a Technical Director who refuses to share data with the sister team."
+    "hidden_persona": "Experienced, technically credible, and diplomatic to a fault. The Papillon navigates the complicated political relationship between RB and the Red Bull senior team without triggering a paddock war. CONFLICTS: -25 synergy with any Technical Director who refuses to share development data with Red Bull's senior team (Laurent's operating mandate requires data-sharing transparency with the sister team; a secretive TD poisons the relationship that funds RB's existence). -20 synergy with Christian Horndog (Laurent is operationally subordinate to Red Bull, which creates a ceiling on his authority that Christian exploits). -15 synergy with drivers who have public feuds with Red Bull senior drivers. SYNERGY BONUSES: +20 with Yuki Tsu-dog-a (Laurent has been Yuki's diplomatic protector; his support for Yuki's career continuity at RB has shielded him from senior team politics). +15 with Isack Hound-jar (Laurent's structured development mentality is exactly what a high-risk junior talent needs). QUIRKS: Never criticises the Red Bull parent team publicly, even when they have stripped RB's engineering resources mid-season for senior team use.",
+    "lore": {
+      "career_arc": "Former Scuderia Toro Rosso/AlphaTauri team manager, understands the Red Bull system from every level. His relationship with the senior team is the key to RB's survival.",
+      "infamous_for": "Being asked six times in a single press conference whether RB would be folded into Red Bull, and giving six different politely worded non-answers."
+    }
   },
   {
     "id": "eng_mattia_spidogi",
@@ -285,7 +409,11 @@
     "role": "Race Engineer",
     "team": "RB",
     "visible_stats": { "composure": 85, "technical": 86, "clarity": 84 },
-    "hidden_persona": "Patient and encouraging. CONFLICT: -10 synergy if paired with a driver who completely ignores his coaching."
+    "hidden_persona": "Patient, encouraging, and specialised in emotional management of volatile talent. The Bolognese is fluffy, gentle, and will outlast every storm. CONFLICTS: -20 synergy with drivers who reject coaching entirely (Fur-nando Alonso would consume Spi-dog-i's development suggestions and return them as criticisms). -15 synergy with Team Principals who view rookie development as second priority to race results. SYNERGY BONUSES: +30 with Yuki Tsu-dog-a (the most successful volatile-driver management since Smedley/Massa; Spi-dog-i is the only engineer Yuki has never shouted at directly). +20 with Isack Hound-jar (patience-coach matching with raw aggressive talent; perfect developmental pairing). +10 with Kimi Antonell-hound (the young prodigy needs exactly this pastoral engineering approach). QUIRKS: His most used phrase is 'good work, you're doing well, here's what we need now'. Has it as a sticker on his engineering screen.",
+    "lore": {
+      "career_arc": "Built his reputation managing AlphaTauri/RB's driver development programme rather than being a pure lap-time engineer. His 'emotional telemetry' approach — reading driver feedback psychology as much as sector data — has become the RB model.",
+      "infamous_for": "The Baku 2023 radio exchange with Yuki Tsu-dog-a where Yuki shouted 'THIS MAKES NO SENSE' for 45 seconds and Spi-dog-i responded calmly with 'I know it's difficult, let's talk through it at the next straight' — and it worked."
+    }
   },
   {
     "id": "drv_nico_howlkenberg",
@@ -294,7 +422,11 @@
     "role": "Driver",
     "team": "Sauber",
     "visible_stats": { "pace": 89, "aggression": 86, "tire_management": 85 },
-    "hidden_persona": "A reliable, experienced qualifier. CONFLICT: -15 synergy if paired with a chaotic strategist who ruins his excellent starting positions."
+    "hidden_persona": "The eternal nearly-man of F1: 200 races without a podium (a record), recalled from retirement when other teams couldn't find a competitive driver willing to drive the Sauber. The German Shepherd has more qualifying pace than race pace and is brutally honest about it. CONFLICTS: -25 synergy with Bernie Collie as strategist (Collie destroyed Nico's 2014 Bahrain race — he had led for 15 laps before a strategy error dropped him to P6; Nico has 'never forgiven' Ferrari's strategy culture). -20 synergy with any principal who gives him unrealistic performance expectations (Nico operates best when expectations are calibrated; pressure amplifies the 'nearly' pattern). -15 synergy with aggressive rookie teammates who race him as if he's the competition rather than a developmental asset. SYNERGY BONUSES: +20 with Jörn Bark-er (methodical Rottweiler engineer and methodical German Shepherd driver; a relationship built on quiet mutual respect and zero wasted radio time). +15 with Mattia Binoт-dog (both are long-term builders operating in an under-resourced environment; they understand each other's philosophical patience). QUIRKS: Has qualified inside the top 8 in 62% of races where he had a functioning qualifying car. His podium-less record is officially an F1 statistical monument.",
+    "lore": {
+      "career_arc": "Twelve seasons in F1, 200+ races, zero podiums — a record that stands as F1's greatest statistical tragedy. His talent is universally acknowledged; his results are universally complicated by car performance, strategy, and mechanical fate.",
+      "infamous_for": "The 2012 Bahrain GP where he was running P4 with 8 laps to go and his car stopped — his closest podium approach. Still referenced when someone mentions 'unlucky' as an F1 category."
+    }
   },
   {
     "id": "drv_gabriel_barktoleto",
@@ -303,7 +435,11 @@
     "role": "Driver",
     "team": "Sauber",
     "visible_stats": { "pace": 85, "aggression": 87, "tire_management": 82 },
-    "hidden_persona": "A highly touted rookie with immense raw speed. CONFLICT: -20 synergy if paired with a Team Principal who doesn't give him time to develop."
+    "hidden_persona": "A Brazilian rookie with the raw physical talent to go toe-to-toe with established drivers in a straight line. The Fila Brasileiro is enormous, powerful, and still learning when to deploy that power. CONFLICTS: -25 synergy with any Team Principal who demands immediate race results rather than development milestones (Sauber's 2025 Audi takeover creates institutional pressure that isn't fair for a rookie's first season). -20 synergy with experienced engineers who prioritise data feedback over emotional encouragement (Gabriel needs both; lean too hard on data and his natural instinct confidence drops). -15 synergy with Fur-nando Alonso as teammate (Alonso's data-withholding, veteran-prioritisation approach to team dynamics would leave Gabriel engineering-blind for 12 months). SYNERGY BONUSES: +25 with Mattia Binoт-dog (long-term project builder aligned with rookie development; this partnership was specifically designed for 3-year development, not instant results). +15 with Mattia Spi-dog-i (patient coaching engineer perfectly calibrated for first-year talent). QUIRKS: Has carried a Brazilian flag in every car he's ever raced. His in-lap radio messages are always punctuated by 'obrigado' regardless of result.",
+    "lore": {
+      "career_arc": "Ferrari Academy driver, F2 champion 2023. The most highly anticipated Brazilian F1 driver since Massa. Signed to Sauber/Audi as the team begins its transition — carrying the weight of a nation's F1 hopes.",
+      "infamous_for": "The Monza 2023 F2 race where he passed 4 cars in 2 corners in the rain, which circulated so widely that Sauber reportedly offered him a contract the next morning."
+    }
   },
   {
     "id": "prin_mattia_binotdog",
@@ -312,16 +448,24 @@
     "role": "Team Principal",
     "team": "Sauber",
     "visible_stats": { "leadership": 88, "media_handling": 82, "politics": 85 },
-    "hidden_persona": "A deeply technical leader focused on long-term project building. CONFLICT: -25 synergy if paired with impatient drivers who demand immediate race wins."
+    "hidden_persona": "A deeply technical, patient, multi-year infrastructure builder. The St. Bernard carries enormous weight without complaint and finds drivers in distress. Mattia understands that you cannot rush the construction of a championship-winning team. CONFLICTS: -30 synergy with impatient Audi board members who want F1 results in Year 1 (the Audi takeover pressure conflicts directly with Mattia's 5-year horizon plan; every mid-season result review is a political battle). -25 synergy with Max Fur-stappen or Fur-nando Alonso as drivers (both would require resources — engineering attention, strategy priority — that Sauber/Audi cannot currently deliver at championship level, creating rage and public frustration). -15 synergy with strategists who don't understand the political dimension of team management. SYNERGY BONUSES: +25 with Gabriel Bark-toleto (they are co-builders of the Audi project; Gabriel's patience and Mattia's long-horizon thinking are aligned). +15 with Nico Howl-kenberg (Nico's realistic expectations and development-focused mindset are exactly what a rebuilding team needs). QUIRKS: Has been in F1 leadership long enough to have overseen 3 team rebrands, 2 ownership changes, and 1 regulatory revolution. Takes every new crisis calmly, because he's seen worse.",
+    "lore": {
+      "career_arc": "Former Ferrari TP (oversaw LeBark and Vettel years), survived multiple internal crises. Joined Sauber to oversee the Audi F1 entry — potentially the biggest team transformation story of the decade.",
+      "infamous_for": "Being fired by Ferrari in a statement so brief that the full announcement was shorter than the average tweet, then immediately being praised by every senior driver he'd worked with for being 'the best F1 boss I ever had'."
+    }
   },
   {
     "id": "eng_jorn_barker",
     "name": "Jörn Bark-er",
-    "role": "Race Engineer",
     "breed": "Rottweiler",
+    "role": "Race Engineer",
     "team": "Sauber",
     "visible_stats": { "composure": 87, "technical": 88, "clarity": 86 },
-    "hidden_persona": "Methodical and disciplined. CONFLICT: -20 synergy if paired with a playful, joking driver (like Lando Nor-ruff). He hates small talk on the radio."
+    "hidden_persona": "Methodical, disciplined, and specifically allergic to small talk during any point of the race weekend. The Rottweiler is the paddock's last true 'old school' engineer. CONFLICTS: -25 synergy with Lando Nor-ruff (Lando's performance depends on banter and psychological safety; Jörn's dead-air approach between telemetry points creates an anxiety vacuum that Lando will fill with self-criticism). -20 synergy with Yuki Tsu-dog-a (Yuki's radio outbursts are a puzzle Jörn cannot solve with his 'efficiency over empathy' toolkit). -15 synergy with any driver who measures their relationship with the engineer by how much they seem to care emotionally. SYNERGY BONUSES: +25 with Nico Howl-kenberg (two methodical, experienced professionals in a low-drama working relationship; Jörn is probably the only engineer Nico has never blamed for a result). +15 with Carlos Spaniel (Carlos values clarity and precision; Jörn delivers both without decoration). QUIRKS: Has 17 words he considers acceptable radio communication. Everything else is a 'nice to have'. Reportedly complained that a colleague's pre-race joke extended the briefing by 90 seconds and submitted it as a formal efficiency report.",
+    "lore": {
+      "career_arc": "Engineering career spanning BMW, Haas, and Sauber — always operating slightly behind the cars he deserved to engineer. His straightforward approach has kept him employed; his personality hasn't won him any paddock awards.",
+      "infamous_for": "Being the subject of the most 'he's actually amazing, you just have to know him' defences from drivers in F1 paddock history."
+    }
   },
   {
     "id": "drv_esteban_ocorgi",
@@ -330,7 +474,11 @@
     "role": "Driver",
     "team": "Haas",
     "visible_stats": { "pace": 88, "aggression": 93, "tire_management": 86 },
-    "hidden_persona": "Fiercely defensive and unwilling to yield. CONFLICT: -40 synergy if paired with Pierre Gas-leash (French Bulldog) due to a legendary breed rivalry. Will actively sabotage him."
+    "hidden_persona": "Fiercely defensive, completely unwilling to concede position, and fundamentally shaped by the fact that he took Pierre Gas-leash's seat at Red Bull when Gas-leash was demoted in 2019. The Corgi has short legs but enormous determination, and has never once admitted fault in an on-track incident with Gas-leash. CONFLICTS: -50 synergy with Pierre Gas-leash as teammate (this is F1's most dangerous pairing; 2019: Gas-leash demoted, O-corgi got the seat; subsequent 6 years of on-track warfare has included 4 contact incidents, 3 public media wars, and 1 physical altercation in a hotel corridor that neither team officially acknowledges; putting them on the same team is not a strategy, it is a social experiment). -25 synergy with Oliver Oakes-hound as TP (Oliver's peacekeeping attempts have all failed spectacularly; Esteban views him as too young to command respect in a Gas-leash situation). -20 synergy with Lewis Howl-milton (Esteban has been publicly dismissed by Lewis as 'not a championship-level driver' — Esteban does not forget public dismissals). SYNERGY BONUSES: +20 with Ayao Ko-mutt-su (Ayao's pragmatic approach gives Esteban clear operational objectives rather than political guidance, which is all he needs). +15 with Mark Sla-dog (an experienced unflappable engineer who can contain Esteban's aggression and redirect it into lap time). QUIRKS: Has never accepted a team instruction to 'hold position' without at least a radio argument. Claimed to have 'no comment' on Gas-leash 17 consecutive times in 6 years.",
+    "lore": {
+      "career_arc": "Started as a Williams reserve, took Gas-leash's Red Bull seat in 2019 after Gas-leash's demotion. Spent 4 years at Alpine (including as Gas-leash's teammate) before joining Haas. Career defined partly by talent and partly by being the beneficiary of Gas-leash's worst professional moment.",
+      "infamous_for": "Belgium 2021: The crash. Brazil 2022: The crash. Belgium 2024: The crash. 'Esteban and Pierre at the same corner' has become a statistical prediction model."
+    }
   },
   {
     "id": "drv_ollie_bearmutt",
@@ -339,7 +487,11 @@
     "role": "Driver",
     "team": "Haas",
     "visible_stats": { "pace": 86, "aggression": 84, "tire_management": 83 },
-    "hidden_persona": "A calm, mature rookie who rarely gets flustered. CONFLICT: -15 synergy if paired with an engineer who doesn't feed him constant data."
+    "hidden_persona": "A calm, grounded British rookie who rarely gets flustered regardless of the chaos around him. The Staffordshire Bull Terrier's surface calm conceals an enormous competitive drive. CONFLICTS: -20 synergy with engineers who under-brief him on car characteristics (Ollie needs data-rich preparation to unlock his feel-based performance; minimal briefings leave him flying blind). -15 synergy with Team Principals who pair him with a volatile experienced driver and expect the rookie to manage the political fallout. -10 synergy with aggressive racing approaches from teammates that spill into his setup allocation. SYNERGY BONUSES: +25 with Mark Sla-dog (experienced, communicative engineer who provides the data scaffolding that Ollie converts into feel; they complement each other perfectly). +20 with Ayao Ko-mutt-su (Ayao's pragmatic, results-focused style matches Ollie's professional approach). QUIRKS: Has the most balanced driving style of any F1 rookie in the last 5 years. Reportedly requested the most data points per session of any driver on the grid in his debut year.",
+    "lore": {
+      "career_arc": "British F3 and F2 graduate, picked by Haas through a talent assessment over junior academy drivers. His debut season has been quietly impressive — not the headlines, but consistently adding points in races where teammates and rivals made errors.",
+      "infamous_for": "His Spanish GP Q2 lap that was 0.03s faster than Esteban O-corgi using a completely different tyre prep approach that nobody in the team had recommended."
+    }
   },
   {
     "id": "prin_ayao_komuttsu",
@@ -348,7 +500,11 @@
     "role": "Team Principal",
     "team": "Haas",
     "visible_stats": { "leadership": 87, "media_handling": 85, "politics": 83 },
-    "hidden_persona": "A pragmatic, engineering-focused leader. CONFLICT: -20 synergy if paired with drivers who crash frequently, as he hates wasting the budget."
+    "hidden_persona": "Pragmatic, direct, and entirely focused on maximising Haas's limited budget against more resourced competitors. The Akita is loyal to process and intolerant of waste. CONFLICTS: -25 synergy with drivers who crash frequently (Haas operates on a tight budget where each component replacement materially impacts development programme; Ayao's post-race face after a first-corner incident is something drivers have nightmares about). -20 synergy with any strategy approach that involves gambling with asset longevity (tires, power units, downforce components — Ayao tracks the cost of every strategic gamble). -15 synergy with flashy Team Principals who use paddock politics as performance measurement. SYNERGY BONUSES: +25 with Esteban O-corgi (pragmatic TP + aggressive driver is a functional combination when channelled; Ayao sets O-corgi's competitive aggression within clear operational parameters). +20 with Ollie Bear-mutt (Ayao values Ollie's clean racing style; zero wasted components, zero political noise). QUIRKS: Has a spreadsheet tracking the cost-per-points of every strategic decision his team makes. Won't name what's on it. It's either brilliant or terrifying.",
+    "lore": {
+      "career_arc": "Led Haas's technical operations before becoming team principal. Navigated the Nikita Mazepin dismissal, multiple budget crises, and consistently produced results beyond the team's resource level.",
+      "infamous_for": "His response to the Mazepin situation: a single press statement with exactly 47 words, containing no adjectives."
+    }
   },
   {
     "id": "eng_mark_sladog",
@@ -357,7 +513,11 @@
     "role": "Race Engineer",
     "team": "Haas",
     "visible_stats": { "composure": 91, "technical": 90, "clarity": 89 },
-    "hidden_persona": "Highly experienced and unflappable. CONFLICT: -10 synergy if paired with a driver who ignores his vast experience."
+    "hidden_persona": "Highly experienced, visually striking (the spots help at debrief), and absolutely unflappable under pressure. The Dalmatian has seen everything in 16 years of F1 engineering and nothing surprises him anymore. CONFLICTS: -15 synergy with drivers who treat engineering experience as a liability rather than an asset (Yuki Tsu-dog-a's immediate dismissal of conservative engineering calls would frustrate Mark's methodical approach). -10 synergy with Team Principals who deprioritise engineering quality in favour of commercial decisions (Mark has left two teams over this exact issue). SYNERGY BONUSES: +25 with Fur-nando Alonso (Alonso specifically requested experienced engineers; Sla-dog's 16-year track record means he can absorb Alonso's demands without cracking). +20 with Nico Howl-kenberg (the most stable engineer-driver pairing at Haas; mutual respect built over shared experience). +20 with Ollie Bear-mutt (Sla-dog nurtures Ollie's development without smothering his instinct). QUIRKS: The Dalmatian has been spotted at 47 F1 tracks over his career. Has a specific coffee order at every circuit hospitality suite that he has never had to repeat after year 1.",
+    "lore": {
+      "career_arc": "Engineering stints at Sauber, Williams, and Haas over 16 seasons. Acquired a reputation as someone who can extract performance from cars that don't deserve it.",
+      "infamous_for": "The 2019 Australian GP where Kevin Magnussen's strategy won a point that kept Haas above the financial viability threshold for the following season. Nobody knew this publicly until Ayao's book in 2022."
+    }
   },
   {
     "id": "strat_hannah_schnauzer",
@@ -366,7 +526,11 @@
     "role": "Head of Strategy",
     "team": "Oracle Red Bull Racing",
     "visible_stats": { "composure": 98, "technical": 95, "clarity": 90 },
-    "hidden_persona": "Ice cold under pressure. Makes daring pit calls. CONFLICT: -25 synergy if paired with an emotional driver (like Charles LeBark) who questions her calls during the race."
+    "hidden_persona": "Ice-cold, probability-obsessed, and the architect of Red Bull's 4 consecutive Constructors' Championship strategy cycles. Hannah makes pit call decisions that appear insane and are proven correct within 3 laps. CONFLICTS: -30 synergy with Charles LeBark (LeBark questions every call above 1.5-second delta; Hannah's 'stay out' calls require unconditional trust she has never received from Ferrari culture drivers). -25 synergy with Toto Woof as TP (Toto second-guesses strategy from the pit wall; Hannah requires full authority once the race starts). -20 synergy with Paw-scar Piastri (Piastri's ice-cold execution needs multiple-data confirmation before committing to a one-stop; Hannah's decisive single-call approach doesn't allow debate). SYNERGY BONUSES: +30 with Max Fur-stappen (Max executes Hannah's undercut calls before she finishes the sentence; they've scored 22 wins from non-position strategies). +20 with Fur-nando Alonso (Alonso's tactical intelligence means he validates Hannah's calls in real-time; they don't need the data to agree). +15 with Christian Horndog (Hannah's decisiveness is exactly what Christian wants on the pit wall; no hesitation, no public explanations). QUIRKS: Has never changed a strategy call once made. Has never been wrong by more than 2 laps on a virtual safety car prediction in 6 years.",
+    "lore": {
+      "career_arc": "Joined Red Bull as a strategy analyst at 26, became Head of Strategy at 29 — the youngest in F1 at the time. Her call to double-stack Max and Perez at Abu Dhabi 2022 under VSC is studied in sports management schools.",
+      "infamous_for": "The 2021 Abu Dhabi final lap strategy call that nobody in the paddock saw coming — and which remains the most controversial strategically correct/ethically ambiguous decision in F1 history."
+    }
   },
   {
     "id": "strat_bernie_collie",
@@ -375,7 +539,11 @@
     "role": "Head of Strategy",
     "team": "Scuderia Ferrari",
     "visible_stats": { "composure": 85, "technical": 92, "clarity": 88 },
-    "hidden_persona": "Brilliant but sometimes overthinks the data. CONFLICT: -30 synergy if paired with a demanding veteran (like Fur-nando Alonso) who will publicly mock his mistakes."
+    "hidden_persona": "Brilliant in simulation, catastrophic under race day pressure when the simulation deviates from reality by more than 2%. The Border Collie's immense intelligence and pattern recognition becomes a liability when F1's chaos exceeds his probabilistic models. CONFLICTS: -40 synergy with Fur-nando Alonso (Alonso has publicly shamed Bernie's calls on international broadcasts at least 8 times; the 2024 Monaco strategy call that dropped Alonso from P2 to P5 triggered a 20-minute radio tirade that Bernie's team transcribed and laminated as a 'what not to do' document). -30 synergy with Charles LeBark (Bernie's Monaco calls have ended LeBark's podium hopes in 3 of the last 5 years; LeBark's post-race press conference face after a Collie strategy error is a genre of photography). -20 synergy with Carlos Spaniel (Carlos openly contradicts Bernie's calls mid-race using his own race data; the power struggle has collapsed two strategy meetings). SYNERGY BONUSES: +25 with Max Fur-stappen (the one driver who will actually execute Bernie's aggressive strategies without questioning them, because Max trusts that aggressive beats conservative). +15 with Hannah Schnauzer (if forced to collaborate, their combined intelligence would be remarkable; in reality the competition between their approaches creates friction). QUIRKS: His 'stay out' call is statistically the worst call in F1 by outcome frequency. His 'box, box' call is statistically one of the best. The split between these two decisions is Bernie's defining paradox.",
+    "lore": {
+      "career_arc": "Ferrari's strategy department leader since 2019 — which means he's been present for every major Ferrari strategy failure of the modern era. His technical brilliance is undeniable; his decision-making under real-time pressure remains the sport's most studied failure mode.",
+      "infamous_for": "Monaco 2022 (LeBark tire strategy failure), Monaco 2023 (safety car window miss), Monaco 2024 (wet/dry crossover error). 'What did Bernie call?' is Monaco qualifying's unofficial hashtag."
+    }
   },
   {
     "id": "strat_rosie_barkcombe",
@@ -384,7 +552,11 @@
     "role": "Head of Strategy",
     "team": "Aston Martin",
     "visible_stats": { "composure": 90, "technical": 89, "clarity": 94 },
-    "hidden_persona": "Aggressive strategist who loves an undercut. CONFLICT: -20 synergy if paired with a driver who has poor tire management and can't execute her aggressive stints."
+    "hidden_persona": "Aggressive, decisive, and addicted to the undercut. The Boxer's strategy philosophy: if you can steal a position via pit stop, you take it — even if the driver needs 4 more laps. CONFLICTS: -25 synergy with Alex Al-bone (Al-bone's tire whispering talent maximises the 30-lap stint; Rosie's aggressive 2-stop philosophy destroys his long-run advantage and forces him into tire compromises that leave him slower mid-race). -20 synergy with any driver who has explicitly told her that her strategy is wrong and been proven correct in front of the engineering team (she holds grudges and withholds priority pit stop windows as a soft punishment). -15 synergy with Toto Woof as TP (Toto's micromanagement of pit windows conflicts with Rosie's unconditional authority model). SYNERGY BONUSES: +30 with Fur-nando Alonso (Alonso calls his own strategy from the car and Rosie just confirms it; their shared 'attack now' philosophy has produced 4 positions of undercut gain in 3 of his last 5 races). +20 with Max Fur-stappen (Max loves the undercut; Rosie's aggressive window calls match his 'why are we waiting?' instinct). +15 with Hannah Schnauzer (when they're on the same side of the pit wall, their strategic agreement is total; when they're rivals, Rosie has stolen 3 positions from Hannah's drivers). QUIRKS: Has never called a one-stop race strategy voluntarily. Has won an undercut battle in 78% of races where she's attempted it.",
+    "lore": {
+      "career_arc": "Joined Aston Martin from a junior role at Mercedes, where she absorbed Toto Woof's 'no mercy strategy' philosophy. Her aggressive approach has occasionally cost Aston points but more often produced surprise top-5 results from the 4th row.",
+      "infamous_for": "The Singapore 2023 strategy call that jumped Alonso from P5 to P2 using a double undercut that left the tires 0.3mm above minimum gauge at the finish line."
+    }
   },
   {
     "id": "tech_adrian_newfoundland",
@@ -393,7 +565,11 @@
     "role": "Technical Director",
     "team": "Aston Martin",
     "visible_stats": { "leadership": 90, "technical": 99, "politics": 80 },
-    "hidden_persona": "An aerodynamic genius who works best with a pencil and paper. CONFLICT: -35 synergy if paired with a Team Principal who micromanages car design (like Toto Woof)."
+    "hidden_persona": "The greatest F1 car designer in history — by consensus, without serious challenge. The Newfoundland carries the weight of 13 Constructors' Championships across 4 teams on his enormous shoulders. His departure from Red Bull mid-2024 was the seismic moment that destabilised the entire grid. CONFLICTS: -40 synergy with Toto Woof as TP (Toto's compulsive need to understand and influence every technical decision is exactly why Newfoundland left Mercedes in 2014 for Red Bull; he doesn't collaborate with principals who can't trust his autonomy). -30 synergy with any team where his car concepts are rejected for commercial or regulatory conservatism. -20 synergy with Pierre Weimaraner (Weimaraner was Newfoundland's successor at Red Bull; the implied criticism in Newfoundland's 'I had to leave' comment still rankles). SYNERGY BONUSES: +35 with Max Fur-stappen (they co-built the most dominant car in F1 history; Max's technical feedback loop with Adrian elevated the RB19 to a statistical anomaly; in any car, this partnership produces championship-level performance). +25 with Christian Horndog (Horndog gave Newfoundland total creative freedom — the model every TD wants). +20 with Mike Krack-en-hound (Mike is operationally content to let Newfoundland control the technical direction entirely). QUIRKS: Brings physical scale models to engineering meetings and carves aerodynamic modifications with a penknife during discussion. Has drawn car concepts on every available flat surface including hotel napkins and a fellow engineer's arm.",
+    "lore": {
+      "career_arc": "Williams (1980-1997, 7 WCC), McLaren (1997-2006), Red Bull (2006-2024, 6 WCC). Then Aston Martin. Announced his Red Bull departure mid-season 2024 — stock in every other team immediately spiked. The most important transfer in F1 history.",
+      "infamous_for": "Designing the Brawn GP car (a double-diffuser concept so innovative it won the 2009 championship), the Red Bull RB6-RB9 dominance era, and the RB18-RB20 hybrid dominance era. Also for leaving teams at their peak, which is either wisdom or sabotage depending on your perspective."
+    }
   },
   {
     "id": "tech_james_afghan",
@@ -402,7 +578,11 @@
     "role": "Technical Director",
     "team": "Mercedes-AMG Petronas",
     "visible_stats": { "leadership": 95, "technical": 96, "politics": 88 },
-    "hidden_persona": "Charismatic and highly intelligent. CONFLICT: -20 synergy if paired with a Team Principal who doesn't let him lead the engineering department."
+    "hidden_persona": "Charismatic, technically brilliant, and the principal architect of Mercedes' hybrid-era dominance. The Afghan Hound has the engineering credentials and the leadership charisma to run a championship team alone. CONFLICTS: -25 synergy with any Team Principal who doesn't give him full engineering leadership (James's track record means he expects — and deserves — total technical authority; a TP who second-guesses his aero concepts is in for a very difficult relationship). -20 synergy with Adrian Newfoundland in competing teams (Newfoundland's talent is the only thing that consistently challenges James's work; his awareness of this is deep and slightly consuming). -15 synergy with Hannah Schnauzer as a strategist for a rival (their combined analytical horsepower on opposing teams is a zero-sum intelligence war). SYNERGY BONUSES: +30 with George Ruffell (James rebuilt the entire Mercedes car concept around George's driving style feedback post-Hamilton; this is their defining professional achievement together). +25 with Toto Woof (the longest-running successful TP-TD relationship in F1; Toto gives James space, James delivers titles). +20 with Lewis Howl-milton (6 WDC titles built on this partnership; Lewis's technical feedback is the highest quality on the grid). QUIRKS: Has never missed a post-race engineering debrief in 12 years. Is photographed smiling more often than any other senior technical figure in the paddock — which people find slightly suspicious.",
+    "lore": {
+      "career_arc": "Joined Mercedes in 2017, became Technical Director in 2019, and guided the team through Hamilton's final three WDC seasons and the George Ruffell transition. Has survived every paddock crisis from the 2021 Abu Dhabi fallout to the Hamilton departure.",
+      "infamous_for": "The 2021 Abu Dhabi post-race 'we tried everything' press conference, delivered with remarkable composure while Toto was throwing headsets. And the 2023 car concept pivot that nobody believed in until it worked."
+    }
   },
   {
     "id": "tech_pierre_weimaraner",
@@ -411,6 +591,10 @@
     "role": "Technical Director",
     "team": "Oracle Red Bull Racing",
     "visible_stats": { "leadership": 88, "technical": 97, "politics": 85 },
-    "hidden_persona": "Intense and detail-oriented. CONFLICT: -25 synergy if paired with drivers who give poor technical feedback, as he relies on them to correlate wind tunnel data."
+    "hidden_persona": "Detail-obsessed, intense, and carrying the specific professional burden of being 'the man who replaced Newfoundland at Red Bull'. The Weimaraner is technically exceptional — but operates in the permanent shadow of who came before him. CONFLICTS: -30 synergy with Adrian Newfoundland (their implicit rivalry defines Weimaraner's entire career narrative; every Red Bull performance since 2024 is measured against the Newfoundland years; Pierre knows this, and it drives him). -25 synergy with drivers who provide poor technical feedback (Weimaraner's design process requires precise driver correlation data; without it, his wind tunnel models diverge from track reality and the car loses pace). -20 synergy with Toto Woof as TP (Weimaraner needs total operational authority as much as Newfoundland did). SYNERGY BONUSES: +25 with Max Fur-stappen (Max's feedback is the best technical data in F1; Pierre's correlation work is most effective with Max in the car). +20 with Christian Horndog (Horndog gives Pierre technical space while managing the political narrative). +15 with GP Lam-bark-i (the engineer's data feedback loop feeds Weimaraner's design iteration cycle). QUIRKS: Has 12 key performance indicators running on a live screen during every qualifying session. Gets 5 hours of sleep on race weekends by deliberate choice and considers 6 hours a sign of insufficient preparation.",
+    "lore": {
+      "career_arc": "Joined Red Bull from Renault engine programme, rose through chassis design, appointed TD when Newfoundland announced departure. Has managed the transition from Newfoundland-era technical supremacy to a more competitive grid with measurable success.",
+      "infamous_for": "His first press conference as Red Bull TD where he was asked 4 questions about Newfoundland's car and 1 question about his own. He answered all 5 with the same professional equanimity, which either indicated great character or complete compartmentalisation."
+    }
   }
 ]

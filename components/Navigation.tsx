@@ -1,27 +1,68 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Car, MessageSquare, Trophy, Home } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function Navigation() {
+  const pathname = usePathname();
+  const navItems = [
+    { href: '/', label: 'Paddock', short: 'Home', icon: Home },
+    { href: '/pitwall', label: 'Pitwall', short: 'Radio', icon: MessageSquare },
+    { href: '/quiz', label: 'Quiz', short: 'Timing', icon: Trophy },
+    { href: '/dream-team', label: 'Team', short: 'Lineup', icon: Car },
+  ];
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-zinc-800 pb-safe">
-      <div className="flex justify-around items-center h-16 max-w-md mx-auto px-4">
-        <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-zinc-400 hover:text-purple-400 transition-colors">
-          <Home className="w-5 h-5 mb-1" />
-          <span className="text-[10px] uppercase font-bold tracking-wider">Paddock</span>
-        </Link>
-        <Link href="/pitwall" className="flex flex-col items-center justify-center w-full h-full text-zinc-400 hover:text-purple-400 transition-colors">
-          <MessageSquare className="w-5 h-5 mb-1" />
-          <span className="text-[10px] uppercase font-bold tracking-wider">Pitwall</span>
-        </Link>
-        <Link href="/quiz" className="flex flex-col items-center justify-center w-full h-full text-zinc-400 hover:text-purple-400 transition-colors">
-          <Trophy className="w-5 h-5 mb-1" />
-          <span className="text-[10px] uppercase font-bold tracking-wider">Quiz</span>
-        </Link>
-        <Link href="/dream-team" className="flex flex-col items-center justify-center w-full h-full text-zinc-400 hover:text-purple-400 transition-colors">
-          <Car className="w-5 h-5 mb-1" />
-          <span className="text-[10px] uppercase font-bold tracking-wider">Team</span>
-        </Link>
-      </div>
-    </nav>
+    <>
+      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 pb-safe px-3 md:hidden">
+        <div className="pointer-events-auto mx-auto flex h-18 max-w-2xl items-center justify-between gap-2 rounded-[1.6rem] border border-white/10 bg-[rgba(10,11,15,0.86)] px-2 shadow-[0_-20px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                'group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[var(--text-muted)] hover:bg-white/5 hover:text-white',
+                pathname === href && 'bg-white/6 text-white'
+              )}
+            >
+              <Icon className="h-4.5 w-4.5" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.24em]">{label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      <nav className="pointer-events-none fixed inset-x-0 top-0 z-40 hidden md:block">
+        <div className="page-shell pointer-events-auto pt-6">
+          <div className="surface-panel flex items-center justify-between rounded-full px-5 py-3">
+            <Link href="/" className="min-w-0">
+              <div className="brand-wordmark text-[1.35rem] leading-none">
+                Box Box <span className="brand-signal">Bits AI</span>
+              </div>
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--text-faint)]">
+                Datadog Live Bangkok 2026
+              </p>
+            </Link>
+            <div className="flex items-center gap-2">
+              {navItems.map(({ href, short, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    'group flex items-center gap-2 rounded-full border border-transparent px-3 py-2 text-sm text-[var(--text-muted)] hover:border-white/10 hover:bg-white/5 hover:text-white',
+                    pathname === href && 'border-[color:var(--border-strong)] bg-white/5 text-white'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="font-mono text-[11px] uppercase tracking-[0.24em]">{short}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }

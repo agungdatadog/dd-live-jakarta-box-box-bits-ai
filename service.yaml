@@ -1,0 +1,83 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: __CR_SERVICE_NAME__
+  labels:
+    service: __CR_SERVICE_NAME__
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      labels:
+        service: __CR_SERVICE_NAME__
+      annotations:
+        autoscaling.knative.dev/maxScale: "20"
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 80
+      containers:
+        - name: app
+          image: __IMAGE_URI__
+          ports:
+            - name: http1
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 3
+            periodSeconds: 240
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 240
+          env:
+            # App config
+            - name: APP_URL
+              value: "__APP_URL__"
+            - name: APPLET_ID
+              value: "__APPLET_ID__"
+            - name: NEXT_PUBLIC_APPLET_ID
+              value: "__APPLET_ID__"
+            - name: GEMINI_API_KEY
+              value: "__GEMINI_API_KEY__"
+            # RUM (baked into client bundle at build time, also needed at runtime for SSR)
+            - name: NEXT_PUBLIC_DATADOG_CLIENT_TOKEN
+              value: "__NEXT_PUBLIC_DATADOG_CLIENT_TOKEN__"
+            - name: NEXT_PUBLIC_DATADOG_APPLICATION_ID
+              value: "__NEXT_PUBLIC_DATADOG_APPLICATION_ID__"
+            - name: NEXT_PUBLIC_DATADOG_SITE
+              value: "__NEXT_PUBLIC_DATADOG_SITE__"
+            - name: NEXT_PUBLIC_DATADOG_SERVICE
+              value: "__NEXT_PUBLIC_DATADOG_SERVICE__"
+            - name: NEXT_PUBLIC_DATADOG_ENV
+              value: "__NEXT_PUBLIC_DATADOG_ENV__"
+            - name: NEXT_PUBLIC_DD_VERSION
+              value: "__NEXT_PUBLIC_DD_VERSION__"
+            # APM — serverless-init (ENTRYPOINT) handles the local agent process.
+            # instrumentation.ts calls tracer.init({ llmobs }) at Next.js startup.
+            - name: DD_API_KEY
+              value: "__DD_API_KEY__"
+            - name: DD_SITE
+              value: "__DD_SITE__"
+            - name: DD_SERVICE
+              value: "__DD_SERVICE__"
+            - name: DD_ENV
+              value: "__DD_ENV__"
+            - name: DD_VERSION
+              value: "__DD_VERSION__"
+            - name: DD_LOGS_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_SOURCE
+              value: "nodejs"
+            - name: DD_LLMOBS_ENABLED
+              value: "1"
+            - name: DD_LLMOBS_ML_APP
+              value: "__DD_LLMOBS_ML_APP__"
+
+  traffic:
+    - latestRevision: true
+      percent: 100

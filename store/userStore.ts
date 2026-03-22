@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface UserState {
   userId: string;
   username: string;
+  hasSetName: boolean;
   setUsername: (name: string) => void;
   initialize: () => void;
 }
@@ -11,11 +12,12 @@ interface UserState {
 export const useUserStore = create<UserState>((set) => ({
   userId: '',
   username: 'GuestDoggo',
+  hasSetName: false,
   setUsername: (name: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('username', name);
     }
-    set({ username: name });
+    set({ username: name, hasSetName: true });
   },
   initialize: () => {
     if (typeof window !== 'undefined') {
@@ -24,8 +26,12 @@ export const useUserStore = create<UserState>((set) => ({
         id = uuidv4();
         localStorage.setItem('usr_id', id);
       }
-      const name = localStorage.getItem('username') || 'GuestDoggo';
-      set({ userId: id, username: name });
+      const storedName = localStorage.getItem('username');
+      set({
+        userId: id,
+        username: storedName || 'GuestDoggo',
+        hasSetName: !!storedName,
+      });
     }
-  }
+  },
 }));

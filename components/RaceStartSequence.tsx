@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Car, CheckCircle2, Zap } from 'lucide-react';
 
+const SPEED_LINES = Array.from({ length: 30 }, (_, index) => ({
+  id: index,
+  top: `${((index * 29) % 100)}%`,
+  width: `${140 + ((index * 37) % 260)}px`,
+  opacity: 0.45 + ((index % 5) * 0.12),
+  duration: 0.12 + ((index % 4) * 0.05),
+}));
+
 interface RaceStartSequenceProps {
   driver1Name: string;
   driver2Name: string;
@@ -19,17 +27,18 @@ export default function RaceStartSequence({ driver1Name, driver2Name, synergyMul
   const [showFinish, setShowFinish] = useState(false);
 
   useEffect(() => {
-    // Sequence: 5 red lights turn on one by one, then all go out (Lights Out!)
-    let timeout: NodeJS.Timeout;
-    
+    let cancelled = false;
+
     const runSequence = async () => {
       for (let i = 1; i <= 5; i++) {
         await new Promise(resolve => setTimeout(resolve, 800));
+        if (cancelled) return;
         setLights(i);
       }
       
       // Hold all 5 lights for a random time between 0.5s and 1.5s
       await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+      if (cancelled) return;
       
       // Lights out!
       setLights(0);
@@ -37,17 +46,21 @@ export default function RaceStartSequence({ driver1Name, driver2Name, synergyMul
       
       // Race duration
       await new Promise(resolve => setTimeout(resolve, 4000));
+      if (cancelled) return;
       
       setShowFinish(true);
       
       // Wait a bit before calling onAnimationComplete
       await new Promise(resolve => setTimeout(resolve, 2000));
+      if (cancelled) return;
       onAnimationComplete();
     };
 
     runSequence();
 
-    return () => clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+    };
   }, [onAnimationComplete]);
 
   return (
@@ -71,19 +84,19 @@ export default function RaceStartSequence({ driver1Name, driver2Name, synergyMul
               {/* Speed lines background */}
               {isRacing && (
                 <div className="absolute inset-0 opacity-50">
-                  {[...Array(30)].map((_, i) => (
+                  {SPEED_LINES.map((line) => (
                     <motion.div
-                      key={i}
+                      key={line.id}
                       className="absolute h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"
                       style={{ 
-                        top: `${Math.random() * 100}%`, 
-                        width: `${Math.random() * 300 + 100}px`,
-                        opacity: Math.random() * 0.5 + 0.5
+                        top: line.top,
+                        width: line.width,
+                        opacity: line.opacity
                       }}
                       animate={{ x: ['100vw', '-100vw'] }}
                       transition={{ 
                         repeat: Infinity, 
-                        duration: Math.random() * 0.2 + 0.1, 
+                        duration: line.duration,
                         ease: 'linear' 
                       }}
                     />
@@ -224,7 +237,7 @@ export default function RaceStartSequence({ driver1Name, driver2Name, synergyMul
                       <Zap className="w-3 h-3" /> AI Race Engineer Feedback
                     </div>
                     <p className="text-zinc-300 text-sm leading-relaxed italic">
-                      "{feedback}"
+                      &ldquo;{feedback}&rdquo;
                     </p>
                   </div>
                 </>

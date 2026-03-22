@@ -5,3 +5,6 @@ coverage/
 *.log
 .env*
 !.env.example
+# Skaffold - generated from .env, contains secrets
+k8s/cloudrun.yaml
+.service.rendered.yaml

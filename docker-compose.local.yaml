@@ -1,0 +1,27 @@
+services:
+  app:
+    image: box-box-bits-ai-local
+    ports:
+      - "8080:8080"
+    environment:
+      APP_URL: "http://localhost:8080"
+      APPLET_ID: "${APPLET_ID}"
+      NEXT_PUBLIC_APPLET_ID: "${APPLET_ID}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      NEXT_PUBLIC_DATADOG_CLIENT_TOKEN: "${NEXT_PUBLIC_DATADOG_CLIENT_TOKEN}"
+      NEXT_PUBLIC_DATADOG_APPLICATION_ID: "${NEXT_PUBLIC_DATADOG_APPLICATION_ID}"
+      NEXT_PUBLIC_DATADOG_SITE: "${NEXT_PUBLIC_DATADOG_SITE}"
+      NEXT_PUBLIC_DATADOG_SERVICE: "${NEXT_PUBLIC_DATADOG_SERVICE}"
+      NEXT_PUBLIC_DATADOG_ENV: "dev"
+      NEXT_PUBLIC_DD_VERSION: "local"
+      DD_ENV: "dev"
+      DD_SERVICE: "${DD_SERVICE:-box-box-bits-ai}"
+      DD_API_KEY: "${DD_API_KEY}"
+      DD_APP_KEY: "${DD_APP_KEY}"
+      DD_SITE: "${DD_SITE}"
+      DD_LOGS_INJECTION: "true"
+      DD_LOGS_ENABLED: "true"
+      DD_PROFILING_ENABLED: "false"
+      DD_LLMOBS_ENABLED: "1"
+      DD_LLMOBS_AGENTLESS_ENABLED: "1"
+      DD_LLMOBS_ML_APP: "${DD_LLMOBS_ML_APP:-box-box-bits-ai}"
