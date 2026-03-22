@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useUserStore } from '@/store/userStore';
 import { motion, useScroll } from 'motion/react';
-import { ArrowRight, Radio, TimerReset, Users2, Settings, Sparkles } from 'lucide-react';
+import { ArrowRight, Radio, TimerReset, Users2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import F1Car3D from '@/components/F1Car3D';
 
 export default function Home() {
-  const { username, setUsername } = useUserStore();
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [tempName, setTempName] = useState(username);
+  const { username } = useUserStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const routes = [
@@ -39,17 +37,6 @@ export default function Home() {
       accentClass: 'text-[var(--brand-secondary)]',
     },
   ];
-
-  useEffect(() => {
-    setTempName(username);
-  }, [username]);
-
-  const handleSaveName = () => {
-    if (tempName.trim()) {
-      setUsername(tempName.trim());
-      setIsEditingName(false);
-    }
-  };
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
@@ -153,7 +140,7 @@ export default function Home() {
 
         <section className="page-shell pb-12">
           <div className="surface-panel-strong rounded-[2rem] p-6 md:p-8">
-            <div className="grid gap-8 lg:grid-cols-[22rem_minmax(0,1fr)]">
+            <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -162,19 +149,20 @@ export default function Home() {
                 className="space-y-4"
               >
                 <div>
-                  <p className="section-kicker">Driver Identity</p>
+                  <p className="section-kicker">Launch Board</p>
                   <h2 className="section-title mt-3 text-[clamp(2rem,3vw,3rem)]">
-                    Keep the broadcast personal.
+                    One name, three race modes.
                   </h2>
                   <p className="muted-copy mt-3 text-sm leading-7">
-                    Set the active driver name once, then use the same profile
-                    across the quiz, pitwall, and Dream Team submission flows.
+                    The first game entry asks for your driver callsign. After that,
+                    the same identity follows every pitwall question, quiz run, and
+                    Dream Team verdict inside Datadog.
                   </p>
                 </div>
                 <div className="telemetry-divider" />
                 <div className="surface-panel rounded-[1.6rem] p-5">
                   <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
-                    Active Driver
+                    Current Callsign
                   </p>
                   <div className="mt-5 flex items-start gap-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--brand-primary)]/12">
@@ -183,37 +171,13 @@ export default function Home() {
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      {isEditingName ? (
-                        <div className="flex flex-col gap-3 sm:flex-row">
-                          <input
-                            type="text"
-                            value={tempName}
-                            onChange={(e) => setTempName(e.target.value)}
-                            className="min-w-0 flex-1 rounded-full border border-white/12 bg-black/35 px-4 py-3 text-sm text-white outline-none focus:border-[color:var(--border-strong)]"
-                            placeholder="Enter driver name"
-                            maxLength={20}
-                          />
-                          <button
-                            onClick={handleSaveName}
-                            className="rounded-full border border-[color:var(--border-strong)] bg-[color:var(--brand-primary)]/18 px-5 py-3 text-sm font-semibold text-white"
-                          >
-                            Save Driver
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="brand-wordmark text-[1.8rem] leading-none text-white">
-                            {username}
-                          </p>
-                          <button
-                            onClick={() => setIsEditingName(true)}
-                            className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs font-medium uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-white"
-                          >
-                            <Settings className="h-3.5 w-3.5" />
-                            Edit Driver
-                          </button>
-                        </>
-                      )}
+                      <p className="brand-wordmark text-[1.8rem] leading-none text-white">
+                        {username}
+                      </p>
+                      <p className="mt-3 text-sm leading-6 text-white/68">
+                        Need a new identity? Enter any mode and the race-number gate
+                        will let you type or generate one again.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -243,7 +207,7 @@ export default function Home() {
                       <p className="muted-copy mt-2 max-w-2xl text-sm leading-7">{description}</p>
                     </div>
                     <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-white/72 group-hover:text-white">
-                      Enter
+                      Launch
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </div>
                   </Link>

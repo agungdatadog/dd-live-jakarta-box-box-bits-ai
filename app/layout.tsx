@@ -19,7 +19,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <body className="bg-zinc-950 text-zinc-50 font-sans antialiased" suppressHydrationWarning>
         <DatadogInit />
         <div className="shell-grid min-h-screen">
-          <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-32 bg-gradient-to-b from-black via-black/70 to-transparent" />
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-28 bg-gradient-to-b from-black/55 via-black/18 to-transparent" />
           <main className="relative z-10 min-h-screen pb-28 md:pb-8">
             {children}
           </main>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useUserStore } from '@/store/userStore';
 import { useDreamTeamStore, Character } from '@/store/dreamTeamStore';
 import charactersData from '@/data/characters.json';
-import { ArrowRight, Timer, Zap } from 'lucide-react';
+import { ArrowRight, LoaderCircle, Timer, Zap } from 'lucide-react';
 import RaceStartSequence from '@/components/RaceStartSequence';
 import { PageIntro } from '@/components/PageIntro';
 import { DriverNameGate } from '@/components/DriverNameGate';
@@ -32,6 +32,24 @@ const SYNERGY_CONFIG: Record<string, { label: string; color: string; bg: string 
   VOLATILE:  { label: 'VOLATILE',  color: 'text-orange-400',                bg: 'bg-orange-500/10 border-orange-500/30' },
   TOXIC:     { label: 'TOXIC',     color: 'text-red-400',                   bg: 'bg-red-500/10 border-red-500/30' },
 };
+
+const SUBMISSION_STAGES = [
+  {
+    id: 'locked',
+    title: 'Garage Locked',
+    copy: 'The lineup is frozen and race control has accepted your submission.',
+  },
+  {
+    id: 'sent',
+    title: 'Context Sent',
+    copy: 'Hidden rivalries, lore, and chemistry data are heading to the judges now.',
+  },
+  {
+    id: 'judging',
+    title: 'AI Judges Reviewing',
+    copy: 'Datadog LLM Observability is tracing the verdict while the pitwall model scores the team.',
+  },
+] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -65,6 +83,8 @@ function DreamTeamContent() {
   const [sneakPeek, setSneakPeek] = useState('');
   const [synergyClass, setSynergyClass] = useState('');
   const [finalScore, setFinalScore] = useState<number | null>(null);
+  const [submissionStage, setSubmissionStage] =
+    useState<(typeof SUBMISSION_STAGES)[number]['id']>('locked');
 
   // Countdown
   const [countdownMs, setCountdownMs] = useState(POLE_TIME_MS);
@@ -121,6 +141,7 @@ function DreamTeamContent() {
 
     setPhase('racing');
     setIsEvaluating(true);
+    setSubmissionStage('locked');
 
     // RUM custom action — records the submission for Session Replay correlation
     if (datadogRum.getInitConfiguration()) {
@@ -141,6 +162,7 @@ function DreamTeamContent() {
     }
 
     try {
+      setSubmissionStage('sent');
       const res = await fetch('/api/evaluate-team', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -162,6 +184,7 @@ function DreamTeamContent() {
       });
 
       if (!res.ok) throw new Error(`Evaluation failed: ${res.status}`);
+      setSubmissionStage('judging');
 
       const result = await res.json();
       setSynergyMultiplier(result.synergyMultiplier ?? 1.0);
@@ -374,6 +397,9 @@ function DreamTeamContent() {
                     <span>Confirm Lineup</span>
                     <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
                   </button>
+                  <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--text-faint)]">
+                    Submit once and the garage locks while the AI judges start immediately.
+                  </p>
                 </div>
               </section>
             </motion.div>
@@ -388,6 +414,70 @@ function DreamTeamContent() {
               exit={{ opacity: 0 }}
               className="space-y-6 pt-6"
             >
+              {isEvaluating ? (
+                <motion.section
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="surface-panel rounded-[2rem] p-5 md:p-6"
+                >
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="max-w-2xl">
+                      <div className="flex items-center gap-3">
+                        <LoaderCircle className="h-5 w-5 animate-spin text-[var(--brand-secondary)]" />
+                        <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[var(--brand-secondary)]">
+                          Evaluation Running
+                        </p>
+                      </div>
+                      <h2 className="section-title mt-3 text-[1.8rem] text-white">
+                        Your lineup is on the pitwall now.
+                      </h2>
+                      <p className="muted-copy mt-3 max-w-xl text-sm leading-7">
+                        We&apos;re locking the garage, sending the full paddock context to the judges,
+                        and waiting for the Datadog-traced verdict to come back.
+                      </p>
+                    </div>
+
+                    <div className="surface-rail rounded-[1.4rem] px-4 py-4 lg:min-w-[14rem]">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                        Current Step
+                      </p>
+                      <p className="mt-2 brand-wordmark text-[1.3rem] leading-none text-[var(--brand-secondary)]">
+                        {SUBMISSION_STAGES.find((stage) => stage.id === submissionStage)?.title}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid gap-3 md:grid-cols-3">
+                    {SUBMISSION_STAGES.map((stage, index) => {
+                      const activeIndex = SUBMISSION_STAGES.findIndex(
+                        (item) => item.id === submissionStage
+                      );
+                      const isActive = stage.id === submissionStage;
+                      const isDone = index < activeIndex;
+
+                      return (
+                        <div
+                          key={stage.id}
+                          className={`rounded-[1.4rem] border px-4 py-4 transition-colors ${
+                            isActive
+                              ? 'border-[color:var(--border-strong)] bg-[var(--brand-secondary)]/10'
+                              : isDone
+                                ? 'border-white/12 bg-white/6'
+                                : 'border-white/8 bg-white/3'
+                          }`}
+                        >
+                          <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-[var(--text-faint)]">
+                            Step {index + 1}
+                          </p>
+                          <p className="mt-2 text-sm font-semibold text-white">{stage.title}</p>
+                          <p className="mt-2 text-sm leading-6 text-white/68">{stage.copy}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.section>
+              ) : null}
+
               {/* Race start animation */}
               <div className="surface-panel-strong overflow-hidden rounded-[2rem]">
                 <RaceStartSequence
