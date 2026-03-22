@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-datadog-purple: #632CA6;
+  --color-datadog-purple-light: #8A4BDE;
+  --color-datadog-purple-dark: #451E75;
+}
+
+:root {
+  --background: #09090b;
+  --foreground: #fafafa;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

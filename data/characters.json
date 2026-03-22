@@ -1,0 +1,416 @@
+[
+  {
+    "id": "drv_max_furstappen",
+    "name": "Max Fur-stappen",
+    "breed": "Belgian Malinois",
+    "role": "Driver",
+    "team": "Oracle Red Bull Racing",
+    "visible_stats": { "pace": 99, "aggression": 95, "tire_management": 85 },
+    "hidden_persona": "Relentlessly fast and aggressively competitive. Demands absolute perfection. CONFLICT: -30 synergy if paired with another alpha driver (like Fur-nando Alonso or Lewis Howl-milton). Refuses to listen to team orders."
+  },
+  {
+    "id": "drv_liam_pawson",
+    "name": "Liam Paw-son",
+    "breed": "New Zealand Huntaway",
+    "role": "Driver",
+    "team": "Oracle Red Bull Racing",
+    "visible_stats": { "pace": 85, "aggression": 88, "tire_management": 82 },
+    "hidden_persona": "Eager to prove himself and highly adaptable. CONFLICT: -15 synergy if paired with a Team Principal who micromanages (like Toto Woof). Responds poorly to constant barking on the radio."
+  },
+  {
+    "id": "prin_christian_horndog",
+    "name": "Christian Horndog",
+    "breed": "Jack Russell Terrier",
+    "role": "Team Principal",
+    "team": "Oracle Red Bull Racing",
+    "visible_stats": { "leadership": 92, "media_handling": 98, "politics": 99 },
+    "hidden_persona": "A master of media manipulation and team politics. CONFLICT: -25 synergy if paired with Toto Woof (Austrian Pinscher) due to a fierce, long-standing breed rivalry."
+  },
+  {
+    "id": "eng_gp_lambarki",
+    "name": "GP (Gianpiero Lam-bark-i)",
+    "breed": "Italian Greyhound",
+    "role": "Race Engineer",
+    "team": "Oracle Red Bull Racing",
+    "visible_stats": { "composure": 99, "technical": 90, "clarity": 95 },
+    "hidden_persona": "Blunt, monotone, and completely unfazed by yelling. CONFLICT: -20 synergy if paired with highly emotional drivers (like Charles LeBark) who need constant reassurance."
+  },
+  {
+    "id": "drv_george_ruffell",
+    "name": "George Ruff-ell",
+    "breed": "Poodle",
+    "role": "Driver",
+    "team": "Mercedes-AMG Petronas",
+    "visible_stats": { "pace": 92, "aggression": 89, "tire_management": 88 },
+    "hidden_persona": "Highly analytical and articulate. Needs to feel like the team leader. CONFLICT: -25 synergy if paired with a rookie driver (like Kimi Antonell-hound) because he demands all the team's attention."
+  },
+  {
+    "id": "drv_kimi_antonellhound",
+    "name": "Kimi Antonell-hound",
+    "breed": "Italian Greyhound",
+    "role": "Driver",
+    "team": "Mercedes-AMG Petronas",
+    "visible_stats": { "pace": 88, "aggression": 90, "tire_management": 75 },
+    "hidden_persona": "A raw, prodigious talent. Extremely fast but prone to rookie mistakes. CONFLICT: -20 synergy if paired with a harsh Race Engineer (like GP Lam-bark-i). Needs a nurturing environment."
+  },
+  {
+    "id": "prin_toto_woof",
+    "name": "Toto Woof",
+    "breed": "Austrian Pinscher",
+    "role": "Team Principal",
+    "team": "Mercedes-AMG Petronas",
+    "visible_stats": { "leadership": 95, "media_handling": 95, "politics": 90 },
+    "hidden_persona": "Intensely passionate and demands total control. CONFLICT: -40 synergy if paired with Christian Horndog, or -20 synergy if the Technical Director ignores his micromanagement (like Adrian Newfoundland)."
+  },
+  {
+    "id": "eng_bono_bark",
+    "name": "Bono Bark",
+    "breed": "Golden Retriever",
+    "role": "Race Engineer",
+    "team": "Mercedes-AMG Petronas",
+    "visible_stats": { "composure": 95, "technical": 92, "clarity": 90 },
+    "hidden_persona": "Extremely supportive and calm under pressure. CONFLICT: -15 synergy if paired with an ice-cold driver (like Paw-scar Piastri) who finds his soothing voice annoying."
+  },
+  {
+    "id": "drv_charles_lebark",
+    "name": "Charles LeBark",
+    "breed": "Cavalier King Charles Spaniel",
+    "role": "Driver",
+    "team": "Scuderia Ferrari",
+    "visible_stats": { "pace": 97, "aggression": 86, "tire_management": 89 },
+    "hidden_persona": "Incredibly fast over a single lap but highly emotional. CONFLICT: -25 synergy if paired with a blunt, monotone engineer (like GP Lam-bark-i) or a chaotic strategist (like Bernie Collie)."
+  },
+  {
+    "id": "drv_lewis_howlmilton",
+    "name": "Lewis Howl-milton",
+    "breed": "English Bulldog",
+    "role": "Driver",
+    "team": "Scuderia Ferrari",
+    "visible_stats": { "pace": 96, "aggression": 85, "tire_management": 98 },
+    "hidden_persona": "A seasoned veteran who values smooth operations. CONFLICT: -30 synergy if paired with a young, aggressive teammate who doesn't respect his seniority (like Max Fur-stappen or Esteban O-corgi)."
+  },
+  {
+    "id": "prin_fred_basseteur",
+    "name": "Fred Basset-eur",
+    "breed": "Basset Hound",
+    "role": "Team Principal",
+    "team": "Scuderia Ferrari",
+    "visible_stats": { "leadership": 90, "media_handling": 85, "politics": 88 },
+    "hidden_persona": "Jovial and relaxed on the outside, but a shrewd operator inside. CONFLICT: -15 synergy if paired with high-stress, micromanaging Technical Directors."
+  },
+  {
+    "id": "eng_bryan_barkzzi",
+    "name": "Bryan Bark-zzi",
+    "breed": "Maremma Sheepdog",
+    "role": "Race Engineer",
+    "team": "Scuderia Ferrari",
+    "visible_stats": { "composure": 88, "technical": 91, "clarity": 85 },
+    "hidden_persona": "Enthusiastic and deeply technical. CONFLICT: -15 synergy if paired with drivers who demand extremely concise radio messages (like Fur-nando Alonso)."
+  },
+  {
+    "id": "drv_lando_norruff",
+    "name": "Lando Nor-ruff",
+    "breed": "Labrador Retriever",
+    "role": "Driver",
+    "team": "McLaren",
+    "visible_stats": { "pace": 95, "aggression": 87, "tire_management": 92 },
+    "hidden_persona": "Playful and fast, but can be harsh on himself. CONFLICT: -20 synergy if paired with a completely humorless engineer (like Jörn Bark-er). Needs banter to stay relaxed."
+  },
+  {
+    "id": "drv_pawscar_piastri",
+    "name": "Paw-scar Piastri",
+    "breed": "Australian Kelpie",
+    "role": "Driver",
+    "team": "McLaren",
+    "visible_stats": { "pace": 93, "aggression": 84, "tire_management": 94 },
+    "hidden_persona": "Ice-cold and unflappable. Rarely shows emotion. CONFLICT: -15 synergy if paired with a highly emotional Team Principal (like Toto Woof) or an overly chatty engineer."
+  },
+  {
+    "id": "prin_andrea_setterla",
+    "name": "Andrea Setter-la",
+    "breed": "Irish Setter",
+    "role": "Team Principal",
+    "team": "McLaren",
+    "visible_stats": { "leadership": 94, "media_handling": 88, "politics": 85 },
+    "hidden_persona": "Calm, methodical, and deeply technical. CONFLICT: -15 synergy if paired with highly political drivers who bring paddock drama into the garage."
+  },
+  {
+    "id": "eng_will_josniff",
+    "name": "Will Jo-sniff",
+    "breed": "Border Collie",
+    "role": "Race Engineer",
+    "team": "McLaren",
+    "visible_stats": { "composure": 92, "technical": 94, "clarity": 91 },
+    "hidden_persona": "Highly intelligent and proactive. CONFLICT: -20 synergy if paired with a driver who easily gets overwhelmed by too much data on the radio."
+  },
+  {
+    "id": "drv_furnando_alonso",
+    "name": "Fur-nando Alonso",
+    "breed": "Spanish Mastiff",
+    "role": "Driver",
+    "team": "Aston Martin",
+    "visible_stats": { "pace": 94, "aggression": 96, "tire_management": 95 },
+    "hidden_persona": "A cunning, experienced tactician. CONFLICT: -35 synergy if paired with a rookie teammate or a strategist who makes mistakes (like Bernie Collie). Will publicly shame them on the radio."
+  },
+  {
+    "id": "drv_lance_strollhound",
+    "name": "Lance Stroll-hound",
+    "breed": "Canadian Eskimo Dog",
+    "role": "Driver",
+    "team": "Aston Martin",
+    "visible_stats": { "pace": 82, "aggression": 85, "tire_management": 80 },
+    "hidden_persona": "Inconsistent but capable of flashes of brilliance. CONFLICT: -20 synergy if paired with a harsh, demanding Team Principal who doesn't give him a structured environment."
+  },
+  {
+    "id": "prin_mike_krackenhound",
+    "name": "Mike Krack-en-hound",
+    "breed": "German Shorthaired Pointer",
+    "role": "Team Principal",
+    "team": "Aston Martin",
+    "visible_stats": { "leadership": 85, "media_handling": 82, "politics": 80 },
+    "hidden_persona": "Pragmatic and straightforward. CONFLICT: -15 synergy if paired with drivers who constantly bypass him to complain directly to team ownership."
+  },
+  {
+    "id": "eng_chris_crosniff",
+    "name": "Chris Cro-sniff",
+    "breed": "Beagle",
+    "role": "Race Engineer",
+    "team": "Aston Martin",
+    "visible_stats": { "composure": 89, "technical": 88, "clarity": 87 },
+    "hidden_persona": "Patient and resilient. CONFLICT: -10 synergy if paired with a driver who ignores his radio calls, as Beagles hate being ignored."
+  },
+  {
+    "id": "drv_pierre_gasleash",
+    "name": "Pierre Gas-leash",
+    "breed": "French Bulldog",
+    "role": "Driver",
+    "team": "Alpine",
+    "visible_stats": { "pace": 87, "aggression": 88, "tire_management": 84 },
+    "hidden_persona": "Passionate and vocal. CONFLICT: -40 synergy if paired with Esteban O-corgi (Corgi). They have a legendary breed rivalry and will actively try to crash into each other."
+  },
+  {
+    "id": "drv_jack_doghan",
+    "name": "Jack Dog-han",
+    "breed": "Australian Cattle Dog",
+    "role": "Driver",
+    "team": "Alpine",
+    "visible_stats": { "pace": 83, "aggression": 85, "tire_management": 81 },
+    "hidden_persona": "Hardworking and determined rookie. CONFLICT: -20 synergy if paired with an unsupportive veteran teammate who refuses to share telemetry."
+  },
+  {
+    "id": "prin_oliver_oakeshound",
+    "name": "Oliver Oakes-hound",
+    "breed": "English Foxhound",
+    "role": "Team Principal",
+    "team": "Alpine",
+    "visible_stats": { "leadership": 84, "media_handling": 80, "politics": 82 },
+    "hidden_persona": "A young, ambitious leader trying to bring stability. CONFLICT: -25 synergy if paired with two drivers who hate each other (like Gas-leash and O-corgi), as it destroys team culture."
+  },
+  {
+    "id": "eng_karel_loobark",
+    "name": "Karel Loo-bark",
+    "breed": "Dutch Shepherd",
+    "role": "Race Engineer",
+    "team": "Alpine",
+    "visible_stats": { "composure": 86, "technical": 87, "clarity": 85 },
+    "hidden_persona": "Direct and no-nonsense. CONFLICT: -15 synergy if paired with a driver who constantly questions his instructions on the radio."
+  },
+  {
+    "id": "drv_alex_albone",
+    "name": "Alex Al-bone",
+    "breed": "Thai Ridgeback",
+    "role": "Driver",
+    "team": "Williams",
+    "visible_stats": { "pace": 89, "aggression": 84, "tire_management": 91 },
+    "hidden_persona": "Smooth, consistent, and an excellent tire whisperer. CONFLICT: -15 synergy if paired with an overly aggressive strategist who forces him into chaotic multi-stop races."
+  },
+  {
+    "id": "drv_carlos_spaniel",
+    "name": "Carlos Spaniel",
+    "breed": "Cocker Spaniel",
+    "role": "Driver",
+    "team": "Williams",
+    "visible_stats": { "pace": 92, "aggression": 88, "tire_management": 93 },
+    "hidden_persona": "A highly intelligent, strategic thinker. CONFLICT: -20 synergy if paired with a Head of Strategy who refuses to debate options with him during the race."
+  },
+  {
+    "id": "prin_james_vowleshound",
+    "name": "James Vowles-hound",
+    "breed": "Greyhound",
+    "role": "Team Principal",
+    "team": "Williams",
+    "visible_stats": { "leadership": 91, "media_handling": 93, "politics": 86 },
+    "hidden_persona": "Articulate, transparent, and deeply analytical. CONFLICT: -20 synergy if paired with drivers who rely purely on 'feel' rather than data."
+  },
+  {
+    "id": "eng_james_urwoof",
+    "name": "James Ur-woof",
+    "breed": "Whippet",
+    "role": "Race Engineer",
+    "team": "Williams",
+    "visible_stats": { "composure": 90, "technical": 89, "clarity": 92 },
+    "hidden_persona": "Calm and precise. CONFLICT: -15 synergy if paired with a highly volatile driver who screams on the radio (like Yuki Tsu-dog-a)."
+  },
+  {
+    "id": "drv_yuki_tsudoga",
+    "name": "Yuki Tsu-dog-a",
+    "breed": "Shiba Inu",
+    "role": "Driver",
+    "team": "RB",
+    "visible_stats": { "pace": 88, "aggression": 92, "tire_management": 83 },
+    "hidden_persona": "Extremely fast but highly volatile. Prone to explosive radio outbursts. CONFLICT: -25 synergy if paired with a Race Engineer who cannot act as a calming therapist."
+  },
+  {
+    "id": "drv_isack_houndjar",
+    "name": "Isack Hound-jar",
+    "breed": "Pug",
+    "role": "Driver",
+    "team": "RB",
+    "visible_stats": { "pace": 84, "aggression": 89, "tire_management": 80 },
+    "hidden_persona": "Aggressive and hungry rookie. CONFLICT: -20 synergy if paired with another aggressive rookie, leading to guaranteed on-track collisions."
+  },
+  {
+    "id": "prin_laurent_mekieshound",
+    "name": "Laurent Me-kies-hound",
+    "breed": "Papillon",
+    "role": "Team Principal",
+    "team": "RB",
+    "visible_stats": { "leadership": 86, "media_handling": 84, "politics": 89 },
+    "hidden_persona": "Diplomatic and experienced. CONFLICT: -15 synergy if paired with a Technical Director who refuses to share data with the sister team."
+  },
+  {
+    "id": "eng_mattia_spidogi",
+    "name": "Mattia Spi-dog-i",
+    "breed": "Bolognese",
+    "role": "Race Engineer",
+    "team": "RB",
+    "visible_stats": { "composure": 85, "technical": 86, "clarity": 84 },
+    "hidden_persona": "Patient and encouraging. CONFLICT: -10 synergy if paired with a driver who completely ignores his coaching."
+  },
+  {
+    "id": "drv_nico_howlkenberg",
+    "name": "Nico Howl-kenberg",
+    "breed": "German Shepherd",
+    "role": "Driver",
+    "team": "Sauber",
+    "visible_stats": { "pace": 89, "aggression": 86, "tire_management": 85 },
+    "hidden_persona": "A reliable, experienced qualifier. CONFLICT: -15 synergy if paired with a chaotic strategist who ruins his excellent starting positions."
+  },
+  {
+    "id": "drv_gabriel_barktoleto",
+    "name": "Gabriel Bark-toleto",
+    "breed": "Fila Brasileiro",
+    "role": "Driver",
+    "team": "Sauber",
+    "visible_stats": { "pace": 85, "aggression": 87, "tire_management": 82 },
+    "hidden_persona": "A highly touted rookie with immense raw speed. CONFLICT: -20 synergy if paired with a Team Principal who doesn't give him time to develop."
+  },
+  {
+    "id": "prin_mattia_binotdog",
+    "name": "Mattia Binot-dog",
+    "breed": "St. Bernard",
+    "role": "Team Principal",
+    "team": "Sauber",
+    "visible_stats": { "leadership": 88, "media_handling": 82, "politics": 85 },
+    "hidden_persona": "A deeply technical leader focused on long-term project building. CONFLICT: -25 synergy if paired with impatient drivers who demand immediate race wins."
+  },
+  {
+    "id": "eng_jorn_barker",
+    "name": "Jörn Bark-er",
+    "role": "Race Engineer",
+    "breed": "Rottweiler",
+    "team": "Sauber",
+    "visible_stats": { "composure": 87, "technical": 88, "clarity": 86 },
+    "hidden_persona": "Methodical and disciplined. CONFLICT: -20 synergy if paired with a playful, joking driver (like Lando Nor-ruff). He hates small talk on the radio."
+  },
+  {
+    "id": "drv_esteban_ocorgi",
+    "name": "Esteban O-corgi",
+    "breed": "Corgi",
+    "role": "Driver",
+    "team": "Haas",
+    "visible_stats": { "pace": 88, "aggression": 93, "tire_management": 86 },
+    "hidden_persona": "Fiercely defensive and unwilling to yield. CONFLICT: -40 synergy if paired with Pierre Gas-leash (French Bulldog) due to a legendary breed rivalry. Will actively sabotage him."
+  },
+  {
+    "id": "drv_ollie_bearmutt",
+    "name": "Ollie Bear-mutt",
+    "breed": "Staffordshire Bull Terrier",
+    "role": "Driver",
+    "team": "Haas",
+    "visible_stats": { "pace": 86, "aggression": 84, "tire_management": 83 },
+    "hidden_persona": "A calm, mature rookie who rarely gets flustered. CONFLICT: -15 synergy if paired with an engineer who doesn't feed him constant data."
+  },
+  {
+    "id": "prin_ayao_komuttsu",
+    "name": "Ayao Ko-mutt-su",
+    "breed": "Akita",
+    "role": "Team Principal",
+    "team": "Haas",
+    "visible_stats": { "leadership": 87, "media_handling": 85, "politics": 83 },
+    "hidden_persona": "A pragmatic, engineering-focused leader. CONFLICT: -20 synergy if paired with drivers who crash frequently, as he hates wasting the budget."
+  },
+  {
+    "id": "eng_mark_sladog",
+    "name": "Mark Sla-dog",
+    "breed": "Dalmatian",
+    "role": "Race Engineer",
+    "team": "Haas",
+    "visible_stats": { "composure": 91, "technical": 90, "clarity": 89 },
+    "hidden_persona": "Highly experienced and unflappable. CONFLICT: -10 synergy if paired with a driver who ignores his vast experience."
+  },
+  {
+    "id": "strat_hannah_schnauzer",
+    "name": "Hannah Schnauzer",
+    "breed": "Miniature Schnauzer",
+    "role": "Head of Strategy",
+    "team": "Oracle Red Bull Racing",
+    "visible_stats": { "composure": 98, "technical": 95, "clarity": 90 },
+    "hidden_persona": "Ice cold under pressure. Makes daring pit calls. CONFLICT: -25 synergy if paired with an emotional driver (like Charles LeBark) who questions her calls during the race."
+  },
+  {
+    "id": "strat_bernie_collie",
+    "name": "Bernie Collie",
+    "breed": "Border Collie",
+    "role": "Head of Strategy",
+    "team": "Scuderia Ferrari",
+    "visible_stats": { "composure": 85, "technical": 92, "clarity": 88 },
+    "hidden_persona": "Brilliant but sometimes overthinks the data. CONFLICT: -30 synergy if paired with a demanding veteran (like Fur-nando Alonso) who will publicly mock his mistakes."
+  },
+  {
+    "id": "strat_rosie_barkcombe",
+    "name": "Rosie Bark-combe",
+    "breed": "Boxer",
+    "role": "Head of Strategy",
+    "team": "Aston Martin",
+    "visible_stats": { "composure": 90, "technical": 89, "clarity": 94 },
+    "hidden_persona": "Aggressive strategist who loves an undercut. CONFLICT: -20 synergy if paired with a driver who has poor tire management and can't execute her aggressive stints."
+  },
+  {
+    "id": "tech_adrian_newfoundland",
+    "name": "Adrian Newfoundland",
+    "breed": "Newfoundland",
+    "role": "Technical Director",
+    "team": "Aston Martin",
+    "visible_stats": { "leadership": 90, "technical": 99, "politics": 80 },
+    "hidden_persona": "An aerodynamic genius who works best with a pencil and paper. CONFLICT: -35 synergy if paired with a Team Principal who micromanages car design (like Toto Woof)."
+  },
+  {
+    "id": "tech_james_afghan",
+    "name": "James Afghan",
+    "breed": "Afghan Hound",
+    "role": "Technical Director",
+    "team": "Mercedes-AMG Petronas",
+    "visible_stats": { "leadership": 95, "technical": 96, "politics": 88 },
+    "hidden_persona": "Charismatic and highly intelligent. CONFLICT: -20 synergy if paired with a Team Principal who doesn't let him lead the engineering department."
+  },
+  {
+    "id": "tech_pierre_weimaraner",
+    "name": "Pierre Weimaraner",
+    "breed": "Weimaraner",
+    "role": "Technical Director",
+    "team": "Oracle Red Bull Racing",
+    "visible_stats": { "leadership": 88, "technical": 97, "politics": 85 },
+    "hidden_persona": "Intense and detail-oriented. CONFLICT: -25 synergy if paired with drivers who give poor technical feedback, as he relies on them to correlate wind tunnel data."
+  }
+]
