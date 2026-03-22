@@ -177,8 +177,41 @@ Return ONLY valid JSON with exactly these keys:
     };
     let rawResponseText = '';
 
+    // Helper: parse the raw LLM JSON into llmResult (shared between getOutput and the outer scope)
+    const parseResponse = (text: string): typeof llmResult => {
+      try {
+        const parsed = JSON.parse(text);
+        return {
+          synergy_multiplier: Number(parsed.synergy_multiplier) || 1.0,
+          weirdness_rating: Math.min(100, Math.max(0, parseInt(parsed.weirdness_rating) || 50)),
+          conflict_index: Math.min(100, Math.max(0, parseInt(parsed.conflict_index) || 50)),
+          sneak_peek: String(parsed.sneak_peek || 'No commentary available.'),
+          team_codename: String(parsed.team_codename || 'Unknown Quantity Racing'),
+          synergy_class: ['LEGENDARY', 'STRONG', 'AVERAGE', 'VOLATILE', 'TOXIC'].includes(
+            String(parsed.synergy_class)
+          )
+            ? String(parsed.synergy_class)
+            : 'AVERAGE',
+        };
+      } catch {
+        logger.warn({ message: 'Failed to parse LLM JSON response', raw: text });
+        return llmResult; // keep defaults on parse error
+      }
+    };
+
+    // Selected lineup as a compact string for the prompt variable
+    const lineupSummary = [
+      principal.name,
+      driver.name,
+      driver2.name,
+      engineer.name,
+      engineer2?.name ?? 'TBD',
+      strategy.name,
+      techDirector.name,
+    ].join(' · ');
+
     const response = await withLlmObsSpan(
-      // Task name — visible in Datadog LLMObs; used to scope custom evaluations.
+      // Span name visible in Datadog LLMObs; used to scope custom evaluations.
       'dream_team_game_evaluation',
       {
         inputMessages: [
@@ -200,6 +233,30 @@ Return ONLY valid JSON with exactly these keys:
           selected_strategy: selection.head_of_strategy,
           selected_tech_director: selection.technical_director,
         },
+        // ── Prompt tracking ────────────────────────────────────────────────────
+        // Template uses placeholders for the two dynamic parts of the user prompt.
+        // Version is omitted → auto-versioned by hash of template content.
+        // contextVariables: the full roster is ground-truth context (for hallucination detection).
+        // queryVariables: the selected lineup is what the user is actually asking about.
+        prompt: {
+          id: 'dream-team-game-evaluation',
+          template: [
+            { role: 'system', content: systemInstruction },
+            {
+              role: 'user',
+              content:
+                '## FULL PADDOCK ROSTER\n{{roster_context}}\n\n---\n\n## SELECTED TEAM LINEUP\n{{lineup_context}}\n\n---\n\n## SCORING INSTRUCTIONS\n{{scoring_instructions}}',
+            },
+          ],
+          variables: {
+            roster_context: `Full paddock roster (${charactersData.length} characters with hidden personas and lore)`,
+            lineup_context: lineupSummary,
+            scoring_instructions: 'synergy_multiplier · weirdness_rating · conflict_index · sneak_peek · team_codename · synergy_class',
+          },
+          tags: { game: 'datadog-live-bangkok-2026', task: 'dream_team_game_evaluation' },
+          contextVariables: ['roster_context'],  // paddock roster = ground-truth context
+          queryVariables: ['lineup_context'],    // selected lineup = user query
+        },
       },
       async () =>
         ai.models.generateContent({
@@ -209,27 +266,34 @@ Return ONLY valid JSON with exactly these keys:
           ],
           config: { responseMimeType: 'application/json' },
         }),
-      // Post-call output annotation — this is what Datadog custom evaluators will read.
+      // ── Post-call output annotation ──────────────────────────────────────────
+      // Parse the LLM JSON response HERE so the LLMObs span metadata contains
+      // the actual scored values — not the pre-initialised defaults.
+      // weirdness_rating, conflict_index, synergy_class are intentionally hidden
+      // from the UI response; they live only in LLMObs for prize judging.
       (res) => {
         const text = res.text ?? '';
         const latencyMs = Date.now() - startTime;
-        // Prefer actual token counts from usageMetadata; fall back to char-length estimate.
         const inputTokens  = res.usageMetadata?.promptTokenCount     ?? Math.round((systemInstruction.length + userPrompt.length) / 4);
         const outputTokens = res.usageMetadata?.candidatesTokenCount ?? Math.round(text.length / 4);
+
+        // Parse and cache so the outer scope can reuse without re-parsing
+        const parsed = parseResponse(text);
+        llmResult = parsed;
+
         return {
           outputContent: text,
           inputTokens,
           outputTokens,
           metadata: {
             latency_ms: latencyMs,
-            // These three values are the ones Datadog evaluators use to judge
-            // Best Score / Weirdest / Most Conflict — intentionally not sent to UI.
-            weirdness_rating: llmResult.weirdness_rating,
-            conflict_index: llmResult.conflict_index,
-            synergy_class: llmResult.synergy_class,
-            synergy_multiplier: llmResult.synergy_multiplier,
-            final_score: Math.round(baseTeamStats * llmResult.synergy_multiplier),
-            team_codename: llmResult.team_codename,
+            // Real scored values — available in Datadog LLMObs for custom evaluation
+            weirdness_rating:   parsed.weirdness_rating,
+            conflict_index:     parsed.conflict_index,
+            synergy_class:      parsed.synergy_class,
+            synergy_multiplier: parsed.synergy_multiplier,
+            final_score: Math.round(baseTeamStats * parsed.synergy_multiplier),
+            team_codename: parsed.team_codename,
           },
         };
       },
@@ -237,25 +301,7 @@ Return ONLY valid JSON with exactly these keys:
 
     rawResponseText = response.text ?? '';
     const latencyMs = Date.now() - startTime;
-
-    // Parse LLM JSON response
-    try {
-      const parsed = JSON.parse(rawResponseText);
-      llmResult = {
-        synergy_multiplier: Number(parsed.synergy_multiplier) || 1.0,
-        weirdness_rating: Math.min(100, Math.max(0, parseInt(parsed.weirdness_rating) || 50)),
-        conflict_index: Math.min(100, Math.max(0, parseInt(parsed.conflict_index) || 50)),
-        sneak_peek: String(parsed.sneak_peek || 'No commentary available.'),
-        team_codename: String(parsed.team_codename || 'Unknown Quantity Racing'),
-        synergy_class: ['LEGENDARY', 'STRONG', 'AVERAGE', 'VOLATILE', 'TOXIC'].includes(
-          String(parsed.synergy_class)
-        )
-          ? String(parsed.synergy_class)
-          : 'AVERAGE',
-      };
-    } catch {
-      logger.warn({ message: 'Failed to parse LLM JSON response', raw: rawResponseText });
-    }
+    // llmResult was already set inside getOutput above — no second parse needed
 
     const finalScore = Math.round(baseTeamStats * llmResult.synergy_multiplier);
 
