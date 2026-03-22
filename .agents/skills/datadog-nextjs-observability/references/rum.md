@@ -3,11 +3,12 @@
 ## Table of Contents
 
 - [Installation](#installation)
-- [RUM initialization](#rum-initialization)
+- [RUM initialization (dedicated component)](#rum-initialization)
 - [APM-RUM correlation](#apm-rum-correlation)
 - [User identification](#user-identification)
 - [Global context properties](#global-context-properties)
-- [RUM-LLMObs correlation](#rum-llmobs-correlation)
+- [Custom actions for game/event telemetry](#custom-actions)
+- [RUM-LLMObs correlation via sessionId](#rum-llmobs-correlation)
 - [Build version display](#build-version-display)
 
 ## Installation
@@ -18,48 +19,84 @@ npm install @datadog/browser-rum
 
 ## RUM initialization
 
-Initialize in a `"use client"` component, typically the root page, inside
-a `useEffect` that runs once on mount:
+Create a dedicated `'use client'` component for RUM initialization.
+Import it in your root layout so it runs on every page:
 
 ```typescript
-"use client";
-import { datadogRum } from '@datadog/browser-rum';
+// components/DatadogInit.tsx
+'use client';
 import { useEffect } from 'react';
+import { datadogRum } from '@datadog/browser-rum';
+import { useUserStore } from '@/store/userStore';
 
-useEffect(() => {
-  datadogRum.init({
-    applicationId: '<APPLICATION_ID>',
-    clientToken: '<CLIENT_TOKEN>',
-    site: 'datadoghq.com',
-    service: 'my-service-name',
-    env: 'prod',
-    sessionSampleRate: 100,
-    sessionReplaySampleRate: 100,
-    trackBfcacheViews: true,
-    trackResources: true,
-    trackLongTasks: true,
-    trackUserInteractions: true,
-    defaultPrivacyLevel: 'allow',
-    // APM-RUM correlation: inject trace-context headers into API requests
-    allowedTracingUrls: [
-      (url: string) => url.startsWith(`${window.location.origin}/api/`),
-    ],
-  });
-}, []);
+export default function DatadogInit() {
+  const { userId, username, initialize } = useUserStore();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !datadogRum.getInitConfiguration()) {
+      datadogRum.init({
+        applicationId: process.env.NEXT_PUBLIC_DATADOG_APPLICATION_ID!,
+        clientToken:   process.env.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN!,
+        site:    process.env.NEXT_PUBLIC_DATADOG_SITE    || 'datadoghq.com',
+        service: process.env.NEXT_PUBLIC_DATADOG_SERVICE || 'my-service',
+        env:     process.env.NEXT_PUBLIC_DATADOG_ENV     || 'production',
+        version: process.env.NEXT_PUBLIC_DD_VERSION      || 'dev',
+        sessionSampleRate: 100,
+        sessionReplaySampleRate: 100,
+        trackBfcacheViews: true,
+        trackResources: true,
+        trackLongTasks: true,
+        trackUserInteractions: true,
+        defaultPrivacyLevel: 'allow',
+        allowedTracingUrls: [
+          (url: string) => url.startsWith(`${window.location.origin}/api/`),
+        ],
+      });
+      datadogRum.startSessionReplayRecording();
+    }
+    initialize();
+  }, [initialize]);
+
+  useEffect(() => {
+    if (userId) {
+      datadogRum.setUser({ id: userId, name: username });
+      datadogRum.setGlobalContextProperty('usr.id', userId);
+      datadogRum.setGlobalContextProperty('usr.name', username);
+    }
+  }, [userId, username]);
+
+  return null;
+}
+```
+
+```typescript
+// app/layout.tsx
+import DatadogInit from '@/components/DatadogInit';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <DatadogInit />
+        {children}
+      </body>
+    </html>
+  );
+}
 ```
 
 ### Configuration notes
 
-- `applicationId` and `clientToken`: from Datadog RUM application setup
-- `service` should match `DD_SERVICE` in the backend for correlation
-- `sessionSampleRate: 100` captures all sessions (adjust for production)
+- All `NEXT_PUBLIC_DATADOG_*` env vars must be set at **build time** (Docker `--build-arg`)
+- `sessionSampleRate: 100` captures all sessions (adjust for high-traffic production)
 - `defaultPrivacyLevel: 'allow'` enables session replay text capture
+- `startSessionReplayRecording()` begins capturing the session replay immediately
 
 ## APM-RUM correlation
 
 `allowedTracingUrls` tells the RUM SDK to inject Datadog/W3C trace-context
-headers into matching requests. This links frontend resources to backend
-APM traces in the Datadog UI.
+headers into matching requests. This links frontend resource spans to backend
+APM traces in the Datadog UI:
 
 ```typescript
 allowedTracingUrls: [
@@ -67,98 +104,117 @@ allowedTracingUrls: [
 ],
 ```
 
-This matches all same-origin `/api/*` requests (Next.js API routes).
-
-Ref: https://docs.datadoghq.com/tracing/other_telemetry/rum?tab=browserrum#setup-rum
-
 ## User identification
 
-Set the RUM user to enable session filtering by user in RUM Explorer:
+Set the RUM user so sessions are searchable by `usr.id` in RUM Explorer:
 
 ```typescript
-useEffect(() => {
-  if (teamName) {
-    datadogRum.setUser({
-      id: teamName,
-      name: teamName,
-    });
-  }
-}, [teamName]);
+datadogRum.setUser({
+  id: userId,   // unique identifier
+  name: username, // display name
+});
 ```
 
-The `id` field becomes queryable as `usr.id` in RUM Explorer.
-
-Ref: https://docs.datadoghq.com/real_user_monitoring/application_monitoring/browser/advanced_configuration/#user-session
+This is typically called after the user sets their name (e.g. DriverNameGate).
 
 ## Global context properties
 
-Add custom properties to all RUM events for filtering:
+Add custom properties to ALL RUM events for filtering:
 
 ```typescript
-datadogRum.setGlobalContextProperty('team_name', teamName);
+datadogRum.setGlobalContextProperty('app.name', 'box-box-bits-ai');
+datadogRum.setGlobalContextProperty('app.version', process.env.NEXT_PUBLIC_DD_VERSION);
+datadogRum.setGlobalContextProperty('usr.id', userId);
+datadogRum.setGlobalContextProperty('usr.name', username);
+```
+
+## Custom actions
+
+Use `datadogRum.addAction()` to emit named events visible in RUM Explorer
+and Session Replay timeline:
+
+```typescript
+// Track game submissions with structured context
+datadogRum.addAction('dream_team_submitted', {
+  userId,
+  username,
+  base_score: baseScore,
+  selection: {
+    principal: selectedPrincipal.name,
+    driver_1: selectedDriver.name,
+  },
+});
+
+// Track AI name generation
+datadogRum.addAction('driver_name_set', {
+  driver_name: name,
+  ai_generated: true,
+});
+
+// Track game results
+datadogRum.addAction('dream_team_result', {
+  final_score: result.finalScore,
+  synergy_class: result.synergyClass,
+  team_codename: result.teamCodename,
+});
 ```
 
 ## RUM-LLMObs correlation
 
 To link RUM sessions with LLM Observability spans:
 
-1. **Client side**: get the RUM session ID:
+1. **Client side**: read the RUM session ID:
 ```typescript
-const getRumSessionId = (): string | undefined =>
-  datadogRum.getInternalContext()?.session_id ?? undefined;
+const sessionId = datadogRum.getInternalContext()?.session_id ?? '';
 ```
 
-2. **Pass to backend**: include `sessionId` in the API request body:
+2. **Include in every API request body**:
 ```typescript
-await fetch('/api/chat', {
+await fetch('/api/pitwall', {
   method: 'POST',
   body: JSON.stringify({
-    messages,
-    sessionId: getRumSessionId(),
-    // ...other fields
+    message,
+    userId,
+    username,
+    sessionId: datadogRum.getInternalContext()?.session_id ?? '',
   }),
 });
 ```
 
-3. **Backend**: use `sessionId` in `llmobs.trace()`:
+3. **Server side**: pass `sessionId` to `withLlmObsSpan`:
 ```typescript
-await llmobs.trace(
+const response = await withLlmObsSpan(
+  'pitwall_chat',
   {
-    kind: "llm",
-    name: "my-llm-call",
-    sessionId: sessionId,  // links this span to the RUM session
+    inputMessages: [...],
+    modelName:     'gemini-3-flash-preview',
+    modelProvider: 'google',
+    sessionId:     sessionId ?? '',
+    // ...
   },
-  async () => { /* ... */ }
+  () => callGemini(),
 );
 ```
 
-Ref: https://docs.datadoghq.com/real_user_monitoring/correlate_with_other_telemetry/llm_observability/
+This links the LLM span to the RUM session — you can click from an LLM trace
+directly into the Session Replay recording of that user's session.
 
 ## Build version display
 
-Expose the build version (git SHA) to the client:
-
-1. **next.config.mjs**: bake into client bundle at build time
+1. **next.config.mjs**: bake git SHA into client bundle:
 ```javascript
 env: {
   NEXT_PUBLIC_DD_VERSION: process.env.DD_VERSION ?? '',
 },
 ```
 
-2. **Dockerfile**: pass as build-arg before `npm run build`
+2. **Dockerfile builder stage**: pass as build-arg:
 ```dockerfile
-ARG DD_VERSION
-ENV DD_VERSION=$DD_VERSION
+ARG NEXT_PUBLIC_DD_VERSION
+ENV NEXT_PUBLIC_DD_VERSION=$NEXT_PUBLIC_DD_VERSION
 ```
 
-3. **deploy.sh**: supply the arg during build
+3. **deploy.sh**: supply the arg:
 ```bash
-docker build --build-arg DD_VERSION="$SHORT_SHA" ...
-```
-
-4. **Client component**: read the baked-in value
-```tsx
-{process.env.NEXT_PUBLIC_DD_VERSION
-  ? `v${process.env.NEXT_PUBLIC_DD_VERSION}`
-  : 'v1.0'}
+docker build --build-arg NEXT_PUBLIC_DD_VERSION="$SHORT_SHA" ...
 ```
