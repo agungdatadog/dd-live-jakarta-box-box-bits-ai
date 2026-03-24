@@ -216,8 +216,8 @@ Return ONLY valid JSON with exactly these keys:
 
     // ── LLM call with full LLMObs annotation ─────────────────────────────────
     const ai = getServerGeminiClient();
-    // gemini-3-flash-preview: $0.50/1M input, $3.00/1M output — main LLM model
-    const MODEL = 'gemini-3-flash-preview';
+    // gemini-2.5-flash: $0.30/1M input, $2.50/1M output — main LLM model
+    const MODEL = 'gemini-2.5-flash';
     const startTime = Date.now();
 
     let llmResult = {

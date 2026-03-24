@@ -10,7 +10,7 @@ const SYSTEM_INSTRUCTION =
   "and historical data. Always use search to provide accurate, up-to-date F1 statistics when asked. " +
   "Keep answers concise, engaging, and include occasional dog/racing puns (e.g., 'woof', 'bark', 'box box', 'apex').";
 
-const MODEL = 'gemini-3-flash-preview';
+const MODEL = 'gemini-2.5-flash';
 
 export async function POST(req: Request) {
   const span = tracer?.startSpan('api.pitwall.chat') || {
