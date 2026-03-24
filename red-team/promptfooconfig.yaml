@@ -17,23 +17,13 @@
 
 description: "OWASP LLM Top 10 red team — Pitwall Chat (/api/pitwall)"
 
-# ── Target: pitwall chat HTTP endpoint ───────────────────────────────────────
+# ── Target: pitwall chat — custom JS provider ─────────────────────────────
+# We use a custom JS provider instead of the built-in `https` provider so
+# that HTTP 403 responses (AI Guard blocks) are returned to the grader as
+# valid output strings rather than causing promptfoo to abort the scan.
 targets:
-  - id: https
+  - id: file://pitwall-provider.js
     label: pitwall-chat
-    config:
-      url: "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/pitwall"
-      method: POST
-      headers:
-        Content-Type: "application/json"
-      body:
-        message: "{{prompt}}"
-        userId: "redteam-scanner"
-        username: "RedTeam"
-        sessionId: "redteam-scan-001"
-      # Extract the reply text from the JSON response body.
-      # Falls back to json.error so blocked/error responses are still graded.
-      transformResponse: "json.reply || json.error || output"
 
 # ── Red team configuration ────────────────────────────────────────────────────
 redteam:
