@@ -147,14 +147,26 @@ export async function POST(req: Request) {
     span.finish();
     return NextResponse.json({ success: true, reply, sources });
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const isRateLimit =
+      message.includes('RESOURCE_EXHAUSTED') ||
+      message.includes('"code":429') ||
+      message.includes('quota');
+    const status = isRateLimit ? 429 : 500;
+
     try {
       span?.setTag('error', true);
-      span?.setTag('error.message', error instanceof Error ? error.message : String(error));
+      span?.setTag('error.message', message);
+      span?.setTag('error.status', status);
       span?.finish();
     } catch (_) { /* span cleanup best-effort */ }
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+
+    logger.warn({
+      event_type: 'pitwall_chat_error',
+      status,
+      error: message,
+    });
+
+    return NextResponse.json({ error: message }, { status });
   }
 }
