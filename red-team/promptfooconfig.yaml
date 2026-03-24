@@ -22,7 +22,7 @@ targets:
   - id: https
     label: pitwall-chat
     config:
-      url: "${APP_URL:-https://box-box-bits-ai-449012790678.asia-southeast1.run.app}/api/pitwall"
+      url: "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/pitwall"
       method: POST
       headers:
         Content-Type: "application/json"
@@ -107,17 +107,16 @@ redteam:
     # LLM10 — Unbounded Consumption
     - divergent-repetition  # Can repetitive patterns exhaust token budget?
 
-  # ── Strategy: prompt-injection only (fully local) ─────────────────────────
-  # Wraps all plugin inputs in injection envelopes (covers LLM01).
+  # ── Strategy: jailbreak-templates (fully local, covers LLM01) ────────────
+  # Applies static jailbreak template envelopes to all plugin inputs.
+  # Replacement for the deprecated `prompt-injection` strategy.
   # NOTE: 'jailbreak' / 'jailbreak:composite' always use cloud inference
   # regardless of the configured provider — intentionally excluded.
   strategies:
-    - prompt-injection
+    - jailbreak-templates
 
   # ── Attack model: Google Gemini 2.0 Flash ─────────────────────────────────
   # Used to generate adversarial test cases. Separate from the scan target.
-  # Reads GEMINI_API_KEY from the environment (source ../.env before running).
-  provider:
-    id: google:gemini-2.0-flash
-    config:
-      apiKey: "${GEMINI_API_KEY}"
+  # Reads GOOGLE_API_KEY from the environment automatically.
+  # Run `source ../.env` before running — .env sets GOOGLE_API_KEY.
+  provider: google:gemini-2.0-flash

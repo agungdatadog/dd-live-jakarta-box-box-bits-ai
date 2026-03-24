@@ -22,8 +22,8 @@ Covers all 10 OWASP LLM vulnerabilities (2025) plus deep-dive plugins for the ri
 ## Prerequisites
 
 - **Node.js 20+**
-- **`GEMINI_API_KEY`** — used by promptfoo to *generate* adversarial attacks via Gemini 2.0 Flash (not sent to your app as a user message)
-- No promptfoo cloud account or OpenAI key required — all inference runs locally through your Gemini key
+- **`GOOGLE_API_KEY`** — used by promptfoo to *generate* adversarial attacks via Gemini 2.0 Flash. The `.env` file already sets this to the same value as `GEMINI_API_KEY`, so `source .env` is all you need.
+- No promptfoo cloud account or OpenAI key required — all inference runs locally through your Google AI key.
 
 ---
 
@@ -40,7 +40,8 @@ cd red-team
 ## Run against production
 
 ```bash
-export GEMINI_API_KEY=...
+# set -a exports all variables so npx child processes inherit them
+set -a && source ../.env && set +a
 
 npx promptfoo@latest redteam run
 ```
@@ -55,7 +56,7 @@ This will:
 ## Run against local dev server
 
 ```bash
-export GEMINI_API_KEY=...
+set -a && source ../.env && set +a
 APP_URL=http://localhost:3000 npx promptfoo@latest redteam run
 ```
 
