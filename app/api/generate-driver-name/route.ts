@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import tracer from '@/lib/tracer';
 import { getServerGeminiClient } from '@/lib/gemini-server';
-import { logger } from '@/lib/logger';
 import { withLlmObsSpan } from '@/lib/llmobs';
 
 // gemini-3.1-flash-lite-preview: $0.25/1M input, $1.50/1M output — ideal for light tasks
@@ -30,55 +28,6 @@ Generate a fun F1 driver identity:
    Match the energy of their name.
 
 Return ONLY valid JSON: {"driver_name": "...", "nickname": "..."}`;
-
-    // ── AI Guard evaluation ───────────────────────────────────────────────────
-    const aiGuardBlock = process.env.DD_AI_GUARD_BLOCK === 'true';
-    const aiGuardTracer = tracer as unknown as {
-      aiguard?: {
-        evaluate: (
-          messages: Array<{ role: string; content: string }>,
-          opts?: { block?: boolean }
-        ) => Promise<{ action: string; reason: string }>;
-      };
-    };
-
-    if (aiGuardTracer.aiguard) {
-      try {
-        const guardResult = await aiGuardTracer.aiguard.evaluate(
-          [
-            { role: 'system', content: SYSTEM_INSTRUCTION },
-            { role: 'user', content: userPrompt },
-          ],
-          { block: aiGuardBlock }
-        );
-        logger.info({
-          event_type: 'ai_guard_evaluation',
-          action: guardResult.action,
-          reason: guardResult.reason,
-          blocked: false,
-        });
-        if (guardResult.action !== 'ALLOW') {
-          return NextResponse.json({ error: 'Request blocked by AI Guard' }, { status: 403 });
-        }
-      } catch (guardErr) {
-        const isAbortError =
-          guardErr != null &&
-          typeof guardErr === 'object' &&
-          (guardErr as { name?: string }).name === 'AIGuardAbortError';
-        if (isAbortError) {
-          logger.warn({
-            event_type: 'ai_guard_blocked',
-            error: guardErr instanceof Error ? guardErr.message : String(guardErr),
-          });
-          return NextResponse.json({ error: 'Request blocked by AI Guard' }, { status: 403 });
-        }
-        // AI Guard service unavailable — log and continue (fail open)
-        logger.warn({
-          event_type: 'ai_guard_error',
-          error: guardErr instanceof Error ? guardErr.message : String(guardErr),
-        });
-      }
-    }
 
     const ai = getServerGeminiClient();
 
