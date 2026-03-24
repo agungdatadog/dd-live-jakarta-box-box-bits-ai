@@ -22,7 +22,8 @@ Covers all 10 OWASP LLM vulnerabilities (2025) plus deep-dive plugins for the ri
 ## Prerequisites
 
 - **Node.js 20+**
-- **`GEMINI_API_KEY`** — used by promptfoo to *generate* adversarial attacks via Gemini 2.5 Flash (not sent to your app as a user message)
+- **`GEMINI_API_KEY`** — used by promptfoo to *generate* adversarial attacks via Gemini 2.0 Flash (not sent to your app as a user message)
+- No promptfoo cloud account or OpenAI key required — all inference runs locally through your Gemini key
 
 ---
 
