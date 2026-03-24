@@ -25,6 +25,56 @@ export async function POST(req: Request) {
     span.setTag('app.username', username);
     span.setTag('app.message_length', message?.length || 0);
 
+    // ── AI Guard evaluation ───────────────────────────────────────────────────
+    const aiGuardBlock = process.env.DD_AI_GUARD_BLOCK === 'true';
+    const aiGuardTracer = tracer as unknown as {
+      aiguard?: {
+        evaluate: (
+          messages: Array<{ role: string; content: string }>,
+          opts?: { block?: boolean }
+        ) => Promise<{ action: string; reason: string }>;
+      };
+    };
+
+    if (aiGuardTracer.aiguard) {
+      try {
+        const guardResult = await aiGuardTracer.aiguard.evaluate(
+          [
+            { role: 'system', content: SYSTEM_INSTRUCTION },
+            { role: 'user', content: message },
+          ],
+          { block: aiGuardBlock }
+        );
+        span.setTag('ai_guard.action', guardResult.action);
+        logger.info({
+          event_type: 'ai_guard_evaluation',
+          action: guardResult.action,
+          reason: guardResult.reason,
+          blocked: false,
+        });
+      } catch (guardErr) {
+        const isAbortError =
+          guardErr != null &&
+          typeof guardErr === 'object' &&
+          (guardErr as { name?: string }).name === 'AIGuardAbortError';
+        if (isAbortError) {
+          span.setTag('ai_guard.action', 'BLOCKED');
+          span.setTag('error', true);
+          span.finish();
+          logger.warn({
+            event_type: 'ai_guard_blocked',
+            error: guardErr instanceof Error ? guardErr.message : String(guardErr),
+          });
+          return NextResponse.json({ error: 'Request blocked by AI Guard' }, { status: 403 });
+        }
+        // AI Guard service unavailable — log and continue (fail open)
+        logger.warn({
+          event_type: 'ai_guard_error',
+          error: guardErr instanceof Error ? guardErr.message : String(guardErr),
+        });
+      }
+    }
+
     const ai = getServerGeminiClient();
 
     const response = await withLlmObsSpan(
