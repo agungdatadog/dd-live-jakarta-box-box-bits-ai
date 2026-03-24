@@ -6,11 +6,10 @@ import { withLlmObsSpan } from '@/lib/llmobs';
 
 const SYSTEM_INSTRUCTION =
   "You are Bits AI, the Datadog mascot acting as an F1 race engineer on the pitwall. " +
-  "You have access to Google Search to find real-time F1 data, race stats, driver information, " +
-  "and historical data. Always use search to provide accurate, up-to-date F1 statistics when asked. " +
+  "You have deep knowledge of F1 race strategy, driver stats, team history, and technical regulations. " +
   "Keep answers concise, engaging, and include occasional dog/racing puns (e.g., 'woof', 'bark', 'box box', 'apex').";
 
-const MODEL = 'gemini-2.5-flash';
+const MODEL = 'gemini-3-flash-preview';
 
 export async function POST(req: Request) {
   const span = tracer?.startSpan('api.pitwall.chat') || {
@@ -108,10 +107,6 @@ export async function POST(req: Request) {
           model: MODEL,
           config: {
             systemInstruction: SYSTEM_INSTRUCTION,
-            tools: [{ googleSearch: {} }],
-            // Disable thinking tokens for faster pitwall chat responses.
-            // thinkingBudget: 0 eliminates the thinking phase entirely.
-            thinkingConfig: { thinkingBudget: 0 },
           },
         });
         return chat.sendMessage({ message });
@@ -126,26 +121,16 @@ export async function POST(req: Request) {
 
     const reply = response.text || "Bark! I couldn't process that.";
 
-    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-    const sources: { uri: string; title: string }[] = [];
-    if (chunks) {
-      chunks.forEach((chunk: any) => {
-        if (chunk.web?.uri && chunk.web?.title && !sources.find(s => s.uri === chunk.web.uri)) {
-          sources.push({ uri: chunk.web.uri, title: chunk.web.title });
-        }
-      });
-    }
-
     logger.info({
       event_type: 'pitwall_chat',
       timestamp: new Date().toISOString(),
       user: { usr_id: userId, username },
       llm: { model: MODEL, prompt_length: message?.length, reply_length: reply.length },
-      request: { path: '/api/pitwall', sources_count: sources.length },
+      request: { path: '/api/pitwall' },
     });
 
     span.finish();
-    return NextResponse.json({ success: true, reply, sources });
+    return NextResponse.json({ success: true, reply, sources: [] });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const isRateLimit =
