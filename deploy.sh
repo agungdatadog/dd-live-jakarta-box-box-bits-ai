@@ -118,6 +118,15 @@ spec:
               value: "1"
             - name: DD_LLMOBS_ML_APP
               value: "${DD_LLMOBS_ML_APP}"
+            # AI Guard
+            - name: DD_TRACE_ENABLED
+              value: "true"
+            - name: DD_APP_KEY
+              value: "${DD_APP_KEY}"
+            - name: DD_AI_GUARD_ENABLED
+              value: "true"
+            - name: DD_AI_GUARD_BLOCK
+              value: "${DD_AI_GUARD_BLOCK:-false}"
   traffic:
     - latestRevision: true
       percent: 100
