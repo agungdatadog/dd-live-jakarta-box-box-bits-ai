@@ -22,8 +22,7 @@ Covers all 10 OWASP LLM vulnerabilities (2025) plus deep-dive plugins for the ri
 ## Prerequisites
 
 - **Node.js 20+**
-- **`OPENAI_API_KEY`** — used by promptfoo to *generate* adversarial attacks (not sent to your app)
-  - Alternatively, uncomment the Gemini attacker block at the bottom of `promptfooconfig.yaml` and set `GEMINI_API_KEY`
+- **`GEMINI_API_KEY`** — used by promptfoo to *generate* adversarial attacks via Gemini 2.5 Flash (not sent to your app as a user message)
 
 ---
 
@@ -40,7 +39,7 @@ cd red-team
 ## Run against production
 
 ```bash
-export OPENAI_API_KEY=sk-...
+export GEMINI_API_KEY=...
 
 npx promptfoo@latest redteam run
 ```
@@ -55,7 +54,7 @@ This will:
 ## Run against local dev server
 
 ```bash
-export OPENAI_API_KEY=sk-...
+export GEMINI_API_KEY=...
 APP_URL=http://localhost:3000 npx promptfoo@latest redteam run
 ```
 
@@ -86,31 +85,9 @@ redteam:
 
 ---
 
-## Use Gemini as the attack model (no OpenAI key needed)
-
-Uncomment the block at the bottom of `promptfooconfig.yaml`:
-
-```yaml
-defaultTest:
-  options:
-    provider:
-      id: google:gemini-2.0-flash
-      config:
-        apiKey: ${GEMINI_API_KEY}
-```
-
-Then run:
-
-```bash
-export GEMINI_API_KEY=...
-npx promptfoo@latest redteam run
-```
-
----
-
 ## CI integration
 
-Add to your pipeline to catch regressions before deploy:
+Add to your pipeline to catch regressions before deploy. Set `GEMINI_API_KEY` as a CI secret:
 
 ```bash
 npx promptfoo@latest redteam run --no-cache

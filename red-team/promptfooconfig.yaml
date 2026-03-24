@@ -1,11 +1,12 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Promptfoo Red Team — OWASP LLM Top 10 scan
 # Target: Pitwall Chat  POST /api/pitwall
+# Attack model: Google Gemini 2.5 Flash (reads GEMINI_API_KEY from env)
 #
 # Usage:
 #   cd red-team
-#   export OPENAI_API_KEY=sk-...        # attack model (default: OpenAI gpt-4o)
-#   export APP_URL=https://...          # override target URL (reads from env)
+#   export GEMINI_API_KEY=...           # used by promptfoo to generate attacks
+#   export APP_URL=https://...          # optional — overrides the default URL
 #   npx promptfoo@latest redteam run
 #   npx promptfoo@latest redteam report
 #
@@ -101,12 +102,11 @@ redteam:
     # through a sequence of increasingly manipulative messages.
     - jailbreak
 
-# ── Optional: use Google Gemini as the attack model instead of OpenAI ────────
-# Uncomment if you don't have an OPENAI_API_KEY but have a GEMINI_API_KEY.
-#
-# defaultTest:
-#   options:
-#     provider:
-#       id: google:gemini-2.0-flash
-#       config:
-#         apiKey: ${GEMINI_API_KEY}
+  # ── Attack model: Google Gemini 2.5 Flash ──────────────────────────────────
+  # This is the model promptfoo uses to *generate* adversarial test cases.
+  # It is separate from the target (the pitwall endpoint being scanned).
+  # Reads GEMINI_API_KEY from the environment.
+  provider:
+    id: google:gemini-2.5-flash
+    config:
+      apiKey: "${GEMINI_API_KEY}"
