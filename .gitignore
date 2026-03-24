@@ -8,3 +8,6 @@ coverage/
 # Skaffold - generated from .env, contains secrets
 k8s/cloudrun.yaml
 .service.rendered.yaml
+
+# Promptfoo - generated scan output, re-created on each run
+red-team/redteam.yaml
