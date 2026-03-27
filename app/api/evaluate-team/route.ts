@@ -274,6 +274,8 @@ Return ONLY valid JSON with exactly these keys:
         modelName:     MODEL,
         modelProvider: 'google',
         sessionId:     sessionId ?? '',
+        // tags are indexed/searchable in LLMObs Explorer; metadata is stored but not indexed
+        tags: { username: username ?? '' },
         metadata: {
           userId: userId ?? '',
           username: username ?? '',

@@ -96,6 +96,8 @@ export async function POST(req: Request) {
         modelName:     MODEL,
         modelProvider: 'google',
         sessionId:     sessionId ?? '',
+        // tags are indexed/searchable in LLMObs Explorer; metadata is stored but not indexed
+        tags:     { username: username ?? '' },
         metadata: { userId: userId ?? '', username: username ?? '' },
         // ── Prompt tracking (dd-trace v5.83.0+) ───────────────────────────
         // Template is static; variables hold the runtime user message.

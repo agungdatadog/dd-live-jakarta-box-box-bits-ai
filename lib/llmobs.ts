@@ -28,6 +28,13 @@ interface LlmObsAnnotation {
   metadata?: Record<string, unknown>;
   metrics?: Record<string, unknown>;
   /**
+   * Custom searchable tags for the LLMObs span.
+   * Tags appear as `key:value` in the LLMObs Explorer and are filterable/queryable.
+   * Use for user-facing fields like username, feature, or game identifiers.
+   * Distinct from `metadata` which is stored but NOT indexed/searchable.
+   */
+  tags?: Record<string, string>;
+  /**
    * Structured prompt metadata for Datadog LLMObs Prompt Tracking.
    * Attaching it here (on a manually-created LLM span) is the correct approach;
    * annotationContext() is only for auto-instrumented provider spans.
@@ -108,6 +115,13 @@ export interface LlmObsInput {
    */
   sessionId?: string;
   metadata?: Record<string, string | number | boolean>;
+  /**
+   * Custom searchable tags for the LLMObs span.
+   * These appear as `key:value` entries in the LLMObs Explorer and are
+   * filterable/queryable — unlike `metadata` which is stored but not indexed.
+   * Use for user-identifying fields: { username, userId, feature, game }.
+   */
+  tags?: Record<string, string>;
   prompt?: LlmObsPrompt;
 }
 
@@ -180,6 +194,8 @@ export async function withLlmObsSpan<T>(
         llmobs.annotate(span, {
           inputData: input.inputMessages,
           metadata: { model: input.modelName ?? 'unknown', ...input.metadata },
+          // tags are indexed/searchable in LLMObs Explorer (e.g. username:alice)
+          ...(input.tags ? { tags: input.tags } : {}),
           ...(input.prompt ? { prompt: input.prompt } : {}),
         });
       } catch (_) { /* annotation best-effort */ }

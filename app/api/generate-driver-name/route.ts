@@ -41,6 +41,7 @@ Return ONLY valid JSON: {"driver_name": "...", "nickname": "..."}`;
         modelName:     MODEL,
         modelProvider: 'google',
         sessionId:     sessionId ?? '',
+        tags:     { feature: 'driver-name-generator' },
         metadata: { real_name_hint: realName ?? '' },
         prompt: {
           id: 'driver-name-generator',
