@@ -8,6 +8,7 @@ import Markdown from 'react-markdown';
 import { PageIntro } from '@/components/PageIntro';
 import { DriverNameGate } from '@/components/DriverNameGate';
 import { datadogRum } from '@datadog/browser-rum';
+import { fetchWithRetry, LLM_FETCH_OPTIONS } from '@/lib/fetch-with-retry';
 
 interface Message {
   id: string;
@@ -27,6 +28,7 @@ export default function PitwallPage() {
 }
 
 function PitwallContent({ userId, username }: { userId: string; username: string }) {
+  const [retryStatus, setRetryStatus] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -63,38 +65,61 @@ function PitwallContent({ userId, username }: { userId: string; username: string
     setInput('');
     setIsLoading(true);
 
+    setRetryStatus(null);
     try {
-      const response = await fetch('/api/pitwall', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMsg.content,
-          userId,
-          username,
-          sessionId: datadogRum.getInternalContext()?.session_id ?? '',
-        }),
-      });
+      const response = await fetchWithRetry(
+        '/api/pitwall',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: userMsg.content,
+            userId,
+            username,
+            sessionId: datadogRum.getInternalContext()?.session_id ?? '',
+          }),
+        },
+        {
+          ...LLM_FETCH_OPTIONS,
+          context: 'pitwall_chat',
+          onRetry: (attempt, max, msg) => {
+            setRetryStatus(`Attempt ${attempt}/${max} — ${msg}`);
+            datadogRum.addAction?.('pitwall_retry', { attempt, max, reason: msg });
+          },
+        },
+      );
+
+      setRetryStatus(null);
 
       if (!response.ok) {
-        throw new Error(`Pitwall request failed with status ${response.status}`);
+        const isRateLimit = response.status === 429;
+        throw new Error(
+          isRateLimit
+            ? 'Rate limited. The pitwall is busy — please try again in a moment.'
+            : `Pitwall request failed with status ${response.status}`,
+        );
       }
 
       const data = await response.json();
       const replyText = data.reply || "Bark! I couldn't process that.";
       const sources = Array.isArray(data.sources) ? data.sources : undefined;
 
-      setMessages(prev => [...prev, { 
-        id: Date.now().toString(), 
-        role: 'assistant', 
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
         content: replyText,
-        sources: sources.length > 0 ? sources : undefined
+        sources: sources && sources.length > 0 ? sources : undefined,
       }]);
     } catch (error) {
-      console.error('Pitwall error:', error);
-      setMessages(prev => [...prev, { 
-        id: Date.now().toString(), 
-        role: 'assistant', 
-        content: "Bark! We lost telemetry. The radio is down, try again later." 
+      setRetryStatus(null);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      datadogRum.addAction?.('pitwall_failed', { error: errMsg });
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: errMsg.includes('rate limit') || errMsg.includes('429')
+          ? '⚠️ Pitwall is overloaded right now. Give it a few seconds and try again.'
+          : '📡 Radio comms lost after multiple attempts. Check your connection and retry.',
       }]);
     } finally {
       setIsLoading(false);
@@ -231,12 +256,17 @@ function PitwallContent({ userId, username }: { userId: string; username: string
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--brand-primary)]/16">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
-                <div className="surface-rail flex rounded-[1.6rem] px-4 py-4">
+                <div className="surface-rail flex flex-col justify-center rounded-[1.6rem] px-4 py-4">
                   <div className="flex items-center gap-1">
                     <span className="h-2 w-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="h-2 w-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="h-2 w-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
+                  {retryStatus ? (
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400">
+                      ↻ {retryStatus}
+                    </p>
+                  ) : null}
                 </div>
               </motion.div>
             ) : null}

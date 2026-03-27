@@ -11,6 +11,7 @@ import { PageIntro } from '@/components/PageIntro';
 import { DriverNameGate } from '@/components/DriverNameGate';
 import { useSearchParams } from 'next/navigation';
 import { datadogRum } from '@datadog/browser-rum';
+import { fetchWithRetry, LLM_FETCH_OPTIONS } from '@/lib/fetch-with-retry';
 
 // ── Countdown: Kimi Antonelli's 2025 Bahrain pole time 1:32.064 ──────────────
 const POLE_TIME_MS = 92064; // 1 min 32.064 sec
@@ -190,6 +191,7 @@ function DreamTeamContent() {
   const [submissionStage, setSubmissionStage] =
     useState<(typeof SUBMISSION_STAGES)[number]['id']>('locked');
   const [expandedRoleId, setExpandedRoleId] = useState<RoleId>('principal');
+  const [retryStatus, setRetryStatus] = useState<string | null>(null);
 
   // Countdown
   const [countdownMs, setCountdownMs] = useState(POLE_TIME_MS);
@@ -323,28 +325,41 @@ function DreamTeamContent() {
       });
     }
 
+    setRetryStatus(null);
     try {
       setSubmissionStage('sent');
-      const res = await fetch('/api/evaluate-team', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          username,
-          sessionId: datadogRum.getInternalContext()?.session_id ?? '',
-          selection: {
-            team_principal: selectedPrincipal.id,
-            driver_1: selectedDriver.id,
-            driver_2: selectedDriver2.id,
-            race_engineer_1: selectedEngineer.id,
-            race_engineer_2: selectedEngineer2.id,
-            head_of_strategy: selectedStrategy.id,
-            technical_director: selectedTechDirector.id,
+      const res = await fetchWithRetry(
+        '/api/evaluate-team',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            username,
+            sessionId: datadogRum.getInternalContext()?.session_id ?? '',
+            selection: {
+              team_principal: selectedPrincipal.id,
+              driver_1: selectedDriver.id,
+              driver_2: selectedDriver2.id,
+              race_engineer_1: selectedEngineer.id,
+              race_engineer_2: selectedEngineer2.id,
+              head_of_strategy: selectedStrategy.id,
+              technical_director: selectedTechDirector.id,
+            },
+            baseTeamStats: baseScore,
+          }),
+        },
+        {
+          ...LLM_FETCH_OPTIONS,
+          context: 'dream_team_evaluation',
+          onRetry: (attempt, max, msg) => {
+            setRetryStatus(`Attempt ${attempt}/${max} — ${msg}`);
+            datadogRum.addAction?.('dream_team_retry', { attempt, max, reason: msg });
           },
-          baseTeamStats: baseScore,
-        }),
-      });
+        },
+      );
 
+      setRetryStatus(null);
       if (!res.ok) throw new Error(`Evaluation failed: ${res.status}`);
       setSubmissionStage('judging');
 
@@ -367,8 +382,15 @@ function DreamTeamContent() {
         });
       }
     } catch (err) {
+      setRetryStatus(null);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      datadogRum.addAction?.('dream_team_failed', { error: errMsg });
       setSynergyMultiplier(1.0);
-      setEvaluationFeedback('Radio comms lost. Default synergy applied.');
+      setEvaluationFeedback(
+        errMsg.includes('429') || errMsg.includes('rate limit')
+          ? 'Judges overloaded — give it a moment and re-submit your lineup.'
+          : 'Radio comms lost after multiple attempts. Re-submit your lineup.',
+      );
       setSynergyClass('AVERAGE');
     } finally {
       setIsEvaluating(false);
@@ -712,6 +734,11 @@ function DreamTeamContent() {
                         We&apos;re locking the garage, sending the full paddock context to the judges,
                         and waiting for the Datadog-traced verdict to come back.
                       </p>
+                      {retryStatus ? (
+                        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400">
+                          ↻ {retryStatus}
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="surface-rail rounded-[1.4rem] px-4 py-4 lg:min-w-[14rem]">

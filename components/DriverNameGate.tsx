@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Flag, ArrowRight } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { datadogRum } from '@datadog/browser-rum';
+import { fetchWithRetry, LIGHT_FETCH_OPTIONS } from '@/lib/fetch-with-retry';
 
 // ── Rainbow gradient cycle used on the AI button ──────────────────────────────
 const RAINBOW_GRADIENT =
@@ -78,14 +79,18 @@ export function DriverNameGate() {
     setSuggestion(null);
     setGenError(false);
     try {
-      const res = await fetch('/api/generate-driver-name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          realName:  input.trim() || '',
-          sessionId: datadogRum.getInternalContext()?.session_id ?? '',
-        }),
-      });
+      const res = await fetchWithRetry(
+        '/api/generate-driver-name',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            realName:  input.trim() || '',
+            sessionId: datadogRum.getInternalContext()?.session_id ?? '',
+          }),
+        },
+        { ...LIGHT_FETCH_OPTIONS, context: 'driver_name_generation' },
+      );
       if (!res.ok) throw new Error('generate failed');
       const data = await res.json();
       setSuggestion({ driverName: data.driverName, nickname: data.nickname });
