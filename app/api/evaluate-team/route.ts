@@ -4,6 +4,7 @@ import charactersData from '@/data/characters.json';
 import { getServerGeminiClient } from '@/lib/gemini-server';
 import { logger } from '@/lib/logger';
 import { withLlmObsSpan } from '@/lib/llmobs';
+import { buildSystemInstruction, LLM_MODEL, THINKING_BUDGET, DEMO_HIGH_LATENCY } from '@/lib/demo-config';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -78,7 +79,7 @@ export async function POST(req: Request) {
     ].join('\n\n');
 
     // ── Prompt ───────────────────────────────────────────────────────────────
-    const systemInstruction = `You are the AI judge for the Dream Team Game at Datadog Live Bangkok 2026.
+    const baseSystemInstruction = `You are the AI judge for the Dream Team Game at Datadog Live Bangkok 2026.
 Your job: evaluate a fantasy F1 team of dog-named characters for a live audience competition.
 
 The audience is watching a SCOREBOARD. There are THREE prize categories:
@@ -89,6 +90,9 @@ The audience is watching a SCOREBOARD. There are THREE prize categories:
 You will receive the FULL PADDOCK ROSTER (all available characters with complete hidden data)
 and the SELECTED LINEUP for this submission. Use the full roster to cross-check rivalries,
 synergy bonuses, team histories, and career conflicts that the user may not know about.`;
+
+    // DEMO_HIGH_LATENCY=true injects a verbose CoT prefix → higher latency + token usage
+    const systemInstruction = buildSystemInstruction(baseSystemInstruction);
 
     const userPrompt = `## FULL PADDOCK ROSTER (all available characters — use this for cross-referencing)
 
@@ -216,8 +220,9 @@ Return ONLY valid JSON with exactly these keys:
 
     // ── LLM call with full LLMObs annotation ─────────────────────────────────
     const ai = getServerGeminiClient();
-    // gemini-3-flash-preview: $0.50/1M input, $3.00/1M output — main LLM model
-    const MODEL = 'gemini-3-flash-preview';
+    // DEMO_HIGH_LATENCY=true → gemini-3.1-pro-preview + max thinking budget
+    // DEMO_HIGH_LATENCY=false → gemini-3-flash-preview (production default)
+    const MODEL = LLM_MODEL;
     const startTime = Date.now();
 
     let llmResult = {
@@ -319,7 +324,11 @@ Return ONLY valid JSON with exactly these keys:
           contents: [
             { role: 'user', parts: [{ text: `${systemInstruction}\n\n${userPrompt}` }] },
           ],
-          config: { responseMimeType: 'application/json' },
+          config: {
+            responseMimeType: 'application/json',
+            // DEMO_HIGH_LATENCY=true → max thinking budget for visible latency in demo
+            thinkingConfig: { thinkingBudget: THINKING_BUDGET },
+          },
         }),
       // ── Post-call output annotation ──────────────────────────────────────────
       // Parse the LLM JSON response HERE so the LLMObs span metadata contains
@@ -393,6 +402,8 @@ Return ONLY valid JSON with exactly these keys:
       },
       llm: {
         model: MODEL,
+        demo_high_latency: DEMO_HIGH_LATENCY,
+        thinking_budget: THINKING_BUDGET,
         latency_ms: latencyMs,
         input_chars: systemInstruction.length + userPrompt.length,
         output_chars: rawResponseText.length,
