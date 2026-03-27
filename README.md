@@ -204,6 +204,65 @@ Browser (RUM)                    Cloud Run Container
 
 ---
 
+## Demo Mode — High-Latency Switch
+
+A single environment variable toggles the app between **production-fast** and **demo-slow** modes without requiring a redeploy.
+
+| | `DEMO_HIGH_LATENCY=false` (default) | `DEMO_HIGH_LATENCY=true` |
+|---|---|---|
+| **Model** | `gemini-3-flash-preview` | `gemini-3.1-pro-preview` |
+| **Thinking budget** | `0` (disabled) | `24576` (Gemini maximum) |
+| **System prompt** | Base prompt only | + verbose 5-step chain-of-thought prefix |
+| **Expected latency** | ~3–6 s | ~20–60 s |
+
+This is useful for live demos where you want Datadog LLM Observability to show **visibly high latency, elevated token counts, and large cost differences** between calls.
+
+### Enable demo mode (no redeploy needed)
+
+`--update-env-vars` creates a new Cloud Run revision in ~30 seconds — no Docker rebuild:
+
+```bash
+# Switch ON
+gcloud run services update box-box-bits-ai \
+  --update-env-vars DEMO_HIGH_LATENCY=true \
+  --region asia-southeast1 \
+  --project YOUR_PROJECT_ID
+
+# Switch OFF
+gcloud run services update box-box-bits-ai \
+  --update-env-vars DEMO_HIGH_LATENCY=false \
+  --region asia-southeast1 \
+  --project YOUR_PROJECT_ID
+```
+
+### How it works
+
+Three techniques are applied simultaneously when `DEMO_HIGH_LATENCY=true`:
+
+1. **Heavier model** — switches from Flash to `gemini-3.1-pro-preview`, which has higher baseline latency and produces more deliberate responses.
+
+2. **Maximum thinking budget** — sets `thinkingConfig: { thinkingBudget: 24576 }` (Gemini's maximum), forcing the model to generate a large internal reasoning chain before producing output. This is the primary latency driver.
+
+3. **Chain-of-thought system prompt** — prepends a verbose 5-step reasoning instruction to every system prompt (understand context → identify factors → consider interpretations → construct answer → review). The model explicitly works through each step, adding both latency and token count.
+
+### Visibility in Datadog
+
+All logs include `demo_high_latency` and `thinking_budget` fields:
+
+```
+event_type: pitwall_chat
+llm.demo_high_latency: true
+llm.thinking_budget: 24576
+llm.model: gemini-3.1-pro-preview
+```
+
+In **LLM Observability** you'll see:
+- Span duration 5–10× longer
+- `inputTokens` significantly higher (CoT prefix adds ~500 tokens per call)
+- Cost metrics (`inputCost`, `outputCost`) proportionally larger
+
+---
+
 ## Load Testing (Observability Data Generation)
 
 Generate realistic concurrent user sessions to populate Datadog dashboards for demos.
@@ -263,7 +322,8 @@ box-box-bits-ai/
 │   ├── datadog-client.ts             # RUM config (client)
 │   ├── llmobs.ts                     # withLlmObsSpan helper
 │   ├── logger.ts                     # Winston + DD log injection
-│   └── gemini-server.ts              # Gemini client singleton
+│   ├── gemini-server.ts              # Gemini client singleton
+│   └── demo-config.ts                # DEMO_HIGH_LATENCY switch (model, thinking, CoT prompt)
 ├── data/characters.json              # 46 dog-themed F1 paddock characters
 ├── store/
 │   └── userStore.ts                  # Zustand username + userId store
@@ -289,3 +349,5 @@ box-box-bits-ai/
 | `npm run start` | Run standalone server (after build) |
 | `npm run lint` | ESLint |
 | `./deploy.sh` | Build + deploy to Cloud Run via Skaffold |
+| `gcloud run services update … --update-env-vars DEMO_HIGH_LATENCY=true` | Enable high-latency demo mode (no redeploy) |
+| `gcloud run services update … --update-env-vars DEMO_HIGH_LATENCY=false` | Revert to production-speed mode |
