@@ -46,6 +46,10 @@ set -a && source ../.env && set +a
 npx promptfoo@latest redteam run
 ```
 
+```
+cd /Users/nuttee.jirattivongvibul/Projects/box-box-bits-ai && set -a && source .env && set +a && cd red-team && npx promptfoo@latest redteam run
+```
+
 This will:
 1. Generate ~5 adversarial test cases per plugin (~50–80 total)
 2. Send each to `POST /api/pitwall` on the production Cloud Run service
