@@ -1,6 +1,4 @@
-<div align="center">
-<img width="1200" alt="Box Box Bits AI" src="assets/box-box-bits-ai-01.png" />
-</div>
+![Box Box Bits AI](assets/box-box-bits-ai-01.png)
 
 # Box Box Bits AI
 
