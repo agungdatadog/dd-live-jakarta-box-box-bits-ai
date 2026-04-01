@@ -165,29 +165,66 @@ To skip the IAM binding (if already public):
 
 ## Observability Architecture
 
-```
-Browser (RUM)                    Cloud Run Container
-┌──────────────┐                 ┌──────────────────────────────────┐
-│ @datadog/    │  page views,    │  serverless-init (ENTRYPOINT)    │
-│ browser-rum  │  user actions,  │    ↕ local DD agent process      │
-│ browser-logs │  errors         │                                  │
-└──────┬───────┘                 │  Next.js (instrumentation.ts)    │
-       │                         │    dd-trace.init({ llmobs })     │
-       │                         │    ↕ APM spans                   │
-       ▼                         │                                  │
-  Datadog RUM                    │  /api/pitwall                    │
-                                 │    withLlmObsSpan('pitwall_chat')│
-                                 │    → Gemini API (grounded search) │
-                                 │                                  │
-                                 │  /api/evaluate-team              │
-                                 │    withLlmObsSpan('dream_team_…')│
-                                 │    → Gemini API (JSON mode)      │
-                                 │                                  │
-                                 │  Winston logger                  │
-                                 │    DD_LOGS_INJECTION=true        │
-                                 └──────────────────────────────────┘
-                                          ↕ DD_API_KEY
-                                    Datadog APM / LLMObs / Logs
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#0a0b0f",
+    "primaryColor": "#632ca6",
+    "primaryBorderColor": "#8a4bde",
+    "primaryTextColor": "#f5f7fb",
+    "secondaryColor": "#1c1f2a",
+    "secondaryBorderColor": "#3d2e6b",
+    "secondaryTextColor": "#c4b5f5",
+    "tertiaryColor": "#1a1024",
+    "tertiaryBorderColor": "#5a3a9a",
+    "tertiaryTextColor": "#e2d9f5",
+    "lineColor": "#8a4bde",
+    "edgeLabelBackground": "#1c1f2a",
+    "nodeBorder": "#8a4bde",
+    "clusterBkg": "#1c1f2a",
+    "clusterBorder": "#5a3a9a",
+    "titleColor": "#f5f7fb",
+    "fontFamily": "monospace",
+    "fontSize": "13px"
+  }
+}}%%
+
+flowchart TD
+    subgraph BROWSER["🌐  Browser"]
+        RUM["@datadog/browser-rum\nSession Replay · Core Web Vitals\nUser actions · JS errors"]
+    end
+
+    subgraph CR["☁️  Cloud Run Container"]
+        direction TB
+        INIT["datadog-init  ENTRYPOINT\nLocal DD Agent  ·  localhost:8126"]
+        TRACE["dd-trace  instrumentation.ts\ntracer.init  llmobs: agentless"]
+        PITWALL["POST /api/pitwall\nwithLlmObsSpan pitwall_chat\nGemini  gemini-3-flash-preview\nGoogle Search grounding"]
+        DREAM["POST /api/evaluate-team\nwithLlmObsSpan dream_team_game_evaluation\nGemini  gemini-3-flash-preview / pro-preview\nFull roster JSON mode"]
+        LOG["Winston logger\nDD_LOGS_INJECTION=true\nJSON · trace_id correlation"]
+        INIT --> TRACE
+        TRACE --> PITWALL
+        TRACE --> DREAM
+        PITWALL --> LOG
+        DREAM --> LOG
+    end
+
+    subgraph DD["🐶  Datadog Platform"]
+        direction LR
+        APM["APM\nTraces · Service Map\napm.pitwall.chat\napm.dream_team.evaluate"]
+        LLMOBS["LLM Observability\npitwall_chat · dream_team_game_evaluation\nPrompt tracking · Cost · Token counts\nCustom Evaluations: weirdness · conflict"]
+        LOGS["Log Management\nevent_type:pitwall_chat\nevent_type:dream_team_game_evaluation\ntrace_id correlation"]
+        RUMDD["RUM\nSession Replay\nCore Web Vitals\nSession → LLMObs link via session_id"]
+    end
+
+    BROWSER -- "allowedTracingUrls /api/\nW3C trace headers\nsession_id in request body" --> CR
+    RUM -- "clientToken · applicationId\npageviews · actions · errors" --> RUMDD
+    INIT -- "DD_API_KEY\nAPM spans · metrics" --> APM
+    TRACE -- "DD_API_KEY agentless\nLLM spans · prompt versions\nweirdness · conflict metadata" --> LLMOBS
+    LOG -- "DD_LOGS_ENABLED\nDD_SOURCE=nodejs" --> LOGS
+
+    APM -. "linked traces" .- LOGS
+    RUMDD -. "session_id link" .- LLMOBS
 ```
 
 ### Key Datadog surfaces
