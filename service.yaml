@@ -42,7 +42,10 @@ spec:
             - name: NEXT_PUBLIC_APPLET_ID
               value: "__APPLET_ID__"
             - name: GEMINI_API_KEY
-              value: "__GEMINI_API_KEY__"
+              valueFrom:
+                secretKeyRef:
+                  name: GEMINI_API_KEY
+                  key: latest
             # RUM (baked into client bundle at build time, also needed at runtime for SSR)
             - name: NEXT_PUBLIC_DATADOG_CLIENT_TOKEN
               value: "__NEXT_PUBLIC_DATADOG_CLIENT_TOKEN__"
@@ -59,7 +62,10 @@ spec:
             # APM — serverless-init (ENTRYPOINT) handles the local agent process.
             # instrumentation.ts calls tracer.init({ llmobs }) at Next.js startup.
             - name: DD_API_KEY
-              value: "__DD_API_KEY__"
+              valueFrom:
+                secretKeyRef:
+                  name: NUTTEE_DD_API_KEY
+                  key: latest
             - name: DD_SITE
               value: "__DD_SITE__"
             - name: DD_SERVICE
@@ -82,7 +88,10 @@ spec:
             - name: DD_TRACE_ENABLED
               value: "true"
             - name: DD_APP_KEY
-              value: "__DD_APP_KEY__"
+              valueFrom:
+                secretKeyRef:
+                  name: NUTTEE_DD_APP_KEY
+                  key: latest
             - name: DD_AI_GUARD_ENABLED
               value: "true"
             - name: DD_AI_GUARD_BLOCK

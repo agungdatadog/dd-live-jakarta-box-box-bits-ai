@@ -23,10 +23,10 @@ DD_LLMOBS_ML_APP="${DD_LLMOBS_ML_APP:-$CR_SERVICE_NAME}"
 
 required_vars=(
   GCP_PROJECT_ID GCP_REGION CR_SERVICE_NAME ARTIFACT_REPO
-  APP_URL APPLET_ID GEMINI_API_KEY
+  APP_URL APPLET_ID
   NEXT_PUBLIC_DATADOG_CLIENT_TOKEN NEXT_PUBLIC_DATADOG_APPLICATION_ID
   NEXT_PUBLIC_DATADOG_SITE NEXT_PUBLIC_DATADOG_SERVICE NEXT_PUBLIC_DATADOG_ENV
-  DD_ENV DD_SERVICE DD_API_KEY DD_APP_KEY DD_SITE DD_LLMOBS_ML_APP
+  DD_ENV DD_SERVICE DD_SITE DD_LLMOBS_ML_APP
 )
 for var in "${required_vars[@]}"; do
   if [[ -z "${!var:-}" ]]; then
@@ -86,7 +86,10 @@ spec:
             - name: NEXT_PUBLIC_APPLET_ID
               value: "${APPLET_ID}"
             - name: GEMINI_API_KEY
-              value: "${GEMINI_API_KEY}"
+              valueFrom:
+                secretKeyRef:
+                  name: GEMINI_API_KEY
+                  key: latest
             - name: NEXT_PUBLIC_DATADOG_CLIENT_TOKEN
               value: "${NEXT_PUBLIC_DATADOG_CLIENT_TOKEN}"
             - name: NEXT_PUBLIC_DATADOG_APPLICATION_ID
@@ -100,7 +103,10 @@ spec:
             - name: NEXT_PUBLIC_DD_VERSION
               value: "${SHORT_SHA}"
             - name: DD_API_KEY
-              value: "${DD_API_KEY}"
+              valueFrom:
+                secretKeyRef:
+                  name: NUTTEE_DD_API_KEY
+                  key: latest
             - name: DD_SITE
               value: "${DD_SITE}"
             - name: DD_SERVICE
@@ -123,7 +129,10 @@ spec:
             - name: DD_TRACE_ENABLED
               value: "true"
             - name: DD_APP_KEY
-              value: "${DD_APP_KEY}"
+              valueFrom:
+                secretKeyRef:
+                  name: NUTTEE_DD_APP_KEY
+                  key: latest
             - name: DD_AI_GUARD_ENABLED
               value: "true"
             - name: DD_AI_GUARD_BLOCK
