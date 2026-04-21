@@ -6,7 +6,6 @@ import { DatadogProvider } from '@datadog/openfeature-browser';
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
 import { OpenFeature, type Hook } from '@openfeature/web-sdk';
 import { useUserStore } from '@/store/userStore';
-import FlagExposer from '@/components/FlagExposer';
 
 /**
  * OpenFeature hook that mirrors every evaluation into the RUM session so it
@@ -119,7 +118,6 @@ export default function FeatureFlagProvider({
 
   return (
     <OpenFeatureProvider client={OpenFeature.getClient()}>
-      <FlagExposer />
       {children}
     </OpenFeatureProvider>
   );
