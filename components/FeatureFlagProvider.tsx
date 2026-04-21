@@ -4,26 +4,8 @@ import { useEffect, useState } from 'react';
 import { datadogRum } from '@datadog/browser-rum';
 import { DatadogProvider } from '@datadog/openfeature-browser';
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
-import { OpenFeature, type Hook } from '@openfeature/web-sdk';
+import { OpenFeature } from '@openfeature/web-sdk';
 import { useUserStore } from '@/store/userStore';
-
-/**
- * OpenFeature hook that mirrors every evaluation into the RUM session so it
- * shows up in RUM → Feature Flag Tracking and on each session's Feature Flags
- * tab. Required because @datadog/openfeature-browser's enableExposureLogging
- * sends to the exposures intake, not to RUM sessions.
- *
- * Docs: https://docs.datadoghq.com/real_user_monitoring/feature_flag_tracking/setup/?tab=browser
- */
-const rumReportingHook: Hook = {
-  after(hookContext, evaluationDetails) {
-    if (!datadogRum.getInitConfiguration()) return;
-    datadogRum.addFeatureFlagEvaluation(
-      hookContext.flagKey,
-      evaluationDetails.value,
-    );
-  },
-};
 
 // Flag env must match one of the environment.queries values configured in
 // Datadog Feature Flags (prod | dev). NEXT_PUBLIC_DATADOG_ENV is "production"
@@ -37,10 +19,18 @@ const FLAG_SERVICE =
  * Initialises the Datadog OpenFeature provider and wraps the app in an
  * OpenFeatureProvider so components can call useBooleanFlagValue / etc.
  *
- * The OpenFeatureProvider renders immediately with the default NOOP provider.
- * Components get the safe default values from useXxxFlagValue(..., default)
- * until DatadogProvider finishes initialising, so flag outages never block
- * time-to-interactive.
+ * Datadog wiring (all three intakes are enabled for full observability):
+ *   - enableRumFeatureFlagTracking: pins every evaluation onto the active
+ *     RUM session (Feature Flag Tracking tab, per-session Feature Flags).
+ *   - enableFlagEvaluationTracking:  streams evaluation counts (per flag
+ *     per variant) to the flag evaluation intake at a fixed interval.
+ *   - enableExposureLogging:         records individual exposures for
+ *     canary/experiment analysis on the exposures intake.
+ *
+ * The OpenFeatureProvider renders immediately with the default NOOP
+ * provider. Components get their safe default values from
+ * useXxxFlagValue(..., default) until DatadogProvider finishes
+ * initialising, so flag outages never block time-to-interactive.
  */
 export default function FeatureFlagProvider({
   children,
@@ -67,8 +57,6 @@ export default function FeatureFlagProvider({
 
     let cancelled = false;
 
-    OpenFeature.addHooks(rumReportingHook);
-
     (async () => {
       try {
         await OpenFeature.setContext({
@@ -84,6 +72,8 @@ export default function FeatureFlagProvider({
           env: FLAG_ENV,
           service: FLAG_SERVICE,
           version: process.env.NEXT_PUBLIC_DD_VERSION || 'dev',
+          enableRumFeatureFlagTracking: true,
+          enableFlagEvaluationTracking: true,
           enableExposureLogging: true,
         });
 
