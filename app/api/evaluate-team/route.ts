@@ -5,6 +5,7 @@ import { getServerGeminiClient } from '@/lib/gemini-server';
 import { logger } from '@/lib/logger';
 import { withLlmObsSpan } from '@/lib/llmobs';
 import { buildSystemInstruction, LLM_MODEL, THINKING_BUDGET, DEMO_HIGH_LATENCY } from '@/lib/demo-config';
+import { buildFlagContext, resolveAiGuardStrict } from '@/lib/feature-flags-server';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -167,9 +168,16 @@ Return ONLY valid JSON with exactly these keys:
 
     // ── AI Guard evaluation ───────────────────────────────────────────────────
     // Evaluates the prompt before it reaches the LLM.
-    // DD_AI_GUARD_BLOCK=true will reject the promise with AIGuardAbortError on DENY/ABORT.
-    // Default is false (MONITOR ONLY) so AI Guard logs without blocking traffic.
-    const aiGuardBlock = process.env.DD_AI_GUARD_BLOCK === 'true';
+    // block=true → AIGuardAbortError on DENY/ABORT → 403 response.
+    // block=false (MONITOR ONLY) → AI Guard logs without blocking traffic.
+    //
+    // Block mode is resolved from the `ai-guard-strict-mode` Datadog feature
+    // flag per request, so it can be flipped live from the Feature Flags UI
+    // without a redeploy. Falls back to DD_AI_GUARD_BLOCK env var if the
+    // flag provider is not ready.
+    const flagContext = buildFlagContext({ userId, username });
+    const aiGuardBlock = await resolveAiGuardStrict(flagContext);
+    span.setTag('ai_guard.block_mode', aiGuardBlock ? 'strict' : 'monitor');
     const aiGuardTracer = tracer as unknown as {
       aiguard?: {
         evaluate: (

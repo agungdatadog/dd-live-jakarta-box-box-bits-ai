@@ -16,6 +16,7 @@
     "@google/genai": "^1.17.0",
     "@hookform/resolvers": "^5.2.1",
     "@openfeature/react-sdk": "^1.2.1",
+    "@openfeature/server-sdk": "^1.20.2",
     "@openfeature/web-sdk": "^1.7.3",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
