@@ -6,6 +6,7 @@ import { DatadogProvider } from '@datadog/openfeature-browser';
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { useUserStore } from '@/store/userStore';
+import ThemeApplier from '@/components/ThemeApplier';
 
 // Flag env must match one of the environment.queries values configured in
 // Datadog Feature Flags (prod | dev). NEXT_PUBLIC_DATADOG_ENV is "production"
@@ -108,6 +109,7 @@ export default function FeatureFlagProvider({
 
   return (
     <OpenFeatureProvider client={OpenFeature.getClient()}>
+      <ThemeApplier />
       {children}
     </OpenFeatureProvider>
   );

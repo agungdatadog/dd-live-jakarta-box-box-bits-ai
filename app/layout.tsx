@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${sora.variable} ${spaceGrotesk.variable} ${plexMono.variable} dark`} suppressHydrationWarning>
+    <html lang="en" data-theme="midnight" className={`${sora.variable} ${spaceGrotesk.variable} ${plexMono.variable} dark`} suppressHydrationWarning>
       <body className="bg-zinc-950 text-zinc-50 font-sans antialiased" suppressHydrationWarning>
         <DatadogInit />
         <FeatureFlagProvider>

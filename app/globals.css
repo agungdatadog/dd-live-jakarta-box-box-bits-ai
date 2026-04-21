@@ -11,7 +11,10 @@
   --color-datadog-amber: #F4B63D;
 }
 
-:root {
+:root,
+:root[data-theme="midnight"] {
+  /* Midnight — default. Deep near-black paddock-at-night with balanced
+     Datadog purple/coral/cyan accents. */
   --background: #09090b;
   --foreground: #f5f7fb;
   --surface-0: rgba(10, 11, 15, 0.88);
@@ -26,6 +29,68 @@
   --status-cool: #67c3d9;
   --status-warm: #f4b63d;
   --page-max: 1440px;
+
+  --body-bg:
+    radial-gradient(circle at top left, rgba(138, 75, 222, 0.18), transparent 34%),
+    radial-gradient(circle at 80% 15%, rgba(242, 107, 94, 0.14), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(103, 195, 217, 0.12), transparent 28%),
+    linear-gradient(180deg, #08090d 0%, #0c0e13 40%, #09090b 100%);
+  --selection-bg: rgba(138, 75, 222, 0.4);
+  --brand-signal-gradient: linear-gradient(120deg, #ffffff 0%, #f1ddff 35%, #8a4bde 100%);
+}
+
+:root[data-theme="hyper-race"] {
+  /* Hyper Race — high-energy race mode. Coral + amber dominant (warning
+     lights / hot tyres), Datadog purple as sparing accent. Warmer base. */
+  --background: #120609;
+  --foreground: #fff5ec;
+  --surface-0: rgba(22, 10, 14, 0.9);
+  --surface-1: rgba(34, 16, 22, 0.92);
+  --surface-2: rgba(52, 24, 32, 0.8);
+  --border-strong: rgba(242, 107, 94, 0.46);
+  --border-soft: rgba(255, 255, 255, 0.09);
+  --text-muted: rgba(255, 237, 222, 0.74);
+  --text-faint: rgba(255, 237, 222, 0.48);
+  --brand-primary: #f26b5e;
+  --brand-secondary: #f4b63d;
+  --status-cool: #8a4bde;
+  --status-warm: #f4b63d;
+  --page-max: 1440px;
+
+  --body-bg:
+    radial-gradient(circle at top left, rgba(242, 107, 94, 0.22), transparent 36%),
+    radial-gradient(circle at 80% 12%, rgba(244, 182, 61, 0.18), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(138, 75, 222, 0.14), transparent 30%),
+    linear-gradient(180deg, #150608 0%, #1c0709 45%, #0f0304 100%);
+  --selection-bg: rgba(242, 107, 94, 0.45);
+  --brand-signal-gradient: linear-gradient(120deg, #ffffff 0%, #ffd9cf 35%, #f26b5e 100%);
+}
+
+:root[data-theme="datadog-purple"] {
+  /* Datadog Purple — brand-forward. Rich violet surfaces, saturated
+     Datadog purple chrome, cool cyan hint for telemetry. */
+  --background: #12081f;
+  --foreground: #f8f3ff;
+  --surface-0: rgba(26, 14, 46, 0.9);
+  --surface-1: rgba(40, 20, 72, 0.92);
+  --surface-2: rgba(58, 30, 102, 0.8);
+  --border-strong: rgba(138, 75, 222, 0.58);
+  --border-soft: rgba(255, 255, 255, 0.12);
+  --text-muted: rgba(239, 229, 255, 0.76);
+  --text-faint: rgba(239, 229, 255, 0.52);
+  --brand-primary: #8a4bde;
+  --brand-secondary: #b38bff;
+  --status-cool: #67c3d9;
+  --status-warm: #f4b63d;
+  --page-max: 1440px;
+
+  --body-bg:
+    radial-gradient(circle at top left, rgba(138, 75, 222, 0.3), transparent 36%),
+    radial-gradient(circle at 85% 15%, rgba(99, 44, 166, 0.24), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(103, 195, 217, 0.1), transparent 30%),
+    linear-gradient(180deg, #140726 0%, #1c0a35 45%, #0f0619 100%);
+  --selection-bg: rgba(138, 75, 222, 0.55);
+  --brand-signal-gradient: linear-gradient(120deg, #ffffff 0%, #e5d2ff 25%, #8a4bde 60%, #632ca6 100%);
 }
 
 html {
@@ -34,15 +99,12 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(138, 75, 222, 0.18), transparent 34%),
-    radial-gradient(circle at 80% 15%, rgba(242, 107, 94, 0.14), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(103, 195, 217, 0.12), transparent 28%),
-    linear-gradient(180deg, #08090d 0%, #0c0e13 40%, #09090b 100%);
+  background: var(--body-bg);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  transition: background 400ms ease, color 200ms ease;
 }
 
 a,
@@ -58,7 +120,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(138, 75, 222, 0.4);
+  background: var(--selection-bg);
   color: #ffffff;
 }
 
@@ -142,7 +204,7 @@ textarea {
 }
 
 .brand-signal {
-  background: linear-gradient(120deg, #ffffff 0%, #f1ddff 35%, #8a4bde 100%);
+  background: var(--brand-signal-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
