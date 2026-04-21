@@ -4,8 +4,26 @@ import { useEffect, useState } from 'react';
 import { datadogRum } from '@datadog/browser-rum';
 import { DatadogProvider } from '@datadog/openfeature-browser';
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
-import { OpenFeature } from '@openfeature/web-sdk';
+import { OpenFeature, type Hook } from '@openfeature/web-sdk';
 import { useUserStore } from '@/store/userStore';
+
+/**
+ * OpenFeature hook that mirrors every evaluation into the RUM session so it
+ * shows up in RUM → Feature Flag Tracking and on each session's Feature Flags
+ * tab. Required because @datadog/openfeature-browser's enableExposureLogging
+ * sends to the exposures intake, not to RUM sessions.
+ *
+ * Docs: https://docs.datadoghq.com/real_user_monitoring/feature_flag_tracking/setup/?tab=browser
+ */
+const rumReportingHook: Hook = {
+  after(hookContext, evaluationDetails) {
+    if (!datadogRum.getInitConfiguration()) return;
+    datadogRum.addFeatureFlagEvaluation(
+      hookContext.flagKey,
+      evaluationDetails.value,
+    );
+  },
+};
 
 // Flag env must match one of the environment.queries values configured in
 // Datadog Feature Flags (prod | dev). NEXT_PUBLIC_DATADOG_ENV is "production"
@@ -48,6 +66,8 @@ export default function FeatureFlagProvider({
     const site = process.env.NEXT_PUBLIC_DATADOG_SITE || 'datadoghq.com';
 
     let cancelled = false;
+
+    OpenFeature.addHooks(rumReportingHook);
 
     (async () => {
       try {
