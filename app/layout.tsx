@@ -11,7 +11,7 @@ const plexMono = IBM_Plex_Mono({ subsets: ['latin'], variable: '--font-mono', we
 
 export const metadata: Metadata = {
   title: 'Box Box Bits AI',
-  description: 'Datadog Live Bangkok 2026 - F1 Racing Simulation with Bits AI',
+  description: 'Datadog Observability & Security Platform Event — F1 Racing Simulation with Bits AI',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

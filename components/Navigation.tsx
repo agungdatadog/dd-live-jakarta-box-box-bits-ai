@@ -47,7 +47,7 @@ export function Navigation() {
                 Box Box <span className="brand-signal">Bits AI</span>
               </div>
               <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--text-faint)]">
-                Datadog Live Bangkok 2026
+                Observability &amp; Security Platform Event
               </p>
             </Link>
             <div className="flex items-center gap-2">

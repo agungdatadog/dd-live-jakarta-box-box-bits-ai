@@ -6,7 +6,7 @@ import { withLlmObsSpan } from '@/lib/llmobs';
 const MODEL = 'gemini-3.1-flash-lite-preview';
 
 const SYSTEM_INSTRUCTION =
-  'You are a creative motorsport callsign generator for the Datadog Live Bangkok 2026 F1 fan event. ' +
+  'You are a creative motorsport callsign generator for a Datadog Observability & Security Platform Event F1 fan experience. ' +
   'Generate fun, punchy F1 driver identities. Always respond with valid JSON only.';
 
 export async function POST(req: Request) {

@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     ].join('\n\n');
 
     // ── Prompt ───────────────────────────────────────────────────────────────
-    const baseSystemInstruction = `You are the AI judge for the Dream Team Game at Datadog Live Bangkok 2026.
+    const baseSystemInstruction = `You are the AI judge for the Dream Team Game at a Datadog Observability & Security Platform Event.
 Your job: evaluate a fantasy F1 team of dog-named characters for a live audience competition.
 
 The audience is watching a SCOREBOARD. There are THREE prize categories:

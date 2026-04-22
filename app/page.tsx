@@ -59,7 +59,7 @@ export default function Home() {
               transition={{ duration: 0.55, ease: 'easeOut' }}
               className="max-w-3xl"
             >
-              <p className="section-kicker mb-4">Datadog Live Bangkok 2026</p>
+              <p className="section-kicker mb-4">Datadog Observability &amp; Security Platform Event</p>
               <div className="brand-wordmark text-[clamp(3.8rem,11vw,8rem)] leading-[0.82]">
                 Box Box <span className="brand-signal">Bits AI</span>
               </div>
