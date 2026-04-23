@@ -2,7 +2,7 @@
 
 # Box Box Bits AI
 
-Interactive F1 demo app for **Datadog Live Bangkok 2026** — built to showcase Datadog APM, RUM, and LLM Observability on a Next.js app deployed to Google Cloud Run.
+Interactive F1 demo app for **Datadog Observability & Security Platform Events** — built to showcase Datadog APM, RUM, and LLM Observability on a Next.js app deployed to Google Cloud Run.
 
 **Live:** https://box-box-bits-ai-449012790678.asia-southeast1.run.app
 

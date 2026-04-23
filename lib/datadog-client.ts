@@ -28,6 +28,9 @@ export function initDatadog() {
       trackLongTasks: true,
       trackUserInteractions: true,
       defaultPrivacyLevel: 'allow',
+      // Enables the RUM Feature Flag Tracking tab and pins evaluated flags
+      // onto each session. Required alongside datadogRum.addFeatureFlagEvaluation().
+      enableExperimentalFeatures: ['feature_flags'],
       // Inject tracing headers into same-origin /api/* requests so each chat
       // fetch is linked to its backend APM trace in the Datadog UI.
       allowedTracingUrls: [

@@ -58,7 +58,7 @@ spec:
         service: ${CR_SERVICE_NAME}
       annotations:
         autoscaling.knative.dev/maxScale: "30"
-        autoscaling.knative.dev/minScale: "10"
+        autoscaling.knative.dev/minScale: "0"
         run.googleapis.com/startup-cpu-boost: "true"
     spec:
       containerConcurrency: 80

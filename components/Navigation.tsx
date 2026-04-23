@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Car, MessageSquare, Trophy, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DriverTag } from '@/components/DriverTag';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -16,6 +17,10 @@ export function Navigation() {
 
   return (
     <>
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 md:hidden">
+        <DriverTag className="pointer-events-auto" />
+      </div>
+
       <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 pb-safe px-3 md:hidden">
         <div className="pointer-events-auto mx-auto flex h-18 max-w-2xl items-center justify-between gap-2 rounded-[1.6rem] border border-white/10 bg-[rgba(10,11,15,0.78)] px-2 shadow-[0_-20px_70px_rgba(0,0,0,0.4)] backdrop-blur-xl">
           {navItems.map(({ href, label, icon: Icon }) => (
@@ -42,7 +47,7 @@ export function Navigation() {
                 Box Box <span className="brand-signal">Bits AI</span>
               </div>
               <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--text-faint)]">
-                Datadog Live Bangkok 2026
+                Observability &amp; Security Platform Event
               </p>
             </Link>
             <div className="flex items-center gap-2">
@@ -59,6 +64,7 @@ export function Navigation() {
                   <span className="font-mono text-[11px] uppercase tracking-[0.24em]">{short}</span>
                 </Link>
               ))}
+              <DriverTag className="ml-2" />
             </div>
           </div>
         </div>

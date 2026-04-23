@@ -5,12 +5,18 @@ import { useUserStore } from '@/store/userStore';
 import { motion, useScroll } from 'motion/react';
 import { ArrowRight, Radio, TimerReset, Users2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { useBooleanFlagValue } from '@openfeature/react-sdk';
 import F1Car3D from '@/components/F1Car3D';
+import { FeatureFlags, FeatureFlagDefaults } from '@/lib/feature-flags';
 
 export default function Home() {
   const { username } = useUserStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
+  const show3DCar = useBooleanFlagValue(
+    FeatureFlags.HOME_3D_CAR_ENABLED,
+    FeatureFlagDefaults[FeatureFlags.HOME_3D_CAR_ENABLED],
+  );
   const routes = [
     {
       href: '/pitwall',
@@ -40,7 +46,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
-      <F1Car3D scrollProgress={scrollYProgress} />
+      {show3DCar && <F1Car3D scrollProgress={scrollYProgress} />}
       <div
         ref={containerRef}
         className="relative z-10 h-screen overflow-y-auto no-scrollbar"
@@ -53,7 +59,7 @@ export default function Home() {
               transition={{ duration: 0.55, ease: 'easeOut' }}
               className="max-w-3xl"
             >
-              <p className="section-kicker mb-4">Datadog Live Bangkok 2026</p>
+              <p className="section-kicker mb-4">Datadog Observability &amp; Security Platform Event</p>
               <div className="brand-wordmark text-[clamp(3.8rem,11vw,8rem)] leading-[0.82]">
                 Box Box <span className="brand-signal">Bits AI</span>
               </div>

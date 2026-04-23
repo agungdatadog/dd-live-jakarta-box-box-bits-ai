@@ -153,7 +153,7 @@ export function DriverNameGate() {
                 </div>
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--brand-primary)]">
-                    Datadog Live Bangkok 2026
+                    Datadog Observability &amp; Security Platform Event
                   </p>
                   <h2 className="brand-wordmark mt-1 text-[1.8rem] leading-none text-white">
                     Set Your Race Number
