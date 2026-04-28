@@ -42,7 +42,7 @@ COPY --from=builder /app/.next/static ./.next/static
 
 # dd-trace is loaded via instrumentation.ts (Next.js in-code init).
 # Install it here so the standalone runtime resolves its transitive deps correctly.
-RUN npm install --omit=dev --no-save dd-trace winston datadog-winston
+RUN npm install --omit=dev --no-save dd-trace winston
 
 EXPOSE 8080
 # serverless-init wraps the app process and handles APM flushing on shutdown.
