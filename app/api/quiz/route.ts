@@ -42,11 +42,21 @@ export async function POST(req: Request) {
     span.finish();
     return NextResponse.json({ success: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     try {
       span?.setTag('error', true);
-      span?.setTag('error.message', error instanceof Error ? error.message : String(error));
+      span?.setTag('error.message', message);
       span?.finish();
-    } catch (e) {}
-    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    } catch (_) { /* span cleanup best-effort */ }
+
+    logger.error({
+      event_type: 'quiz_submission_error',
+      status: 500,
+      error: message,
+      stack: error instanceof Error ? error.stack : undefined,
+      request: { path: '/api/quiz' },
+    });
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

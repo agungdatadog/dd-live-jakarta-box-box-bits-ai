@@ -172,7 +172,8 @@ export async function POST(req: Request) {
       span?.finish();
     } catch (_) { /* span cleanup best-effort */ }
 
-    logger.warn({
+    const logFn = status >= 500 ? logger.error : logger.warn;
+    logFn.call(logger, {
       event_type: 'pitwall_chat_error',
       status,
       error: message,
