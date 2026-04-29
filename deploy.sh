@@ -49,6 +49,9 @@ metadata:
   name: ${CR_SERVICE_NAME}
   labels:
     service: ${CR_SERVICE_NAME}
+    # Opts this Cloud Run service into Datadog's GCP integration so the
+    # platform auto-discovers it (logs, runtime metrics, container labels).
+    datadog: "enabled"
   annotations:
     run.googleapis.com/ingress: all
 spec:
@@ -56,6 +59,7 @@ spec:
     metadata:
       labels:
         service: ${CR_SERVICE_NAME}
+        datadog: "enabled"
       annotations:
         autoscaling.knative.dev/maxScale: "30"
         autoscaling.knative.dev/minScale: "0"
