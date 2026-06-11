@@ -18,11 +18,17 @@
 kubectl get pods -n data-pipeline
 # Expected: redpanda-0 Running, bq-sink Running, dbt-pricing CronJob active, traffic-sim Running
 
-# 4. Verify Kafka broker metrics flowing (new — Redpanda /public_metrics scrape)
+# 4. Verify Kafka broker + message metrics flowing
 kubectl exec -n datadog \
   $(kubectl get pod -l app=datadog-agent -n datadog -o jsonpath='{.items[0].metadata.name}') \
-  -c agent -- agent status 2>/dev/null | grep "redpanda.*OK\]"
-# Expected: Instance ID: openmetrics:redpanda:... [OK]   Metric Samples: ~95/run
+  -c agent -- agent status 2>/dev/null | grep "openmetrics:kafka.*OK\]"
+# Expected: Instance ID: openmetrics:kafka:... [OK]   Metric Samples: ~110/run
+# Key metrics verified in Datadog (Jun 2026):
+#   kafka.topic.message_rate{topic:limited_merch_transactions}  = 0.65/s  [kafka_consumer check]
+#   kafka.consumer_lag{topic:limited_merch_transactions}        = 0        [kafka_consumer check]
+#   kafka.topic.max_offset, kafka.topic.partitions              ✓          [openmetrics rename]
+#   kafka.cluster.brokers, kafka.cluster.topics                 ✓          [openmetrics rename]
+#   kafka.topic.messages_in (counter)                           ← needs ~1h to appear in catalog
 ```
 
 ---
@@ -64,7 +70,12 @@ open "https://app.datadoghq.com/data-observability/pipelines"
 ```bash
 # Scenario 1 — Bits AI: bq-sink OOMKilled
 ./scripts/demo-issues.sh --k8s-oom-inject
-# Expected: bq-sink pod enters OOMKilled / CrashLoopBackOff within ~2 min
+# Expected: bq-sink pod enters OOMKilled / CrashLoopBackOff within ~5s
+# Mechanism: memory limit 28Mi + NODE_OPTIONS=--max-old-space-size=20 → V8 OOM on first batch
+# Verify: kubectl get pods -n data-pipeline -l app=bq-sink
+#   NAME           READY  STATUS             RESTARTS
+#   bq-sink-...    0/1    CrashLoopBackOff   3 (45s ago)
+# Datadog metric: kubernetes.containers.restarts{kube_container_name:bq-sink} → rising
 
 # Scenario 3 — Shift Left Security: PR branch with SAST/Secrets/SCA issues
 ./scripts/demo-issues.sh --create-sec-pr
@@ -143,6 +154,43 @@ open "https://app.datadoghq.com/metric/explorer#live=true&metrics=redpanda.kafka
 | `demo-issues.sh` | `--cleanup-sec-pr` | Delete security-issues branch |
 | `demo-data-quality.sh` | `--show-bad-data` | Query BigQuery for anomalies |
 | `demo-data-quality.sh` | `--create-monitors` | Print monitor setup guide |
+
+---
+
+## Required Monitors — Setup Checklist
+
+> Monitors in Datadog as of Jun 2026. ✅ = exists, ⚠️ = create manually in UI.
+
+### ✅ Already created (verified via MCP)
+
+| Monitor | ID | Status | Type |
+|---|---|---|---|
+| `[DO] Freshness - NovaPay Dynamic Pricing` | 294193065 | **ALERT** (fires when `--fail-dbt` runs) | Data Quality |
+| `[DO] Row Count Anomaly - NovaPay Dynamic Pricing` | 294192562 | OK | Data Quality |
+| `[DO] Row Count Anomally - limited_merch_events` | 294203343 | OK | Data Quality |
+
+### ⚠️ Create manually in Datadog UI
+
+**Monitor 1: bq-sink OOMKilled (Scenario 1)**
+- URL: [app.datadoghq.com/monitors/create](https://app.datadoghq.com/monitors/create)
+- Type: `Metric Alert`
+- Query: `sum(last_5m):max:kubernetes.containers.restarts{kube_container_name:bq-sink,kube_namespace:data-pipeline} >= 1`
+- Name: `[NovaPay Demo] bq-sink OOMKilled - CrashLoopBackOff`
+- Message: `## 🚨 bq-sink OOMKilled\n\nExit Code 137. Bits AI auto-investigating root cause.\n\n@slack-Nuttees_Slack-dd-alerts`
+- Tags: `env:prod`, `service:bq-sink`, `demo:royal-rumble-2026`, `scenario:bits-ai-oom`
+
+**Monitor 2: Kafka Consumer Lag (ties Scenario 1 to Data Observability)**
+- Type: `Metric Alert`
+- Query: `max(last_5m):max:kafka.consumer_lag{topic:limited_merch_transactions,consumer_group:bq-sink-consumer,env:prod} > 500`
+- Name: `[NovaPay Demo] Kafka Consumer Lag - limited_merch_transactions`
+- Message: `Consumer lag growing on limited_merch_transactions — bq-sink may be down. Events not reaching BigQuery. @slack-Nuttees_Slack-dd-alerts`
+- Tags: `env:prod`, `demo:royal-rumble-2026`, `topic:limited_merch_transactions`
+
+**Monitor 3+4: Data Quality — Percent Zero + Nullness (Scenario 4)**
+- Type: `Data Quality Alert` (create via [Data Observability → Monitors](https://app.datadoghq.com/data-observability/monitors/create))
+- Table: `novapay_raw.limited_merch_events` in BigQuery
+- Monitor 3: **Percent Zero** on column `price_thb` — threshold: > 5%
+- Monitor 4: **Nullness** on column `user_id` — threshold: > 10%
 
 ---
 

@@ -159,8 +159,10 @@ case "${1:-}" in
 
   --traffic-burst)
     echo_step "Traffic sim: burst mode (3× rate — simulate Black Friday spike)"
-    kubectl set env deployment/traffic-sim TRAFFIC_MODE=burst DATA_QUALITY_MODE=normal -n data-pipeline > /dev/null
-    echo_ok "Traffic sim → burst (36 events/min)"
+    # Only change TRAFFIC_MODE — do NOT reset DATA_QUALITY_MODE so injected faults persist
+    kubectl set env deployment/traffic-sim TRAFFIC_MODE=burst -n data-pipeline > /dev/null
+    echo_ok "Traffic sim → burst (36 events/min, DATA_QUALITY_MODE unchanged)"
+    echo_warn "To also reset data quality: ./scripts/demo-pipeline.sh --dq-normal"
     ;;
 
   --traffic-off)
