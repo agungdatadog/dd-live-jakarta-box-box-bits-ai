@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redpanda
+  namespace: data-pipeline
+  labels:
+    app: redpanda
+    demo: novapay-royal-rumble
+spec:
+  serviceName: redpanda-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redpanda
+  template:
+    metadata:
+      labels:
+        app: redpanda
+        demo: novapay-royal-rumble
+      annotations:
+        # ── Redpanda broker metrics via OpenMetrics (Prometheus) ──────────────────
+        # Redpanda is C++-based (NOT Java) — JMX does not apply.
+        # Broker metrics are collected from two endpoints:
+        #   /public_metrics  — stable Kafka-compatible broker metrics (records, latency, throughput)
+        #   /metrics         — internal Redpanda metrics (storage, raft, CPU)
+        # Docs: https://docs.redpanda.com/docs/manage/monitoring/
+        #       https://docs.datadoghq.com/integrations/redpanda/
+        ad.datadoghq.com/redpanda.checks: |
+          {
+            "openmetrics": {
+              "init_config": {},
+              "instances": [
+                {
+                  "openmetrics_endpoint": "http://%%host%%:9644/public_metrics",
+                  "namespace": "redpanda",
+                  "metrics": [
+                    "redpanda_kafka_records_produced_total",
+                    "redpanda_kafka_records_fetched_total",
+                    "redpanda_kafka_request_bytes_total",
+                    "redpanda_kafka_request_latency_seconds",
+                    "redpanda_kafka_handler_latency_seconds",
+                    "redpanda_kafka_partitions",
+                    "redpanda_kafka_replicas",
+                    "redpanda_kafka_max_offset",
+                    "redpanda_kafka_consumer_group_committed_offset",
+                    "redpanda_kafka_consumer_group_consumers",
+                    "redpanda_cluster_brokers",
+                    "redpanda_cluster_topics",
+                    "redpanda_cluster_partitions",
+                    "redpanda_cluster_unavailable_partitions"
+                  ],
+                  "tags": ["kafka_cluster:novapay-redpanda", "env:prod", "demo:royal-rumble-2026"]
+                }
+              ]
+            }
+          }
+        ad.datadoghq.com/redpanda.logs: |
+          [{"source": "redpanda", "service": "redpanda", "tags": ["env:prod", "demo:royal-rumble"]}]
+    spec:
+      # Fix PVC permissions so the redpanda user (UID 101) can write to the volume
+      initContainers:
+        - name: redpanda-init
+          image: busybox:1.36
+          command: ["sh", "-c", "chown -R 101:101 /var/lib/redpanda/data && chmod 755 /var/lib/redpanda/data"]
+          volumeMounts:
+            - name: redpanda-data
+              mountPath: /var/lib/redpanda/data
+      containers:
+        - name: redpanda
+          image: docker.redpanda.com/redpandadata/redpanda:v24.2.10
+          command:
+            - /usr/bin/rpk
+            - redpanda
+            - start
+            - --smp=1
+            - --memory=1G
+            - --reserve-memory=0M
+            - --overprovisioned
+            - --node-id=0
+            - --kafka-addr=0.0.0.0:9092
+            # Advertise the Internal LoadBalancer IP so all clients (Cloud Run via
+            # VPC connector, bq-sink in GKE) complete the Kafka metadata handshake
+            # using the same RFC 1918 address.
+            - --advertise-kafka-addr=10.148.0.65:9092
+            - --pandaproxy-addr=0.0.0.0:8082
+            - --advertise-pandaproxy-addr=$(POD_IP):8082
+            - --schema-registry-addr=0.0.0.0:8081
+            - --rpc-addr=0.0.0.0:33145
+            - --advertise-rpc-addr=$(POD_IP):33145
+            - --mode=dev-container
+            - --default-log-level=warn
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - name: kafka
+              containerPort: 9092
+            - name: admin
+              containerPort: 9644
+            - name: proxy
+              containerPort: 8082
+            - name: schema
+              containerPort: 8081
+            - name: rpc
+              containerPort: 33145
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /v1/cluster/health_overview
+              port: 9644
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /v1/cluster/health_overview
+              port: 9644
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 5
+          volumeMounts:
+            - name: redpanda-data
+              mountPath: /var/lib/redpanda/data
+  volumeClaimTemplates:
+    - metadata:
+        name: redpanda-data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 10Gi
