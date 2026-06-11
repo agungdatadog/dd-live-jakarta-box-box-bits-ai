@@ -1,0 +1,76 @@
+# infra/gke/bq-sink/deployment-oom-demo.yaml
+#
+# Demo variant of the bq-sink deployment with an intentionally low memory limit.
+# This causes the pod to be OOMKilled when it processes Avro messages + BigQuery writes.
+#
+# DEMO USAGE (Bits AI investigation scenario):
+#   kubectl apply -f infra/gke/bq-sink/deployment-oom-demo.yaml
+#   # → Pod goes OOMKilled → CrashLoopBackOff → K8s monitor fires
+#   # → Bits AI auto-investigates → finds OOMKilled → recommends fix
+#   # → Bits Code opens PR to restore deployment.yaml with correct memory limit
+#
+# RECOVERY:
+#   kubectl apply -f infra/gke/bq-sink/deployment.yaml
+#   kubectl rollout restart deployment/bq-sink -n data-pipeline
+#
+# ROOT CAUSE (what Bits AI will find):
+#   bq-sink deserializes Avro messages and buffers up to 100 events before
+#   flushing to BigQuery. Under load, the Avro schema + buffer + BigQuery client
+#   requires ~200Mi. The 64Mi limit below causes OOM during batch processing.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bq-sink
+  namespace: data-pipeline
+  labels:
+    app: bq-sink
+    demo: novapay-royal-rumble
+    demo-mode: oom-trigger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bq-sink
+  template:
+    metadata:
+      labels:
+        app: bq-sink
+        demo: novapay-royal-rumble
+        demo-mode: oom-trigger
+      annotations:
+        ad.datadoghq.com/bq-sink.logs: |
+          [{"source": "nodejs", "service": "bq-sink", "tags": ["env:prod", "demo:oom-trigger"]}]
+    spec:
+      serviceAccountName: bq-sink-ksa
+      containers:
+        - name: bq-sink
+          image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/bq-sink:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: bq-sink-config
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=20"  # limits V8 heap to 20Mi; combined with 28Mi container limit → OOMKilled under load
+            - name: DD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: datadog-secret
+                  key: api-key
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 24Mi     # deliberately low — will OOM under Avro processing load
+            limits:
+              cpu: 500m
+              memory: 28Mi     # reliably triggers OOMKilled: with --max-old-space-size=20, heap+overhead >28Mi under load
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 30
