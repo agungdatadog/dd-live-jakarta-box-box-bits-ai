@@ -26,34 +26,7 @@ spec:
         # Docs: https://docs.redpanda.com/docs/manage/monitoring/
         #       https://docs.datadoghq.com/integrations/redpanda/
         ad.datadoghq.com/redpanda.checks: |
-          {
-            "openmetrics": {
-              "init_config": {},
-              "instances": [
-                {
-                  "openmetrics_endpoint": "http://%%host%%:9644/public_metrics",
-                  "namespace": "redpanda",
-                  "metrics": [
-                    "redpanda_kafka_records_produced_total",
-                    "redpanda_kafka_records_fetched_total",
-                    "redpanda_kafka_request_bytes_total",
-                    "redpanda_kafka_request_latency_seconds",
-                    "redpanda_kafka_handler_latency_seconds",
-                    "redpanda_kafka_partitions",
-                    "redpanda_kafka_replicas",
-                    "redpanda_kafka_max_offset",
-                    "redpanda_kafka_consumer_group_committed_offset",
-                    "redpanda_kafka_consumer_group_consumers",
-                    "redpanda_cluster_brokers",
-                    "redpanda_cluster_topics",
-                    "redpanda_cluster_partitions",
-                    "redpanda_cluster_unavailable_partitions"
-                  ],
-                  "tags": ["kafka_cluster:novapay-redpanda", "env:prod", "demo:royal-rumble-2026"]
-                }
-              ]
-            }
-          }
+          {"openmetrics":{"init_config":{},"instances":[{"openmetrics_endpoint":"http://%%host%%:9644/public_metrics","namespace":"kafka","metrics":[{"redpanda_kafka_records_produced_total":"topic.messages_in"},{"redpanda_kafka_records_fetched_total":"topic.messages_out"},{"redpanda_kafka_request_bytes_total":"topic.bytes_in"},{"redpanda_kafka_request_latency_seconds":"request.latency_seconds"},{"redpanda_kafka_handler_latency_seconds":"handler.latency_seconds"},{"redpanda_kafka_partitions":"topic.partitions"},{"redpanda_kafka_replicas":"topic.replicas"},{"redpanda_kafka_max_offset":"topic.max_offset"},{"redpanda_kafka_consumer_group_committed_offset":"consumer_group.committed_offset"},{"redpanda_kafka_consumer_group_consumers":"consumer_group.consumers"},{"redpanda_cluster_brokers":"cluster.brokers"},{"redpanda_cluster_topics":"cluster.topics"},{"redpanda_cluster_partitions":"cluster.partitions"},{"redpanda_cluster_unavailable_partitions":"cluster.unavailable_partitions"}],"rename_labels":{"redpanda_topic":"topic","redpanda_namespace":"kafka_namespace","redpanda_group":"consumer_group","redpanda_partition":"partition"},"tags":["kafka_cluster:novapay-redpanda","env:prod","demo:royal-rumble-2026"]}]}}
         ad.datadoghq.com/redpanda.logs: |
           [{"source": "redpanda", "service": "redpanda", "tags": ["env:prod", "demo:royal-rumble"]}]
     spec:
