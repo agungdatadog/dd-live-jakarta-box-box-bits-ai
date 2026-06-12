@@ -34,7 +34,10 @@ jobs:
       # ── SAST: Datadog Static Analysis ──────────────────────────────────────
       # v2.0.0 — supports Linux/X64 runners.
       # v2 reads DD_API_KEY/DD_APP_KEY from env vars (not inputs).
+      # continue-on-error: SAST uploads findings to Datadog but never blocks deploy.
+      # PR Gates in Datadog UI enforces the policy — not this CI step exit code.
       - name: Run Datadog Static Analysis
+        continue-on-error: true
         uses: DataDog/datadog-static-analyzer-github-action@2cc0e0621ea2863272b29d9aea230d9aad238086 # v2.0.0
         env:
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
@@ -43,12 +46,13 @@ jobs:
           dd_api_key: ${{ secrets.DD_API_KEY }}
           dd_app_key: ${{ secrets.DD_APP_KEY }}
           dd_site: datadoghq.com
-          diff_aware: true
+          diff_aware: false
 
       # ── SCA: Software Composition Analysis ─────────────────────────────────
       # v4.5.0 — composite action (no Docker build), generates SBOM and uploads to Datadog.
-      # dd_service/dd_env not supported in v4+; service is inferred from git context.
+      # continue-on-error: SCA uploads SBOM findings to Datadog but never blocks deploy.
       - name: Run Datadog SCA
+        continue-on-error: true
         uses: DataDog/datadog-sca-github-action@37d973e751cff3de3d5dd4fc46160262688e1fa7 # v4.5.0
         with:
           dd_api_key: ${{ secrets.DD_API_KEY }}
