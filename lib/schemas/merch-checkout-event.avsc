@@ -1,0 +1,50 @@
+{
+  "type": "record",
+  "name": "MerchCheckoutEvent",
+  "namespace": "com.novapay.merch",
+  "doc": "A purchase event from the Box Box Bits AI Limited Merch storefront, produced on every checkout and consumed by bq-sink → BigQuery.",
+  "fields": [
+    {
+      "name": "event_id",
+      "type": "string",
+      "doc": "UUID for the purchase event"
+    },
+    {
+      "name": "product_id",
+      "type": "string",
+      "doc": "Merch product SKU (e.g. rb-cap-001)"
+    },
+    {
+      "name": "user_id",
+      "type": "string",
+      "doc": "RUM user ID"
+    },
+    {
+      "name": "quantity",
+      "type": "int",
+      "doc": "Units purchased"
+    },
+    {
+      "name": "price_thb",
+      "type": "double",
+      "doc": "Dynamic unit price in THB at time of purchase"
+    },
+    {
+      "name": "team",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "F1 team name on the merch item"
+    },
+    {
+      "name": "category",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Product category: caps | tops | jackets | accessories"
+    },
+    {
+      "name": "event_ts",
+      "type": "string",
+      "doc": "ISO 8601 event timestamp (UTC)"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+# Datadog Helm chart values for nuttee-cluster-1
+# Deploy with:
+#   helm repo add datadog https://helm.datadoghq.com
+#   helm repo update
+#   helm upgrade --install datadog-agent datadog/datadog \
+#     -f infra/gke/datadog/datadog-values.yaml \
+#     --namespace datadog \
+#     --create-namespace \
+#     --set datadog.apiKey=<DD_API_KEY> \
+#     --set datadog.appKey=<DD_APP_KEY>
+
+datadog:
+  site: datadoghq.com
+  # DD_ENV is set via tags; do NOT use `env:` here — it conflicts with the
+  # Helm chart's `datadog.env` list field (additional env vars for the agent).
+  tags:
+    - "env:prod"
+    - "cluster:nuttee-cluster-1"
+    - "project:datadog-ese-sandbox"
+    - "demo:royal-rumble-2026"
+
+  # APM
+  apm:
+    portEnabled: true
+
+  # Data Streams Monitoring — required for Kafka pipeline tracing
+  dataStreams:
+    enabled: true
+
+  # Log collection from all containers
+  logs:
+    enabled: true
+    containerCollectAll: true
+
+  # Process monitoring (optional but useful for demo)
+  processAgent:
+    enabled: true
+    processCollection: true
+
+  # Suppress auto-discovered checks for services not present in this cluster
+  ignoreAutoConfig:
+    - cilium
+    - postgres
+
+  # GKE Container-Optimized OS (COS) fix — required for nuttee-cluster-1
+  # Source: https://docs.datadoghq.com/containers/kubernetes/distributions/#GKE
+  # Without this, system-probe tries to mount /usr/src which is read-only on COS
+  # nodes, causing CreateContainerError: "failed to mkdir /usr/src: read-only file system"
+  systemProbe:
+    enableDefaultKernelHeadersPaths: false
+
+  # Prometheus autodiscovery — picks up Redpanda /metrics endpoint
+  prometheusScrape:
+    enabled: true
+    serviceEndpoints: true
+
+  # Cluster checks runner for heavier checks
+  clusterChecks:
+    enabled: true
+
+clusterAgent:
+  enabled: true
+  replicas: 1
+
+  # Cluster-level checks: Kubernetes state metrics
+  admissionController:
+    enabled: true
+    mutateUnlabelled: false
+
+# GKE COS provider — tells the Helm chart to use COS-compatible paths and configs.
+# Source: https://docs.datadoghq.com/containers/kubernetes/distributions/#GKE
+providers:
+  gke:
+    cos: true
+
+agents:
+  tolerations:
+    - operator: Exists
+
+  # Give the agent enough resources for Data Streams + Prometheus scraping
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

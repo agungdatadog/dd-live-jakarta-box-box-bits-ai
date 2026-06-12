@@ -1,0 +1,34 @@
+{
+  "_comment": "Datadog Synthetics CI/CD configuration. Docs: https://docs.datadoghq.com/continuous_testing/cicd_integrations/configuration/",
+
+  "global": {
+    "allowInsecureCertificates": false,
+    "defaultTestTimeout": 60,
+    "failOnCriticalErrors": false,
+    "failOnMissingTests": false,
+    "failOnTimeout": false,
+    "locations": ["aws:ap-southeast-1"],
+    "pollingTimeout": 120000,
+    "tunnel": false
+  },
+
+  "testSearchQuery": "tag:service:box-box-bits-ai AND tag:env:prod",
+
+  "tests": [
+    {
+      "id": "REPLACE_WITH_HEALTH_CHECK_ID",
+      "executionRule": "blocking",
+      "_comment": "GET /api/health → {status:ok}. Create in Datadog UI then paste public_id here."
+    },
+    {
+      "id": "REPLACE_WITH_MERCH_PRODUCTS_ID",
+      "executionRule": "blocking",
+      "_comment": "GET /api/merch/products → products array, pricing_source present."
+    },
+    {
+      "id": "REPLACE_WITH_CHECKOUT_ID",
+      "executionRule": "blocking",
+      "_comment": "POST /api/merch/checkout → {success:true, orderId:...}."
+    }
+  ]
+}

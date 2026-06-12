@@ -1,0 +1,58 @@
+name: Datadog Static Analysis (PR Gates)
+
+on:
+  push:
+    branches: [main, 'demo/**']
+  pull_request:
+    branches: [main]
+
+# Runs Datadog Static Analysis (SAST + SCA + Secret Scanning + IaC) and uploads
+# results to Datadog Code Analysis. PR Gates in Datadog then automatically creates
+# a GitHub check on the PR that can be set as required to block bad merges.
+#
+# PR Gates config (Datadog UI):
+#   Software Delivery > PR Gates > New Rule
+#   Source: Static Code Analysis (SAST)
+#   Condition: Introduces new Critical or High severity vulnerability
+#   Scope: this repository
+#
+# Docs: https://docs.datadoghq.com/pr_gates/
+
+jobs:
+  datadog-static-analysis:
+    name: Datadog Static Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write  # required for SARIF upload to GitHub Security tab
+      pull-requests: write    # required for PR comment annotations
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── SAST: Datadog Static Analysis ──────────────────────────────────────
+      # Analyzes TypeScript/JavaScript for security vulnerabilities and code quality.
+      # Results uploaded to Datadog — PR Gates reads these findings.
+      - name: Run Datadog Static Analysis
+        uses: DataDog/datadog-static-analyzer-github-action@v1
+        with:
+          dd_api_key: ${{ secrets.DD_API_KEY }}
+          dd_app_key: ${{ secrets.DD_APP_KEY }}
+          dd_site: datadoghq.com
+          dd_service: box-box-bits-ai
+          dd_env: ci
+          # Fail the CI step if CRITICAL vulnerabilities are found (blocks merge)
+          fail_on_error: true
+
+      # ── SCA: Software Composition Analysis ─────────────────────────────────
+      # Scans npm dependencies for known CVEs and license violations.
+      # Results uploaded to Datadog — PR Gates SCA rule reads these.
+      - name: Run Datadog SCA
+        uses: DataDog/datadog-sca-github-action@v1
+        with:
+          dd_api_key: ${{ secrets.DD_API_KEY }}
+          dd_app_key: ${{ secrets.DD_APP_KEY }}
+          dd_site: datadoghq.com
+          dd_service: box-box-bits-ai
+          dd_env: ci

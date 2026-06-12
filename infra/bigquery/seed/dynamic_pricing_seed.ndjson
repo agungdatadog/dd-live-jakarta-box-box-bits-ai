@@ -1,0 +1,8 @@
+{"product_id":"rb-cap-001","base_price_thb":1290.0,"demand_multiplier":1.0,"current_price_thb":1290.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"rb-hoodie-001","base_price_thb":3490.0,"demand_multiplier":1.0,"current_price_thb":3490.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"mw-cap-001","base_price_thb":1390.0,"demand_multiplier":1.0,"current_price_thb":1390.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"mw-jacket-001","base_price_thb":5990.0,"demand_multiplier":1.0,"current_price_thb":5990.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"fl-cap-001","base_price_thb":1490.0,"demand_multiplier":1.0,"current_price_thb":1490.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"fl-tshirt-001","base_price_thb":1990.0,"demand_multiplier":1.0,"current_price_thb":1990.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"mc-cap-001","base_price_thb":1390.0,"demand_multiplier":1.0,"current_price_thb":1390.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}
+{"product_id":"mc-hoodie-001","base_price_thb":3290.0,"demand_multiplier":1.0,"current_price_thb":3290.0,"units_sold_1h":0,"dbt_updated_at":"2026-06-09T00:00:00Z","dbt_run_id":"seed-001"}

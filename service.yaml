@@ -15,6 +15,10 @@ spec:
         autoscaling.knative.dev/maxScale: "30"
         autoscaling.knative.dev/minScale: "0"
         run.googleapis.com/startup-cpu-boost: "true"
+        # VPC connector — routes private-range traffic through novapay-vpc-connector
+        # so Cloud Run can reach Redpanda Internal LB (10.148.0.65:9092) without public firewall rules.
+        run.googleapis.com/vpc-access-connector: projects/datadog-ese-sandbox/locations/asia-southeast1/connectors/novapay-vpc-connector
+        run.googleapis.com/vpc-access-egress: private-ranges-only
     spec:
       containerConcurrency: 80
       containers:
@@ -96,6 +100,26 @@ spec:
               value: "true"
             - name: DD_AI_GUARD_BLOCK
               value: "__DD_AI_GUARD_BLOCK__"
+            # Data Streams Monitoring — auto-instruments KafkaJS producer
+            # Docs: https://docs.datadoghq.com/data_streams/setup/language/nodejs/
+            - name: DD_DATA_STREAMS_ENABLED
+              value: "true"
+            # Required for correct service naming in the DSM topology map
+            - name: DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED
+              value: "true"
+            # Data pipeline — Redpanda Internal LB IP (VPC only, reachable via VPC connector)
+            - name: REDPANDA_BROKERS
+              value: "10.148.0.65:9092"
+            - name: BQ_PROJECT
+              value: "datadog-ese-sandbox"
+            - name: BQ_SA_KEY_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: NOVAPAY_BQ_SA_KEY
+                  key: latest
+            # Demo control toggles (toggled without redeploy via gcloud run services update)
+            - name: DEMO_ERROR_INJECT
+              value: "false"
 
   traffic:
     - latestRevision: true

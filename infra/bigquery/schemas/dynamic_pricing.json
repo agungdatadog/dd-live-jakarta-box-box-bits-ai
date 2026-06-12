@@ -1,0 +1,9 @@
+[
+  { "name": "product_id",        "type": "STRING",    "mode": "REQUIRED", "description": "Merch product SKU (FK to limited_merch_events.product_id)" },
+  { "name": "base_price_thb",    "type": "FLOAT64",   "mode": "REQUIRED", "description": "Static base price from merch-products.json" },
+  { "name": "demand_multiplier", "type": "FLOAT64",   "mode": "REQUIRED", "description": "Demand-based multiplier computed by dbt (>1.0 = high demand)" },
+  { "name": "current_price_thb", "type": "FLOAT64",   "mode": "REQUIRED", "description": "base_price_thb * demand_multiplier (rounded to nearest 10 THB)" },
+  { "name": "units_sold_1h",     "type": "INTEGER",   "mode": "NULLABLE", "description": "Units sold in the last 1 hour (source window for demand calc)" },
+  { "name": "dbt_updated_at",    "type": "TIMESTAMP", "mode": "REQUIRED", "description": "Timestamp when dbt last wrote this row — used for freshness monitoring" },
+  { "name": "dbt_run_id",        "type": "STRING",    "mode": "NULLABLE", "description": "dbt invocation ID for lineage tracing in Datadog Data Jobs Monitoring" }
+]

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920,initial-scale=1">
+<title>NovaPay × Datadog — Royal Rumble 2026</title>
+<style>
+/* ════════════════════════════════════════════════════════
+   LIGHT DATADOG THEME — 1920 × 1080 OPTIMISED
+   Datadog template ref: 10in × 7.5in @ 96dpi = 960 × 720px
+   Our target: 1920 × 1080 = 2× width, 1.5× height → scale fonts 1.5–2×
+   Template title 36pt → 48px@960 → 72px@1920 minimum
+════════════════════════════════════════════════════════ */
+:root{
+  --p:    #632CA6;   /* Datadog purple */
+  --pL:   #7B3FC4;   /* lighter purple */
+  --pD:   #3D1A6E;   /* dark purple */
+  --pXD:  #1D1133;   /* near-black */
+  --pale: #F8F5FF;   /* very light purple */
+  --tint: #EDE4FF;
+  --bord: #D4C0F0;
+  --bg:   #FFFFFF;
+  --sf:   #F9F8FD;
+  --sf2:  #F3EEFF;
+  --or:   #FF6B35;
+  --gr:   #00B388;
+  --bl:   #3E9BFF;
+  --rd:   #E5002D;
+  --tx:   #1D1133;
+  --tx2:  #4A3F6B;
+  --tx3:  #7B6FA0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;}
+
+/* ── Progress bar ─────────────────────────────── */
+.pb{position:fixed;top:0;left:0;height:5px;
+  background:linear-gradient(90deg,var(--p),var(--or));
+  transition:width .4s ease;z-index:200;}
+
+/* ── Deck ──────────────────────────────────────── */
+#deck{position:fixed;inset:0;}
+
+/* ── Slides ────────────────────────────────────── */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;
+  transition:opacity .4s ease,transform .4s ease;
+  transform:translateX(50px);overflow:hidden;
+  display:flex;flex-direction:column;}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.slide.leaving{opacity:0;transform:translateX(-50px);}
+
+/* dot-grid texture */
+.dg{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle,var(--bord) 1.5px,transparent 1.5px);
+  background-size:32px 32px;opacity:.3;}
+
+/* slide body wrapper — MUST be flex:1 col */
+.sb{position:relative;z-index:1;flex:1;
+  display:flex;flex-direction:column;
+  padding:60px 80px;}
+.sb-sm{padding:48px 80px;}
+
+/* ── Demo slides (dark) ─────────────────────────── */
+.slide.dm{background:linear-gradient(145deg,#1D1133 0%,#3D1A6E 55%,#632CA6 100%);}
+.slide.dm .dg{background-image:radial-gradient(circle,rgba(255,255,255,.14) 1.5px,transparent 1.5px);opacity:1;}
+
+/* ── Typography — SCALED FOR 1920×1080 ──────────── */
+/* Datadog template 36pt → 48px@960 → ~72px@1920 */
+.ey{font-size:clamp(18px,1.2vw,22px);font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--p);}
+.ey.lt{color:rgba(255,255,255,.55);}
+h1{font-size:clamp(64px,5.5vw,92px);font-weight:900;line-height:1.05;color:var(--tx);}
+h2{font-size:clamp(56px,4.5vw,76px);font-weight:800;line-height:1.1;color:var(--tx);}
+h3{font-size:clamp(32px,2.5vw,44px);font-weight:700;line-height:1.2;color:var(--tx);}
+p {font-size:clamp(22px,1.7vw,28px);line-height:1.6;color:var(--tx2);}
+.sm{font-size:clamp(18px,1.3vw,22px);line-height:1.5;color:var(--tx3);}
+.xs{font-size:clamp(16px,1.1vw,20px);line-height:1.5;color:var(--tx3);}
+.inv {color:#fff!important;}
+.inv2{color:rgba(255,255,255,.75)!important;}
+.inv3{color:rgba(255,255,255,.5)!important;}
+
+/* ── Fill helpers ────────────────────────────────── */
+.fill{flex:1;display:flex;flex-direction:column;}
+.fill-row{flex:1;display:flex;flex-direction:row;gap:24px;}
+.g2{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch;}
+.g3{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch;}
+.g4{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:stretch;}
+.g32{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:22px;align-items:stretch;}
+
+/* ── Cards ───────────────────────────────────────── */
+.card{background:var(--bg);border:1.5px solid var(--bord);
+  border-radius:18px;padding:28px 32px;
+  box-shadow:0 2px 12px rgba(99,44,166,.07);
+  display:flex;flex-direction:column;gap:0;}
+.card-p{background:var(--sf2);border:1.5px solid var(--bord);
+  border-radius:18px;padding:28px 32px;
+  display:flex;flex-direction:column;}
+.card-dk{background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.18);
+  border-radius:18px;padding:32px 32px 28px;display:flex;flex-direction:column;justify-content:flex-start;gap:14px;}
+.card-dka{background:rgba(99,44,166,.28);border:1.5px solid rgba(123,63,196,.55);
+  border-radius:18px;padding:32px 32px 28px;display:flex;flex-direction:column;justify-content:flex-start;gap:14px;}
+
+/* ── Badges ──────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:7px;
+  padding:7px 16px;border-radius:24px;
+  font-size:clamp(16px,1.1vw,19px);font-weight:700;
+  background:var(--sf2);color:var(--p);border:1.5px solid var(--bord);}
+.badge-s{background:var(--p);color:#fff;border:none;}
+.badge-or{background:#FFF3EF;color:var(--or);border:1.5px solid #FFD5C2;}
+.badge-gr{background:#EDFBF6;color:var(--gr);border:1.5px solid #B6F0DF;}
+.badge-bl{background:#EBF4FF;color:var(--bl);border:1.5px solid #B8D9FF;}
+.badge-rd{background:#FFEEF0;color:var(--rd);border:1.5px solid #FFB8C0;}
+.badge-dk{display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.13);color:#fff;border:1.5px solid rgba(255,255,255,.22);
+  padding:7px 16px;border-radius:24px;
+  font-size:clamp(16px,1.1vw,19px);font-weight:600;}
+.demo-tag{display:inline-block;padding:8px 24px;border-radius:28px;
+  font-size:clamp(16px,1.2vw,20px);font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  background:rgba(255,107,53,.2);color:var(--or);border:1.5px solid rgba(255,107,53,.4);}
+
+/* ── Stat blocks ─────────────────────────────────── */
+.stat-n{font-size:clamp(48px,4.5vw,76px);font-weight:900;line-height:1;
+  background:linear-gradient(135deg,var(--p),var(--pL));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.stat-l{font-size:clamp(18px,1.3vw,22px);font-weight:600;color:var(--tx3);margin-top:6px;}
+
+/* ── Dividers ────────────────────────────────────── */
+.div-h{height:2px;background:var(--bord);}
+.div-v{width:2px;background:var(--bord);align-self:stretch;}
+
+/* ── Left accent strip (cover) ───────────────────── */
+.lstrip{position:absolute;left:0;top:0;bottom:0;width:9px;
+  background:linear-gradient(180deg,var(--p),var(--or));}
+
+/* ── Counter / kbd-hint ─────────────────────────── */
+.ctr{position:fixed;bottom:20px;right:32px;
+  font-size:17px;color:var(--tx3);z-index:200;font-variant-numeric:tabular-nums;}
+.kh{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  font-size:15px;color:var(--tx3);z-index:200;white-space:nowrap;}
+.kh kbd{background:var(--sf2);border:1.5px solid var(--bord);
+  border-radius:5px;padding:2px 8px;font-size:14px;font-family:inherit;}
+
+/* ════ PRINT / PDF ══════════════════════════════════
+   P key → window.print() → Save as PDF
+   Margins=None, Background graphics=ON, Landscape
+═══════════════════════════════════════════════════ */
+@page{size:1920px 1080px;margin:0;}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible!important;
+    background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  #deck{position:static!important;inset:auto!important;
+    width:1920px!important;height:auto!important;overflow:visible!important;display:block!important;}
+  .slide{position:relative!important;inset:auto!important;
+    width:1920px!important;height:1080px!important;
+    opacity:1!important;transform:none!important;pointer-events:auto!important;
+    page-break-after:always;break-after:page;overflow:hidden!important;display:flex!important;}
+  .slide:last-child{page-break-after:auto;break-after:auto;}
+  .slide.active,.slide.leaving{opacity:1!important;transform:none!important;}
+  .pb,.ctr,.kh{display:none!important;}
+  *{transition:none!important;animation:none!important;}
+}
+</style>
+</head>
+<body>
+<div class="pb" id="pb" style="width:8.33%"></div>
+<div id="deck">
+
+<!-- ══════════════════════════════════════════════
+     S1 — COVER
+══════════════════════════════════════════════ -->
+<section class="slide active" id="s1">
+  <div class="dg"></div>
+  <div class="lstrip"></div>
+
+  <div class="sb" style="padding-left:90px;flex-direction:row;gap:56px;align-items:stretch;height:100%;">
+
+    <!-- Left: main content fills height -->
+    <div style="flex:1.1;display:flex;flex-direction:column;justify-content:space-between;">
+      <!-- Top -->
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="width:52px;height:52px;background:var(--p);border-radius:12px;
+          display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+            <path d="M8 24V8l16 8-16 8z" fill="white" opacity=".9"/>
+            <circle cx="24" cy="16" r="5" fill="white" opacity=".55"/>
+          </svg>
+        </div>
+        <span class="ey">APJ SE Royal Rumble 2026</span>
+      </div>
+
+      <!-- Center: headline -->
+      <div>
+        <h1 style="font-size:clamp(68px,6vw,96px);margin-bottom:16px;">
+          NovaPay <span style="color:var(--p);">×</span> Datadog
+        </h1>
+        <h2 style="font-size:clamp(36px,3vw,52px);font-weight:600;color:var(--tx2);margin-bottom:20px;">
+          From $4.2M Outage to IPO-Ready
+        </h2>
+        <p style="font-size:clamp(22px,1.6vw,28px);color:var(--tx3);max-width:640px;line-height:1.7;">
+          One platform. Built for engineers and AI agents alike.<br>
+          Unified context. Unified operations. IPO confidence.
+        </p>
+      </div>
+
+      <!-- Stats bar -->
+      <div style="padding:28px 0;border-top:2px solid var(--bord);border-bottom:2px solid var(--bord);
+        display:flex;gap:48px;">
+        <div><div class="stat-n">3M+</div><div class="stat-l">Tx / day</div></div>
+        <div class="div-v"></div>
+        <div><div class="stat-n">12</div><div class="stat-l">APJ markets</div></div>
+        <div class="div-v"></div>
+        <div><div class="stat-n" style="-webkit-text-fill-color:var(--rd);color:var(--rd);">$4.2M</div>
+          <div class="stat-l">BF outage cost</div></div>
+        <div class="div-v"></div>
+        <div><div class="stat-n">D-180</div><div class="stat-l">To IPO</div></div>
+      </div>
+
+      <!-- Badge row -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;">
+        <span class="badge">Watchdog</span><span class="badge">Bits AI</span>
+        <span class="badge">LLMObs</span><span class="badge">AI Guard</span>
+        <span class="badge">Deploy Gates</span><span class="badge">Code Security</span>
+        <span class="badge">Data Obs</span><span class="badge">CSPM + AAP</span>
+      </div>
+    </div>
+
+    <!-- Right: hero panel — full height -->
+    <div style="width:400px;flex-shrink:0;align-self:stretch;
+      background:linear-gradient(145deg,var(--pD),var(--p),var(--pL));
+      border-radius:24px;padding:36px 32px;
+      display:flex;flex-direction:column;gap:20px;justify-content:space-between;">
+
+      <div class="xs inv3" style="letter-spacing:.1em;text-transform:uppercase;font-weight:700;">
+        NovaPay Limited Merch — Live
+      </div>
+
+      <!-- Mock price tiles -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;">
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+          <div style="font-size:16px;color:rgba(255,107,53,.9);font-weight:800;margin-bottom:8px;">ON FIRE ×1.50</div>
+          <div style="font-size:28px;font-weight:900;color:#fff;">฿1,940</div>
+          <div style="font-size:16px;color:rgba(255,255,255,.45);text-decoration:line-through;">฿1,290</div>
+        </div>
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+          <div style="font-size:16px;color:rgba(255,107,53,.9);font-weight:800;margin-bottom:8px;">HOT ×1.40</div>
+          <div style="font-size:28px;font-weight:900;color:#fff;">฿4,890</div>
+          <div style="font-size:16px;color:rgba(255,255,255,.45);text-decoration:line-through;">฿3,490</div>
+        </div>
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+          <div style="font-size:16px;color:rgba(0,179,136,.9);font-weight:800;margin-bottom:8px;">TRENDING ×1.20</div>
+          <div style="font-size:28px;font-weight:900;color:#fff;">฿1,670</div>
+          <div style="font-size:16px;color:rgba(255,255,255,.45);text-decoration:line-through;">฿1,390</div>
+        </div>
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+          <div style="font-size:16px;color:rgba(62,155,255,.9);font-weight:800;margin-bottom:8px;">RISING ×1.10</div>
+          <div style="font-size:28px;font-weight:900;color:#fff;">฿2,190</div>
+          <div style="font-size:16px;color:rgba(255,255,255,.45);text-decoration:line-through;">฿1,990</div>
+        </div>
+      </div>
+
+      <!-- Telemetry lines -->
+      <div style="background:rgba(0,0,0,.25);border-radius:12px;padding:18px 20px;">
+        <div style="font-size:16px;color:rgba(255,255,255,.45);font-family:monospace;line-height:2.2;">
+          <div><span style="color:#00C7B7;">✓</span> APM: api.merch.checkout → 180ms</div>
+          <div><span style="color:#00C7B7;">✓</span> LLMObs: fraud_score p95 cost tracked</div>
+          <div><span style="color:#00C7B7;">✓</span> DSM: Kafka pipeline latency 1.2s</div>
+          <div><span style="color:var(--or);">⚡</span> Watchdog: pricing anomaly detected</div>
+          <div><span style="color:#FFD666;">⚠</span> dbt freshness: 6h17m stale</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;" class="xs inv3">
+        Custom NovaPay Demo · Cloud Run · GKE
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     S2 — NOVAPAY REALITY
+══════════════════════════════════════════════ -->
+<section class="slide" id="s2">
+  <div class="dg"></div>
+  <div class="sb">
+    <!-- Header row -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;">
+      <div>
+        <div class="ey" style="margin-bottom:10px;">Context</div>
+        <h2>NovaPay's Reality — IPO D-180</h2>
+      </div>
+      <div style="background:var(--rd);color:#fff;padding:12px 28px;border-radius:28px;font-size:22px;font-weight:800;flex-shrink:0;align-self:center;">
+        $4.2M Black Friday outage
+      </div>
+    </div>
+
+    <!-- Fill grid -->
+    <div class="g2" style="flex:1;min-height:0;">
+      <!-- Left: What you've built -->
+      <div class="fill" style="gap:16px;">
+        <div class="ey" style="color:var(--gr);">What you've built</div>
+        <div class="card fill">
+          <div style="display:flex;align-items:flex-start;gap:18px;flex:1;">
+            <div style="width:58px;height:58px;border-radius:50%;background:var(--sf2);
+              border:2px solid var(--bord);display:flex;align-items:center;justify-content:center;
+              font-size:28px;flex-shrink:0;">🌏</div>
+            <div>
+              <h3 style="margin-bottom:8px;">12 APJ Markets</h3>
+              <p>Payments, lending, insurance on one platform. Serving super-apps, e-commerce platforms, and neo-banks.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card fill">
+          <div style="display:flex;align-items:flex-start;gap:18px;flex:1;">
+            <div style="width:58px;height:58px;border-radius:50%;background:var(--sf2);
+              border:2px solid var(--bord);display:flex;align-items:center;justify-content:center;
+              font-size:28px;flex-shrink:0;">⚡</div>
+            <div>
+              <h3 style="margin-bottom:8px;">3M+ Transactions / Day</h3>
+              <p>Uptime SLAs tied directly to merchant contracts with penalty clauses across all 12 markets.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card fill">
+          <div style="display:flex;align-items:flex-start;gap:18px;flex:1;">
+            <div style="width:58px;height:58px;border-radius:50%;background:var(--sf2);
+              border:2px solid var(--bord);display:flex;align-items:center;justify-content:center;
+              font-size:28px;flex-shrink:0;">👥</div>
+            <div>
+              <h3 style="margin-bottom:8px;">Engineering 3× in 18 Months</h3>
+              <p>Team tripled. Tools multiplied with them. 14 different monitoring products running today.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: What you're navigating -->
+      <div class="fill" style="gap:16px;">
+        <div class="ey" style="color:var(--rd);">What you're navigating</div>
+        <div class="card-p fill" style="border-left:6px solid var(--rd);">
+          <h3 style="margin-bottom:10px;">40 Deploys / Day — No Quality Gate</h3>
+          <p>No visibility into deploy quality. Regressions reach production silently. Every deploy a risk.</p>
+        </div>
+        <div class="card-p fill" style="border-left:6px solid var(--or);">
+          <h3 style="margin-bottom:10px;">Regulators: RBI · MAS · OJK · BSP</h3>
+          <p>Faster incident forensics demanded. Disconnected security stack delays every audit by weeks.</p>
+        </div>
+        <div class="card-p fill" style="border-left:6px solid var(--p);">
+          <h3 style="margin-bottom:10px;">IPO in 6 Months</h3>
+          <p>Every reliability and security risk is now a valuation conversation. The board is watching every incident.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     S3 — THE BLIND SPOT
+══════════════════════════════════════════════ -->
+<section class="slide" id="s3">
+  <div class="dg"></div>
+  <div class="sb">
+
+    <!-- Header: NovaPay-specific framing, not generic -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-shrink:0;">
+      <div>
+        <div class="ey" style="margin-bottom:10px;">NovaPay at a crossroads</div>
+        <h2 style="margin-bottom:8px;">Your engine is powerful.<br>The observability is missing.</h2>
+      </div>
+      <!-- IPO clock — the urgency anchor -->
+      <div style="background:var(--pXD);border-radius:18px;padding:22px 32px;text-align:center;flex-shrink:0;">
+        <div style="font-size:52px;font-weight:900;color:#fff;line-height:1;">D-180</div>
+        <div style="font-size:18px;color:rgba(255,255,255,0.6);margin-top:6px;font-weight:600;">To IPO</div>
+        <div style="font-size:15px;color:rgba(255,107,53,0.85);margin-top:4px;">Every blind spot = valuation risk</div>
+      </div>
+    </div>
+
+    <!-- Two NovaPay-specific tensions (not generic "Problem 1/2") -->
+    <div class="g2" style="flex:1;min-height:0;">
+
+      <!-- Tension 1: Growth vs Context -->
+      <div class="card fill" style="border-left:6px solid var(--rd);">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+            color:var(--rd);margin-bottom:10px;">Growth without shared context</div>
+          <h3 style="font-size:36px;line-height:1.15;">3× engineers.<br>14 different maps.</h3>
+        </div>
+        <p style="flex:1;font-size:24px;line-height:1.65;color:var(--tx2);">
+          Engineering tripled in 18 months. Every new hire brings their own tooling background
+          and no one holds the full picture anymore.
+          When a P0 fires at 3am, your team isn't investigating — they're orientating.
+          <strong style="color:var(--tx);">At $17,500 per minute in SLA penalties
+          ($4.2M ÷ 4 hours), that 45-minute orientation is your entire outage cost.</strong>
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:16px;">
+          <span class="badge-rd badge">$17,500 / min SLA cost</span>
+          <span class="badge-rd badge">45 min to root cause</span>
+          <span class="badge-rd badge">Knowledge silos</span>
+        </div>
+      </div>
+
+      <!-- Tension 2: Speed vs Verification -->
+      <div class="card fill" style="border-left:6px solid var(--or);">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+            color:var(--or);margin-bottom:10px;">Speed without deep observability</div>
+          <h3 style="font-size:36px;line-height:1.15;">40 deploys a day.<br>Healthchecks, but not deep enough.</h3>
+        </div>
+        <p style="flex:1;font-size:24px;line-height:1.65;color:var(--tx2);">
+          You have smoke tests. You have healthchecks. But they tell you the service is
+          <em>up</em> — not that it's <em>correct</em>. A payment processing in 8 seconds
+          instead of 0.8 looks healthy to a ping.
+          <strong style="color:var(--tx);">APM Faulty Detection and Watchdog catch
+          what healthchecks miss: new error types, silent regressions, and latency
+          spikes — automatically, on every deploy.</strong>
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:16px;">
+          <span class="badge-or badge">Healthchecks: service is UP</span>
+          <span class="badge-or badge">Watchdog: service is CORRECT</span>
+          <span class="badge-or badge">AI model unobservable</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pivot — reframe toward the platform -->
+    <div style="background:var(--pXD);border-radius:18px;
+      padding:22px 36px;display:flex;align-items:center;gap:24px;flex-shrink:0;">
+      <div style="font-size:32px;flex-shrink:0;">→</div>
+      <div>
+        <p style="font-size:24px;font-weight:700;color:#fff;margin-bottom:6px;">
+          NovaPay doesn't have a tooling problem. It has a context problem.
+        </p>
+        <p style="font-size:18px;color:rgba(255,255,255,0.65);">
+          14 tools is the symptom. Scattered, unconnected context is the disease.
+          Let me show you what it looks like when every signal is connected.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     S4 — HUMAN + AI PLATFORM THESIS
+══════════════════════════════════════════════ -->
+<section class="slide" id="s3b">
+  <div class="dg"></div>
+  <div class="sb">
+    <div class="ey" style="margin-bottom:14px;">The Platform Thesis</div>
+    <h2 style="margin-bottom:6px;">Best for Engineers. Best for AI Agents. Same Platform.</h2>
+    <p class="sm" style="margin-bottom:28px;">14 tools = 14 silos. Your AI agent is just as lost as your on-call engineer when data is scattered.</p>
+
+    <div class="g2" style="flex:1;min-height:0;">
+      <!-- LEFT: 14 tools -->
+      <div style="background:#FFF8F8;border:2px solid #FFD5D5;border-radius:18px;padding:28px 32px;
+        display:flex;flex-direction:column;gap:20px;">
+        <div style="font-size:18px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--rd);">14 Tools — Neither Can Help</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex:1;">
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">Grafana</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">PagerDuty</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">Kibana</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">Sentry</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">Jaeger</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">Prometheus</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">Wazuh</div>
+          <div style="background:#fff;border:1.5px solid #FFE0E0;border-radius:10px;padding:12px;text-align:center;font-size:18px;color:#999;">+7 more</div>
+        </div>
+        <div style="background:#FFF0F0;border-radius:12px;padding:20px 24px;">
+          <p style="font-size:22px;color:#CC2222;font-weight:600;margin-bottom:10px;">👷 Engineer: opens 14 dashboards. 45 min. Still no root cause.</p>
+          <p style="font-size:22px;color:#CC2222;font-weight:600;">🤖 AI Agent: "Investigate error" → <em>Generic advice. No real context.</em></p>
+        </div>
+      </div>
+
+      <!-- RIGHT: Datadog harness -->
+      <div style="background:var(--sf2);border:2px solid var(--bord);border-radius:18px;padding:28px 32px;
+        display:flex;flex-direction:column;gap:20px;">
+        <div style="font-size:18px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--p);">Datadog — The Harness for Both</div>
+
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Built-in AI (zero setup)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;">
+            <span class="badge">Watchdog</span><span class="badge">Bits AI</span>
+            <span class="badge">AI Guard</span><span class="badge">LLMObs</span><span class="badge">Deploy Gates</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Bring Your Own Agent (via MCP)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;">
+            <span class="badge-bl badge">Claude Code</span><span class="badge-bl badge">Cursor</span>
+            <span class="badge-bl badge">Gemini CLI</span><span class="badge-bl badge">Codex</span>
+          </div>
+        </div>
+
+        <div style="background:var(--p);border-radius:12px;padding:20px 24px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;">
+          <p style="font-size:22px;color:#fff;font-weight:600;">👷 Engineer: unified traces + logs + deploys in 90 seconds.</p>
+          <p style="font-size:22px;color:rgba(255,255,255,.85);font-weight:600;">🤖 AI Agent: same context window — real root cause, not generic advice.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:14px 0 0;flex-shrink:0;">
+      <p style="font-size:24px;font-weight:700;color:var(--tx);">
+        Same unified tags · Same correlation engine · Same platform.
+        <span style="color:var(--p);">Your choice who acts first.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     D1 — ACT 2: THE INCIDENT
+══════════════════════════════════════════════ -->
+<section class="slide dm" id="d1">
+  <div class="dg"></div>
+  <div class="sb" style="gap:0;">
+    <div class="demo-tag">Live Demo</div>
+    <div>
+      <div class="ey lt" style="margin-bottom:12px;">ACT 2 · 2:00 – 6:00</div>
+      <h1 class="inv" style="font-size:clamp(72px,7vw,108px);">The Incident</h1>
+      <h2 class="inv2" style="font-weight:400;font-size:clamp(32px,2.8vw,44px);margin-top:12px;">End-to-End Observability: Pricing Pipeline Fails</h2>
+    </div>
+        <div class="g3" style="flex:1;min-height:0;">
+      <div class="card-dk">
+        <div style="font-size:52px;">🔍</div>
+        <h3 class="inv" style="font-size:34px;">Watchdog → RUM</h3>
+        <p class="inv2" style="font-size:24px;line-height:1.65;flex:1;">
+          Watchdog fires before any human knows. Checkout abandonment anomaly detected automatically.
+          RUM Session Replay shows the exact session — wrong price, abandoned cart.
+        </p>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:auto;">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Datadog advantage</div>
+          <div style="font-size:20px;font-weight:700;color:#fff;">Detected before any customer complaint</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:52px;">📡</div>
+        <h3 class="inv" style="font-size:34px;">APM → Data Obs</h3>
+        <p class="inv2" style="font-size:24px;line-height:1.65;flex:1;">
+          APM traces the pricing API serving 6-hour stale data.
+          Data Observability finds the cause: Kafka lag 4.2M messages,
+          dbt failed 03:14, BigQuery freshness 6h17m.
+        </p>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:auto;">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Root cause chain</div>
+          <div style="font-size:20px;font-weight:700;color:#fff;">dbt failed → BigQuery stale → wrong price</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:52px;">🎯</div>
+        <h3 class="inv" style="font-size:34px;">90 seconds</h3>
+        <p class="inv2" style="font-size:24px;line-height:1.65;flex:1;">
+          Browser session to failed dbt job at 3am — across 6 system layers.
+          No war room. No Slack archaeology. No 14 separate dashboards.
+        </p>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:auto;">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Without Datadog</div>
+          <div style="font-size:20px;font-weight:700;color:#fff;">4 hours · $4.2M SLA penalty</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:20px 28px;background:rgba(255,255,255,.07);border-radius:14px;
+      display:flex;align-items:center;gap:20px;margin-top:auto;flex-shrink:0;">
+      <div style="display:flex;gap:10px;flex-shrink:0;">
+        <div style="background:#7B3FC4;border-radius:8px;padding:6px 14px;font-size:16px;font-weight:800;color:#fff;">AI for Obs</div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 14px;font-size:16px;font-weight:600;color:#fff;">Watchdog · Bits AI</div>
+        <div style="background:var(--or);border-radius:8px;padding:6px 14px;font-size:16px;font-weight:800;color:#fff;">Obs for AI</div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 14px;font-size:16px;font-weight:600;color:#fff;">LLMObs · AI Guard · GPU</div>
+      </div>
+      <p class="inv2" style="font-size:20px;font-style:italic;">
+        "When the regulator asks why you declined a transaction — you have a trace, not a black box."
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     D2 — ACT 3: BITS AI
+══════════════════════════════════════════════ -->
+<section class="slide dm" id="d2">
+  <div class="dg"></div>
+  <div class="sb" style="gap:0;">
+    <div class="demo-tag">Live Demo</div>
+    <div>
+      <div class="ey lt" style="margin-bottom:12px;">ACT 3 · 6:00 – 9:30</div>
+      <h1 class="inv" style="font-size:clamp(60px,6vw,96px);">Bits AI</h1>
+      <h2 class="inv2" style="font-weight:400;font-size:clamp(28px,2.5vw,40px);margin-top:12px;">Root Cause in 3 Sentences. P0 in 3 Minutes.</h2>
+    </div>
+    <div class="g4" style="flex:1;min-height:0;">
+      <div class="card-dka">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;">Step 1</div>
+        <h3 class="inv" style="font-size:30px;">Auto-investigates</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">Watchdog fires → Bits AI SRE Agent starts automatically. No human needs to open a ticket or write a prompt. Investigation begins immediately.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">Zero prompt. Zero manual trigger.</div>
+        </div>
+      </div>
+      <div class="card-dka">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;">Step 2</div>
+        <h3 class="inv" style="font-size:30px;">3-sentence RCA</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">Error spike started 4 minutes after v2.4.1 deploy. Null pointer on Thai Baht currency handler. Suggested action: rollback to v2.4.0.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">Root cause in minutes, not hours.</div>
+        </div>
+      </div>
+      <div class="card-dka">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;">Step 3</div>
+        <h3 class="inv" style="font-size:30px;">Slack → Approve</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">Workflow Automation posts to #incidents with root cause + rollback option. One button press. Human decides — machine executes the Argo rollback.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">Investigator, not autonomy engine.</div>
+        </div>
+      </div>
+      <div class="card-dka">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;">Step 4</div>
+        <h3 class="inv" style="font-size:30px;">Argo rollback</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">Zero terminal. Zero SSH. Zero runbook. Error rate recovers in 3 minutes. Error Tracking surfaces a secondary bug — Bits Code already has a draft PR ready.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">P0 resolved · fix PR ready.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:20px 28px;background:rgba(255,255,255,.07);border-radius:14px;border-left:5px solid #00C7B7;margin-top:auto;flex-shrink:0;">
+      <p class="inv2" style="font-size:24px;font-style:italic;">
+        "Bits AI is an investigator, not an autonomy engine — and that's by design. The engineer gets the root cause. They make the call."
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     D3 — ACT 4: DEPLOY CONFIDENCE
+══════════════════════════════════════════════ -->
+<section class="slide dm" id="d3">
+  <div class="dg"></div>
+  <div class="sb" style="gap:0;">
+    <div class="demo-tag">Live Demo</div>
+    <div>
+      <div class="ey lt" style="margin-bottom:12px;">ACT 4 · 9:30 – 12:00</div>
+      <h1 class="inv" style="font-size:clamp(60px,6vw,96px);">Deploy with Confidence</h1>
+      <h2 class="inv2" style="font-weight:400;font-size:clamp(28px,2.5vw,40px);margin-top:12px;">Deployment Gates + Feature Flags: 40×/Day with Guardrails</h2>
+    </div>
+    <div class="g3" style="flex:1;min-height:0;">
+      <div class="card-dk">
+        <div style="font-size:52px;">🧪</div>
+        <h3 class="inv" style="font-size:34px;">Synthetics Gate</h3>
+        <p class="inv2" style="font-size:24px;line-height:1.65;flex:1;">
+          A synthetic payment transaction runs against staging before every merge.
+          If the checkout fails — pipeline stops. The merchant never knows.
+          Real API, real assertions, automatic every single deploy.
+        </p>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:auto;">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Catches</div>
+          <div style="font-size:20px;font-weight:700;color:#fff;">Functional regressions before production</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:52px;">📊</div>
+        <h3 class="inv" style="font-size:34px;">Watchdog APM Gate</h3>
+        <p class="inv2" style="font-size:24px;line-height:1.65;flex:1;">
+          Watchdog APM Faulty Deployment Detection monitors the canary at 10%.
+          It knows your 30-day baseline. New error types or latency spikes →
+          Deployment Gate fails → Argo Rollouts auto-rollback. No human needed.
+        </p>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:auto;">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Catches</div>
+          <div style="font-size:20px;font-weight:700;color:#fff;">Performance regressions and new errors</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:52px;">🚩</div>
+        <h3 class="inv" style="font-size:34px;">Feature Flags</h3>
+        <p class="inv2" style="font-size:24px;line-height:1.65;flex:1;">
+          Safe canary rollout: 10% of users see the new feature.
+          If RUM shows worse engagement — flip the flag. Zero redeploy.
+          The other 90% never noticed. That's how you ship fast AND safely.
+        </p>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:auto;">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Result</div>
+          <div style="font-size:20px;font-weight:700;color:#fff;">40 deploys/day. Controlled rollout.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:20px 28px;background:rgba(255,255,255,.07);border-radius:14px;border-left:5px solid var(--pL);margin-top:auto;flex-shrink:0;">
+      <p class="inv2" style="font-size:24px;font-style:italic;">
+        "40 deploys a day sounds like chaos. With Deployment Gates, it sounds like confidence."
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     D4 — ACT 5: AI OBSERVABILITY (BOTH DIRECTIONS)
+══════════════════════════════════════════════ -->
+<section class="slide dm" id="d4">
+  <div class="dg"></div>
+  <div class="sb" style="gap:0;">
+    <div class="demo-tag">Live Demo</div>
+    <div>
+      <div class="ey lt" style="margin-bottom:12px;">ACT 5 · 12:00 – 15:00</div>
+      <h1 class="inv" style="font-size:clamp(52px,5vw,84px);">AI for Observability.<br>Observability for AI.</h1>
+      <h2 class="inv2" style="font-weight:400;font-size:clamp(22px,2vw,32px);margin-top:10px;">Datadog has both — on one platform.</h2>
+    </div>
+    <div class="g3" style="flex:1;min-height:0;">
+      <div class="card-dk" style="border-top:4px solid #7B3FC4;">
+        <div style="font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);">Observability for AI</div>
+        <h3 class="inv" style="font-size:30px;">LLM Observability</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;flex:1;">
+          <p class="inv2" style="font-size:22px;">• Token cost · latency · model version per call</p>
+          <p class="inv2" style="font-size:22px;">• Custom evals: confidence + hallucination checks on fraud score</p>
+          <p class="inv2" style="font-size:22px;">• Topic clustering: what users actually ask your AI</p>
+          <p class="inv2" style="font-size:22px;">• Regulator audit trail: full trace, not a black box</p>
+        </div>
+        <div style="background:rgba(123,63,196,.3);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">Know what your AI costs and whether it's correct.</div>
+        </div>
+      </div>
+      <div class="card-dk" style="border-top:4px solid var(--or);">
+        <div style="font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);">Observability for AI</div>
+        <h3 class="inv" style="font-size:30px;">AI Guard + Agent Obs</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;flex:1;">
+          <p class="inv2" style="font-size:22px;">• OWASP Top 10 LLM risks — prompt injection blocked live</p>
+          <p class="inv2" style="font-size:22px;">• PII in LLM response → flagged before it reaches the user</p>
+          <p class="inv2" style="font-size:22px;">• Sensitive data leakage detection out-of-the-box</p>
+          <p class="inv2" style="font-size:22px;">• Agent trace: full reasoning chain visible in real time</p>
+        </div>
+        <div style="background:rgba(255,107,53,.2);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">AI Security without custom firewall code.</div>
+        </div>
+      </div>
+      <div class="card-dk" style="border-top:4px solid var(--gr);">
+        <div style="font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);">Observability for AI</div>
+        <h3 class="inv" style="font-size:30px;">GPU Monitoring</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;flex:1;">
+          <p class="inv2" style="font-size:22px;">• GPU utilization · memory · temperature per card</p>
+          <p class="inv2" style="font-size:22px;">• Inference cost per request — track model ROI</p>
+          <p class="inv2" style="font-size:22px;">• Scale signals: add capacity vs. optimize the model</p>
+          <p class="inv2" style="font-size:22px;">• For teams self-hosting models, not just calling APIs</p>
+        </div>
+        <div style="background:rgba(0,179,136,.2);border-radius:8px;padding:12px 14px;margin-top:auto;">
+          <div style="font-size:19px;font-weight:700;color:#fff;">See your AI infrastructure cost in real time.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:18px 28px;background:rgba(255,255,255,.07);border-radius:14px;
+      display:flex;align-items:center;gap:18px;margin-top:auto;flex-shrink:0;">
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <div style="background:#7B3FC4;border-radius:8px;padding:6px 14px;font-size:15px;font-weight:800;color:#fff;">AI for Obs</div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 14px;font-size:15px;font-weight:600;color:#fff;">Watchdog · Bits AI</div>
+        <div style="background:var(--or);border-radius:8px;padding:6px 14px;font-size:15px;font-weight:800;color:#fff;">Obs for AI</div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 14px;font-size:15px;font-weight:600;color:#fff;">LLMObs · AI Guard · GPU</div>
+      </div>
+      <p class="inv2" style="font-size:20px;font-style:italic;">"When the regulator asks why you declined a transaction — you have a trace, not a black box."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     D5 — ACT 6: SECURITY / IPO
+══════════════════════════════════════════════ -->
+<section class="slide dm" id="d5">
+  <div class="dg"></div>
+  <div class="sb" style="gap:0;">
+    <div class="demo-tag">Live Demo</div>
+    <div>
+      <div class="ey lt" style="margin-bottom:12px;">ACT 6 · 15:00 – 18:00</div>
+      <h1 class="inv" style="font-size:clamp(60px,6vw,96px);">Security — IPO Readiness</h1>
+      <h2 class="inv2" style="font-weight:400;font-size:clamp(28px,2.5vw,40px);margin-top:12px;">Shift Left + CSPM + AAP + Compliance Report</h2>
+    </div>
+    <div class="g4" style="flex:1;min-height:0;">
+      <div class="card-dk">
+        <div style="font-size:48px;">☁️</div>
+        <h3 class="inv" style="font-size:30px;">CSPM</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">Cloud misconfigurations scanned and mapped directly to SOC 2 controls. S3 bucket with PCI data publicly readable — found in 4 minutes, before regulators do.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-top:auto;">
+          <div style="font-size:18px;font-weight:700;color:#fff;">Cloud posture for IPO audit.</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:48px;">🛡️</div>
+        <h3 class="inv" style="font-size:30px;">AAP</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">SQL injection attempt on the payment API — blocked live. Your WAF missed it. Datadog AAP (App & API Protection) caught and blocked it in real time. No rule writing needed.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-top:auto;">
+          <div style="font-size:18px;font-weight:700;color:#fff;">Threats blocked before damage.</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:48px;">🔒</div>
+        <h3 class="inv" style="font-size:30px;">PR Gates</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">Diff-aware: only NEW code introduced in THIS PR gets blocked. Existing issues don't interrupt developers. SQL injection caught before merge. Developer still has full context — the PR is open.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-top:auto;">
+          <div style="font-size:18px;font-weight:700;color:#fff;">Security without killing velocity.</div>
+        </div>
+      </div>
+      <div class="card-dk">
+        <div style="font-size:48px;">📋</div>
+        <h3 class="inv" style="font-size:30px;">Compliance</h3>
+        <p class="inv2" style="font-size:22px;line-height:1.6;flex:1;">SOC 2 Type II evidence auto-generated from Datadog logs, traces, and security findings. Not from 14 spreadsheets across 12 markets. Hours, not weeks. IPO audit-ready.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-top:auto;">
+          <div style="font-size:18px;font-weight:700;color:#fff;">Evidence writes itself.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:22px 28px;background:rgba(255,255,255,.07);border-radius:14px;border-left:5px solid var(--or);margin-top:auto;">
+      <p class="inv2" style="font-size:24px;font-style:italic;">
+        "Your compliance team isn't chasing spreadsheets. Your SOC 2 evidence writes itself."
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     S10 — AIOPS MATURITY CURVE
+══════════════════════════════════════════════ -->
+<section class="slide" id="s10">
+  <div class="dg"></div>
+  <div class="sb">
+    <div class="ey" style="margin-bottom:14px;">The Journey Ahead</div>
+    <h2 style="margin-bottom:6px;">From Reactive to Autonomous Operations</h2>
+    <p class="sm" style="margin-bottom:28px;">A Gartner projection: 25% of enterprises will operate autonomously by 2028. NovaPay is standing at Stage 1.</p>
+
+    <div class="g4" style="margin-bottom:24px;">
+      <!-- Stage 0 -->
+      <div style="border-radius:18px;border:2.5px solid #FFB8B8;background:#FFF8F8;padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--rd);">Stage 0</div>
+        <div style="font-size:44px;font-weight:900;color:var(--rd);">Reactive</div>
+        <div style="font-size:28px;color:var(--rd);font-weight:700;">MTTR: 4+ hours</div>
+        <p style="font-size:20px;color:var(--tx3);flex:1;">Alert fires. Phone rings. 14 dashboards. Slack archaeology. Root cause after 3 hours.</p>
+        <div style="padding:10px 16px;background:#FFE8E8;border-radius:10px;font-size:18px;font-weight:700;color:var(--rd);text-align:center;">NovaPay today (without Datadog)</div>
+      </div>
+      <!-- Stage 1 -->
+      <div style="border-radius:18px;border:2.5px solid #FFD5A8;background:#FFFAF5;padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--or);">Stage 1</div>
+        <div style="font-size:44px;font-weight:900;color:var(--or);">Proactive</div>
+        <div style="font-size:28px;color:var(--or);font-weight:700;">MTTR: 1–2 hours</div>
+        <p style="font-size:20px;color:var(--tx3);flex:1;">Anomaly detection. Dashboards unified. Faster triage. Still human-driven investigation.</p>
+        <div style="padding:10px 16px;background:#FFF0DC;border-radius:10px;font-size:18px;font-weight:700;color:var(--or);text-align:center;">Unified Platform (Phase 1)</div>
+      </div>
+      <!-- Stage 2 -->
+      <div style="border-radius:18px;border:2.5px solid var(--bord);background:var(--sf2);padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--p);">Stage 2</div>
+        <div style="font-size:44px;font-weight:900;color:var(--p);">Intelligent</div>
+        <div style="font-size:28px;color:var(--p);font-weight:700;">MTTR: 18 minutes</div>
+        <p style="font-size:20px;color:var(--tx3);flex:1;">Bits AI RCA. Workflow Automation approval. Argo rollback. Human approves — machine executes.</p>
+        <div style="padding:10px 16px;background:var(--p);border-radius:10px;font-size:18px;font-weight:700;color:#fff;text-align:center;">This demo ← NovaPay target</div>
+      </div>
+      <!-- Stage 3 -->
+      <div style="border-radius:18px;border:2.5px solid #A8F0D5;background:#F0FFF8;padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gr);">Stage 3</div>
+        <div style="font-size:44px;font-weight:900;color:var(--gr);">Autonomous</div>
+        <div style="font-size:28px;color:var(--gr);font-weight:700;">MTTR: 5 minutes</div>
+        <p style="font-size:20px;color:var(--tx3);flex:1;">Self-healing. AI detects, diagnoses, and remediates without human intervention.</p>
+        <div style="padding:10px 16px;background:#D0F5E8;border-radius:10px;font-size:18px;font-weight:700;color:var(--gr);text-align:center;">Gartner 2028 projection</div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;
+      background:var(--sf2);border-radius:14px;border:1.5px solid var(--bord);">
+      <div style="width:20px;height:20px;background:var(--rd);border-radius:50%;flex-shrink:0;"></div>
+      <div style="flex:1;height:6px;background:linear-gradient(90deg,var(--rd),var(--or),var(--p),var(--gr));border-radius:3px;"></div>
+      <div style="width:20px;height:20px;background:var(--gr);border-radius:50%;flex-shrink:0;"></div>
+      <p style="font-size:22px;font-weight:700;color:var(--tx);white-space:nowrap;margin-left:12px;">
+        Datadog accelerates this journey. Stage 1 → Stage 2 in 30 days.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     S11 — THE CLOSE
+══════════════════════════════════════════════ -->
+<section class="slide" id="s11">
+  <div class="dg"></div>
+  <div class="sb">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div class="ey" style="margin-bottom:12px;">One Platform</div>
+      <h2>NovaPay Ships to IPO on Its Own Terms</h2>
+    </div>
+
+    <!-- 6 metric tiles — fill remaining height -->
+    <div class="g32" style="margin-bottom:22px;">
+      <div class="card" style="align-items:center;text-align:center;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">MTTR</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:10px;">
+          <div style="font-size:40px;font-weight:900;color:var(--rd);text-decoration:line-through;opacity:.7;">4 hrs</div>
+          <div style="font-size:36px;color:var(--tx3);">→</div>
+          <div style="font-size:52px;font-weight:900;color:var(--gr);">18 min</div>
+        </div>
+        <p class="xs">That's the $4.2M outage that doesn't happen</p>
+      </div>
+      <div class="card" style="align-items:center;text-align:center;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Deploy Quality</div>
+        <div style="font-size:52px;font-weight:900;color:var(--p);margin-bottom:10px;">40×/day ✓</div>
+        <p class="xs">Every fault auto-recovered. Every rollback automatic.</p>
+      </div>
+      <div class="card" style="align-items:center;text-align:center;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Outage Cost</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px;">
+          <div style="font-size:34px;font-weight:900;color:var(--rd);text-decoration:line-through;opacity:.7;">$4.2M</div>
+          <div style="font-size:32px;color:var(--tx3);">→</div>
+          <div style="font-size:56px;font-weight:900;color:var(--gr);">$0</div>
+        </div>
+        <p class="xs">Watchdog fires before customers notice</p>
+      </div>
+      <div class="card" style="align-items:center;text-align:center;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">AI Fraud Model</div>
+        <div style="font-size:46px;font-weight:900;color:var(--p);margin-bottom:10px;">Observable ✓</div>
+        <p class="xs">Auditable · cost-attributed · regulator-ready</p>
+      </div>
+      <div class="card" style="align-items:center;text-align:center;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">SOC 2 Evidence</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px;">
+          <div style="font-size:26px;font-weight:700;color:var(--rd);text-decoration:line-through;opacity:.7;">14 sheets</div>
+          <div style="font-size:28px;color:var(--tx3);">→</div>
+          <div style="font-size:38px;font-weight:900;color:var(--gr);">Automated</div>
+        </div>
+        <p class="xs">Hours, not weeks. IPO audit-ready.</p>
+      </div>
+      <div class="card" style="align-items:center;text-align:center;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Data Quality</div>
+        <div style="font-size:46px;font-weight:900;color:var(--p);margin-bottom:10px;">Monitored ✓</div>
+        <p class="xs">Pricing pipeline fresh · zero stale prices</p>
+      </div>
+    </div>
+
+    <!-- Human + AI badge rows -->
+    <div style="background:var(--sf2);border:2px solid var(--bord);border-radius:16px;
+      padding:20px 32px;display:flex;gap:48px;align-items:center;">
+      <div style="flex:1;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Built-in AI</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <span class="badge">Watchdog</span><span class="badge">Bits AI</span>
+          <span class="badge">AI Guard</span><span class="badge">LLMObs</span><span class="badge">Deploy Gate</span>
+        </div>
+      </div>
+      <div class="div-v"></div>
+      <div style="flex:1;">
+        <div class="xs" style="text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Bring Your Own Agent (via MCP)</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <span class="badge-bl badge">Claude Code</span><span class="badge-bl badge">Cursor</span>
+          <span class="badge-bl badge">Gemini CLI</span><span class="badge-bl badge">Codex</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     S12 — NEXT STEPS
+══════════════════════════════════════════════ -->
+<section class="slide" id="s12">
+  <div class="dg"></div>
+  <div class="sb">
+    <div class="ey" style="margin-bottom:14px;">The Path Forward</div>
+    <h2 style="margin-bottom:6px;">30-Day Pilot — IPO-Aligned</h2>
+    <p class="sm" style="margin-bottom:28px;">Not a sandbox. Your services, your pipeline, your compliance framework.</p>
+
+    <div class="g2" style="flex:1;min-height:0;">
+      <!-- Left: Pilot phases -->
+      <div class="fill" style="gap:18px;">
+        <div class="card fill" style="flex-direction:row;gap:20px;align-items:flex-start;">
+          <div style="background:var(--p);color:#fff;border-radius:10px;padding:10px 18px;font-size:20px;font-weight:800;flex-shrink:0;align-self:flex-start;">Week 1–2</div>
+          <div>
+            <h3 style="font-size:28px;margin-bottom:8px;">Connect observability</h3>
+            <p>APM + Logs + Infra + RUM → unified context. First MTTR reduction measured within 14 days.</p>
+          </div>
+        </div>
+        <div class="card fill" style="flex-direction:row;gap:20px;align-items:flex-start;">
+          <div style="background:var(--pL);color:#fff;border-radius:10px;padding:10px 18px;font-size:20px;font-weight:800;flex-shrink:0;align-self:flex-start;">Week 3–4</div>
+          <div>
+            <h3 style="font-size:28px;margin-bottom:8px;">Add guardrails</h3>
+            <p>Deployment Gates + LLMObs + Security posture → deploy confidence and AI visibility proven.</p>
+          </div>
+        </div>
+        <div class="card fill" style="flex-direction:row;gap:20px;align-items:flex-start;border:2px solid var(--bord);">
+          <div style="background:var(--gr);color:#fff;border-radius:10px;padding:10px 18px;font-size:20px;font-weight:800;flex-shrink:0;align-self:flex-start;">Day 30</div>
+          <div>
+            <h3 style="font-size:28px;margin-bottom:8px;">IPO milestone</h3>
+            <p>SOC 2 compliance evidence auto-generated. MTTR proven. Deploy quality gated and measured.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: What + closing Q -->
+      <div class="fill" style="gap:18px;">
+        <div class="g2" style="flex:0 0 auto;">
+          <div class="card-p" style="text-align:center;padding:24px;">
+            <div style="font-size:36px;margin-bottom:10px;">🐾</div>
+            <h3 style="font-size:24px;margin-bottom:8px;">Datadog Provides</h3>
+            <p class="xs">Dedicated SE · Weekly check-ins · Custom success criteria at kickoff</p>
+          </div>
+          <div class="card-p" style="text-align:center;padding:24px;">
+            <div style="font-size:36px;margin-bottom:10px;">🏦</div>
+            <h3 style="font-size:24px;margin-bottom:8px;">NovaPay Provides</h3>
+            <p class="xs">1 technical champion · Non-prod access · KPI definition at kickoff</p>
+          </div>
+        </div>
+
+        <!-- Closing question -->
+        <div style="background:var(--p);border-radius:18px;padding:32px 36px;flex:1;
+          display:flex;flex-direction:column;justify-content:center;text-align:center;gap:16px;">
+          <p style="font-size:26px;font-weight:700;color:#fff;">Before we close —</p>
+          <p style="font-size:22px;color:rgba(255,255,255,.85);line-height:1.6;">
+            Which of the four pain points would you want the pilot to prove first?
+          </p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+            <span class="badge-dk">MTTR reduction</span>
+            <span class="badge-dk">Deploy quality</span>
+            <span class="badge-dk">Security forensics</span>
+            <span class="badge-dk">Data pipeline</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- #deck -->
+
+<div class="ctr" id="ctr">1 / 12</div>
+<div class="kh">
+  <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;·&nbsp; <kbd>Space</kbd> next &nbsp;·&nbsp; <kbd>P</kbd> export PDF &nbsp;·&nbsp; click left/right
+</div>
+
+<script>
+const slides=Array.from(document.querySelectorAll('.slide'));
+let cur=0;
+const pb=document.getElementById('pb');
+const ctr=document.getElementById('ctr');
+function go(d){
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('leaving');
+  const p=cur;
+  cur=(cur+d+slides.length)%slides.length;
+  slides[cur].classList.add('active');
+  setTimeout(()=>slides[p].classList.remove('leaving'),450);
+  upd();
+}
+function jumpTo(n){
+  slides[cur].classList.remove('active');
+  cur=Math.max(0,Math.min(n,slides.length-1));
+  slides[cur].classList.add('active');
+  upd();
+}
+function upd(){
+  pb.style.width=((cur+1)/slides.length*100).toFixed(2)+'%';
+  ctr.textContent=`${cur+1} / ${slides.length}`;
+}
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(1);}
+  if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(-1);}
+  if(e.key==='Home'){e.preventDefault();jumpTo(0);}
+  if(e.key==='End'){e.preventDefault();jumpTo(slides.length-1);}
+  if((e.key==='p'||e.key==='P')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();window.print();}
+});
+document.getElementById('deck').addEventListener('click',e=>{
+  if(e.target.closest('a,button,input,select,textarea'))return;
+  go(e.clientX>window.innerWidth/2?1:-1);
+});
+upd();
+</script>
+</body>
+</html>

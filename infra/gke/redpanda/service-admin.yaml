@@ -1,0 +1,54 @@
+# ClusterIP service — admin / Prometheus metrics port, internal only.
+# The Datadog Agent DaemonSet scrapes Redpanda metrics via autodiscovery on port 9644.
+#
+# The `kafka_consumer` cluster check annotation below configures Datadog to monitor
+# the Redpanda Kafka cluster (consumer lag, offsets, throughput) via the Cluster Agent.
+# This powers the Kafka UI in Datadog Data Streams Monitoring.
+# Docs: https://docs.datadoghq.com/integrations/kafka-consumer/?tab=kubernetes
+apiVersion: v1
+kind: Service
+metadata:
+  name: redpanda-admin
+  namespace: data-pipeline
+  labels:
+    app: redpanda
+  annotations:
+    # Kafka Consumer cluster check — runs once on the Cluster Agent, not per-node.
+    # kafka_connect_str uses the headless StatefulSet DNS so it works from any namespace.
+    ad.datadoghq.com/service.checks: |
+      {
+        "kafka_consumer": {
+          "init_config": {
+            "max_partition_contexts": 10000
+          },
+          "instances": [{
+            "kafka_connect_str": "redpanda-0.redpanda-headless.data-pipeline.svc.cluster.local:9092",
+            "tags": [
+              "kafka_cluster_name:novapay-redpanda",
+              "env:prod",
+              "demo:royal-rumble-2026"
+            ],
+            "enable_cluster_monitoring": true,
+            "consumer_groups": {
+              "bq-sink-consumer": {
+                "limited_merch_transactions": []
+              }
+            }
+          }]
+        }
+      }
+spec:
+  type: ClusterIP
+  selector:
+    app: redpanda
+  ports:
+    - name: admin
+      port: 9644
+      targetPort: 9644
+      protocol: TCP
+    - name: proxy
+      port: 8082
+      targetPort: 8082
+    - name: schema
+      port: 8081
+      targetPort: 8081

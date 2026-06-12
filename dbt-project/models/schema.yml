@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: dynamic_pricing
+    description: "Dynamic pricing table — output of the healthy pricing model"
+    columns:
+      - name: product_id
+        description: "Merch product SKU"
+        data_tests:
+          - not_null
+          - unique
+      - name: current_price_thb
+        description: "Final dynamic price in THB"
+        data_tests:
+          - not_null
+      - name: demand_multiplier
+        description: "Demand multiplier (1.0–1.5)"
+        data_tests:
+          - not_null
+      - name: dbt_updated_at
+        description: "Timestamp when dbt last ran — key field for freshness monitoring"
+        data_tests:
+          - not_null

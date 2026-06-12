@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbt-config
+  namespace: data-pipeline
+data:
+  BQ_PROJECT: "datadog-ese-sandbox"
+  BQ_DATASET_SOURCE: "novapay_raw"
+  BQ_DATASET_TARGET: "novapay_analytics"
+  BQ_LOCATION: "asia-southeast1"
+  # Set to "true" to inject a broken model for the Act 2 demo failure scenario.
+  # demo-pipeline.sh --fail-dbt patches this to "true".
+  # demo-pipeline.sh --fix-dbt patches this back to "false".
+  DBT_FAIL_MODE: "false"
+  DD_SERVICE: "novapay-dbt"
+  DD_ENV: "prod"
+  DD_SITE: "datadoghq.com"
+  # OpenLineage dbt Core integration — sends job runs + lineage to Datadog Data Observability
+  # Docs: https://docs.datadoghq.com/data_observability/jobs_monitoring/dbt/?tab=dbtcore
+  OPENLINEAGE__TRANSPORT__TYPE: "datadog"
+  OPENLINEAGE_NAMESPACE: "prod"
+  DBT_JOB_NAME: "novapay-dynamic-pricing"

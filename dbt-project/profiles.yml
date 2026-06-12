@@ -1,0 +1,12 @@
+novapay:
+  target: prod
+  outputs:
+    prod:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('BQ_PROJECT', 'datadog-ese-sandbox') }}"
+      dataset: "{{ env_var('BQ_DATASET_TARGET', 'novapay_analytics') }}"
+      location: "{{ env_var('BQ_LOCATION', 'asia-southeast1') }}"
+      threads: 1
+      timeout_seconds: 300
+      priority: interactive

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Car, MessageSquare, Trophy, Home } from 'lucide-react';
+import { Car, MessageSquare, Trophy, Home, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DriverTag } from '@/components/DriverTag';
 
@@ -13,6 +13,7 @@ export function Navigation() {
     { href: '/pitwall', label: 'Pitwall', short: 'Radio', icon: MessageSquare },
     { href: '/quiz', label: 'Quiz', short: 'Timing', icon: Trophy },
     { href: '/dream-team', label: 'Team', short: 'Lineup', icon: Car },
+    { href: '/merch', label: 'Shop', short: 'Shop', icon: ShoppingBag },
   ];
 
   return (

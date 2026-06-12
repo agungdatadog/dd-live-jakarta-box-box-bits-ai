@@ -27,6 +27,17 @@ export const FeatureFlags = {
   AI_GUARD_STRICT_MODE: 'ai-guard-strict-mode',
   /** BOOLEAN — client-side twin of DEMO_HIGH_LATENCY server env var */
   DEMO_HIGH_LATENCY: 'demo-high-latency',
+  /**
+   * STRING — pricing engine for the Limited Merch storefront.
+   * 'static'    = keyword filter on static catalog (fallback, low cost)
+   * 'ai-search' = Gemini embedding + dynamic pricing from BigQuery (live mode)
+   *
+   * Act 3 demo: flip 'ai-search' → 'static' in Datadog FF UI to show
+   * zero-downtime mitigation while the dbt fix is reviewed.
+   */
+  PRICING_ENGINE: 'pricing-engine',
+  /** BOOLEAN — kill-switch for the /merch route */
+  LIMITED_MERCH_ENABLED: 'limited-merch-enabled',
 } as const;
 
 export type FeatureFlagKey = (typeof FeatureFlags)[keyof typeof FeatureFlags];
@@ -46,4 +57,6 @@ export const FeatureFlagDefaults = {
   [FeatureFlags.NEW_PITWALL_UI]: false,
   [FeatureFlags.AI_GUARD_STRICT_MODE]: false,
   [FeatureFlags.DEMO_HIGH_LATENCY]: false,
+  [FeatureFlags.PRICING_ENGINE]: 'ai-search',
+  [FeatureFlags.LIMITED_MERCH_ENABLED]: true,
 } as const;

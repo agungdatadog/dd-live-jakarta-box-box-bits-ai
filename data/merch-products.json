@@ -1,0 +1,90 @@
+[
+  {
+    "id": "rb-cap-001",
+    "name": "Horndog Racing Cap",
+    "team": "Red Bark Racing",
+    "base_price": 1290,
+    "currency": "THB",
+    "category": "caps",
+    "description": "Official team cap — Max Fur-stappen edition. Lightweight twill, adjustable strap.",
+    "available": true,
+    "badge": "Best Seller"
+  },
+  {
+    "id": "rb-hoodie-001",
+    "name": "Horndog Team Hoodie",
+    "team": "Red Bark Racing",
+    "base_price": 3490,
+    "currency": "THB",
+    "category": "tops",
+    "description": "Heavyweight fleece hoodie with embroidered team crest and sponsor patches.",
+    "available": true,
+    "badge": "Limited"
+  },
+  {
+    "id": "mw-cap-001",
+    "name": "Mercedes Woof Cap",
+    "team": "Mercedes Woof AMG",
+    "base_price": 1390,
+    "currency": "THB",
+    "category": "caps",
+    "description": "Lewis Howl-milton signature cap. Silver arrow colorway, UV-protective fabric.",
+    "available": true,
+    "badge": null
+  },
+  {
+    "id": "mw-jacket-001",
+    "name": "Mercedes Woof Softshell Jacket",
+    "team": "Mercedes Woof AMG",
+    "base_price": 5990,
+    "currency": "THB",
+    "category": "jackets",
+    "description": "Paddock softshell jacket. Wind-resistant, thermal lining, team logo embossed.",
+    "available": true,
+    "badge": "New Arrival"
+  },
+  {
+    "id": "fl-cap-001",
+    "name": "Ferrari LeBark Cap",
+    "team": "Ferrari LeBark",
+    "base_price": 1490,
+    "currency": "THB",
+    "category": "caps",
+    "description": "Scuderia LeBark cap — Charles LeBark edition. Classic red with yellow prancing dog.",
+    "available": true,
+    "badge": null
+  },
+  {
+    "id": "fl-tshirt-001",
+    "name": "Ferrari LeBark Team T-Shirt",
+    "team": "Ferrari LeBark",
+    "base_price": 1990,
+    "currency": "THB",
+    "category": "tops",
+    "description": "Official race-day tee. Moisture-wicking performance fabric, slim fit.",
+    "available": true,
+    "badge": null
+  },
+  {
+    "id": "mc-cap-001",
+    "name": "McLaren Nor-ruff Cap",
+    "team": "McLaren Nor-ruff",
+    "base_price": 1390,
+    "currency": "THB",
+    "category": "caps",
+    "description": "Papaya orange cap — Lando Nor-ruff edition. Snapback, embroidered dog logo.",
+    "available": true,
+    "badge": "Hot"
+  },
+  {
+    "id": "mc-hoodie-001",
+    "name": "McLaren Nor-ruff Hoodie",
+    "team": "McLaren Nor-ruff",
+    "base_price": 3290,
+    "currency": "THB",
+    "category": "tops",
+    "description": "Papaya and chrome crew hoodie. Pre-shrunk cotton blend, kangaroo pocket.",
+    "available": true,
+    "badge": null
+  }
+]

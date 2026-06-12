@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traffic-sim
+  namespace: data-pipeline
+  labels:
+    app: traffic-sim
+    demo: novapay-royal-rumble
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traffic-sim
+  template:
+    metadata:
+      labels:
+        app: traffic-sim
+        demo: novapay-royal-rumble
+      annotations:
+        ad.datadoghq.com/traffic-sim.logs: |
+          [{"source": "python", "service": "traffic-sim", "tags": ["env:prod","demo:royal-rumble"]}]
+    spec:
+      containers:
+        - name: traffic-sim
+          # Image built from traffic-sim/Dockerfile
+          image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/traffic-sim:latest
+          imagePullPolicy: Always
+          # Reads all settings from ConfigMap — change mode with:
+          #   kubectl set env deployment/traffic-sim DATA_QUALITY_MODE=zero-prices -n data-pipeline
+          # or edit the ConfigMap and restart:
+          #   kubectl rollout restart deployment/traffic-sim -n data-pipeline
+          envFrom:
+            - configMapRef:
+                name: traffic-sim-config
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

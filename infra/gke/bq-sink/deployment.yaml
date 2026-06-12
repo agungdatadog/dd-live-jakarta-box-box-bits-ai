@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bq-sink
+  namespace: data-pipeline
+  labels:
+    app: bq-sink
+    demo: novapay-royal-rumble
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bq-sink
+  template:
+    metadata:
+      labels:
+        app: bq-sink
+        demo: novapay-royal-rumble
+      annotations:
+        ad.datadoghq.com/bq-sink.logs: |
+          [{"source": "nodejs", "service": "bq-sink", "tags": ["env:prod"]}]
+    spec:
+      serviceAccountName: bq-sink-ksa
+      containers:
+        - name: bq-sink
+          # Image built from bq-sink/Dockerfile
+          # Push to: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/bq-sink
+          image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/bq-sink:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: bq-sink-config
+          env:
+            - name: DD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: datadog-secret
+                  key: api-key
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 30

@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dbt-pricing
+  namespace: data-pipeline
+  labels:
+    app: dbt-pricing
+    demo: novapay-royal-rumble
+spec:
+  # Run every 5 minutes — keeps dynamic_pricing fresh for the demo
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  # suspend: true is set by demo-pipeline.sh --fail-dbt to trigger the stale data scenario
+  suspend: false
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 120
+      template:
+        metadata:
+          labels:
+            app: dbt-pricing
+          annotations:
+            ad.datadoghq.com/dbt-pricing.logs: |
+              [{"source": "python", "service": "novapay-dbt", "tags": ["env:prod"]}]
+        spec:
+          restartPolicy: Never
+          serviceAccountName: dbt-ksa
+          containers:
+            - name: dbt-pricing
+              # Image built from dbt-project/Dockerfile
+              # Push to: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/novapay-dbt
+              image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/novapay-dbt:latest
+              imagePullPolicy: Always
+              envFrom:
+                - configMapRef:
+                    name: dbt-config
+              env:
+                - name: DD_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: datadog-secret
+                      key: api-key
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi

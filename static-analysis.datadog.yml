@@ -8,3 +8,7 @@ rulesets:
   - typescript-express
   - typescript-inclusive
   - typescript-node-security
+  # Infrastructure as Code scanning — catches misconfigs in K8s manifests and Dockerfiles
+  # Feeds into PR Gates IaC rule type (Shift Left demo Act 6)
+  - docker-best-practices
+  - kubernetes-best-practices

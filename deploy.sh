@@ -64,6 +64,8 @@ spec:
         autoscaling.knative.dev/maxScale: "30"
         autoscaling.knative.dev/minScale: "0"
         run.googleapis.com/startup-cpu-boost: "true"
+        run.googleapis.com/vpc-access-connector: projects/${GCP_PROJECT_ID}/locations/${GCP_REGION}/connectors/novapay-vpc-connector
+        run.googleapis.com/vpc-access-egress: private-ranges-only
     spec:
       containerConcurrency: 80
       containers:
@@ -141,6 +143,25 @@ spec:
               value: "true"
             - name: DD_AI_GUARD_BLOCK
               value: "${DD_AI_GUARD_BLOCK:-false}"
+            # Data Streams Monitoring — auto-instruments KafkaJS producer
+            # Docs: https://docs.datadoghq.com/data_streams/setup/language/nodejs/
+            - name: DD_DATA_STREAMS_ENABLED
+              value: "true"
+            # Required for correct service naming in the DSM topology map
+            - name: DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED
+              value: "true"
+            # Redpanda broker — Internal LB, reachable via VPC connector
+            - name: REDPANDA_BROKERS
+              value: "10.148.0.65:9092"
+            - name: BQ_PROJECT
+              value: "datadog-ese-sandbox"
+            - name: BQ_SA_KEY_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: NOVAPAY_BQ_SA_KEY
+                  key: latest
+            - name: DEMO_ERROR_INJECT
+              value: "false"
   traffic:
     - latestRevision: true
       percent: 100

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traffic-sim-config
+  namespace: data-pipeline
+  labels:
+    app: traffic-sim
+    demo: novapay-royal-rumble
+data:
+  # ── Traffic rate & mode ────────────────────────────────────────────────
+  APP_URL: "https://box-box-bits-ai-449012790678.asia-southeast1.run.app"
+
+  # Events per minute (float). Multiplied by TRAFFIC_MODE modifier.
+  TRAFFIC_RATE: "12"
+
+  # normal  → TRAFFIC_RATE/min   (steady state — keep pipeline alive)
+  # burst   → 3× TRAFFIC_RATE    (simulate Black Friday / spike)
+  # low     → 0.3× TRAFFIC_RATE  (simulate off-peak)
+  # off     → 0 events           (freeze pipeline for Kafka lag demo)
+  TRAFFIC_MODE: "normal"
+
+  # ── Data quality simulation ────────────────────────────────────────────
+  # normal        → clean valid events (base state)
+  # zero-prices   → price_thb=0  → Percent Zero monitor fires in Datadog
+  # null-users    → user_id=null → Nullness monitor fires
+  # negative-qty  → qty<0, price<0 → Percent Negative monitor fires
+  # drop-payload  → malformed request → checkout returns 4xx → Kafka NOT
+  #                 published → BigQuery row count stops → Row Count anomaly
+  # low-volume    → 1 event/2min → row count plateau → anomaly (slow)
+  DATA_QUALITY_MODE: "normal"
+
+  # Products with 3× traffic weight (comma-separated IDs)
+  HOT_PRODUCTS: "rb-cap-001,mc-cap-001"
+
+  LOG_LEVEL: "INFO"

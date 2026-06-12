@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redpanda-config
+  namespace: data-pipeline
+data:
+  redpanda.yaml: |
+    redpanda:
+      # Allow auto-creation of topics by producers
+      auto_create_topics_enabled: true
+      # Retention: keep events for 24h (demo only)
+      log_retention_ms: 86400000
+      log_segment_size: 67108864
+    pandaproxy: {}
+    schema_registry: {}
+    rpk:
+      kafka_api:
+        brokers:
+          - "0.0.0.0:9092"
+      admin_api:
+        addresses:
+          - "0.0.0.0:9644"

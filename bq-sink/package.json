@@ -1,0 +1,23 @@
+{
+  "name": "bq-sink",
+  "version": "1.0.0",
+  "description": "Kafka (Redpanda) → BigQuery consumer for NovaPay demo pipeline",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node -r dd-trace/init dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "^7.9.1",
+    "avsc": "^5.7.7",
+    "dd-trace": "^5.89.0",
+    "kafkajs": "^2.2.4",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  }
+}

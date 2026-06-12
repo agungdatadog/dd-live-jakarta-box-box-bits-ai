@@ -1,0 +1,236 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      demo_error_inject:
+        description: 'Inject checkout error (simulates bad deploy for Deployment Gate demo)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+env:
+  GCP_PROJECT_ID: datadog-ese-sandbox
+  GCP_REGION: asia-southeast1
+  CR_SERVICE: box-box-bits-ai
+  IMAGE: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/box-box-bits-ai
+  DD_SITE: datadoghq.com
+
+jobs:
+  deploy:
+    name: Build, Deploy & Gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # for Workload Identity Federation
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Authenticate to GCP ─────────────────────────────────────────────
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # ── 3. Build & push image via Cloud Build ──────────────────────────────
+      - name: Build image via Cloud Build
+        env:
+          SHORT_SHA: ${{ github.sha }}
+        run: |
+          gcloud builds submit \
+            --config=cloudbuild.yaml \
+            --project=$GCP_PROJECT_ID \
+            --region=$GCP_REGION \
+            --machine-type=e2-highcpu-8 \
+            --substitutions="\
+              _IMAGE_URI=$IMAGE:$SHORT_SHA,\
+              _NEXT_PUBLIC_DATADOG_CLIENT_TOKEN=${{ secrets.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN }},\
+              _NEXT_PUBLIC_DATADOG_APPLICATION_ID=${{ secrets.NEXT_PUBLIC_DATADOG_APPLICATION_ID }},\
+              _NEXT_PUBLIC_DATADOG_SITE=datadoghq.com,\
+              _NEXT_PUBLIC_DATADOG_SERVICE=box-box-bits-ai-frontend,\
+              _NEXT_PUBLIC_DATADOG_ENV=production,\
+              _NEXT_PUBLIC_DD_VERSION=$SHORT_SHA" \
+            .
+
+      # ── 4. Deploy to Cloud Run ──────────────────────────────────────────────
+      # DD_VERSION=$SHORT_SHA is the version tag the Deployment Gate uses to
+      # correlate APM traces and monitor state to this specific deployment.
+      - name: Deploy to Cloud Run
+        id: deploy
+        env:
+          SHORT_SHA: ${{ github.sha }}
+          DEMO_ERROR_INJECT: ${{ github.event.inputs.demo_error_inject || 'false' }}
+        run: |
+          gcloud run deploy $CR_SERVICE \
+            --image="$IMAGE:$SHORT_SHA" \
+            --region=$GCP_REGION \
+            --project=$GCP_PROJECT_ID \
+            --update-env-vars "DEMO_ERROR_INJECT=$DEMO_ERROR_INJECT,DD_VERSION=$SHORT_SHA" \
+            --update-secrets "BQ_SA_KEY_JSON=NOVAPAY_BQ_SA_KEY:latest" \
+            --quiet
+
+          REVISION=$(gcloud run services describe $CR_SERVICE \
+            --region=$GCP_REGION --project=$GCP_PROJECT_ID \
+            --format='value(status.latestReadyRevisionName)')
+          echo "revision=$REVISION" >> $GITHUB_OUTPUT
+          echo "Deployed revision: $REVISION  version: $SHORT_SHA"
+
+      # ── 5. Mark deployment in Datadog (DORA Metrics + CD Visibility) ───────
+      # datadog-ci v5+: 'deployment mark' was renamed to 'dora deployment'
+      # This sends a deployment event to Datadog for DORA metrics and CD Visibility
+      # so the version appears in the deployment timeline and gates can reference it.
+      # Docs: https://docs.datadoghq.com/dora_metrics/
+      - name: Mark deployment in Datadog
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          SHORT_SHA: ${{ github.sha }}
+        run: |
+          npm install -g @datadog/datadog-ci
+          datadog-ci dora deployment \
+            --service box-box-bits-ai \
+            --env prod \
+            --version "$SHORT_SHA" \
+            --started-at "$(date +%s)" \
+            --git-commit-sha "$SHORT_SHA"
+
+      # ── 5b. Wait for Cloud Run revision to be fully ready ──────────────────
+      - name: Wait for service warm-up
+        run: |
+          echo "Waiting 30s for Cloud Run to route traffic to new revision..."
+          sleep 30
+          # Smoke-test the health endpoint before gates run
+          HEALTH=$(curl -sf \
+            "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/health" \
+            --retry 3 --retry-delay 5 --max-time 15 || echo "FAIL")
+          if echo "$HEALTH" | grep -q '"status":"ok"'; then
+            echo "Service is healthy and responding."
+          else
+            echo "::warning::Health check returned unexpected response: $HEALTH"
+          fi
+
+      # ── 6. Evaluate Deployment Gate ────────────────────────────────────────
+      # FIRST gate: Deployment Gate runs before Synthetics.
+      # Evaluates the Datadog gate policy for service:box-box-bits-ai env:prod.
+      # The gate contains two rules:
+      #   Rule 1 — Monitor: tag:scenario:deployment-gates tag:env:prod
+      #            Fails immediately if any matched monitor is in ALERT state.
+      #            The checkout error spike monitor fires within ~2 min of a bad deploy.
+      #   Rule 2 — APM Faulty Deployment Detection (Watchdog):
+      #            Detects new error types vs 30-day baseline. Needs ~15 min.
+      # Timeout: 900s (15 min) to allow Watchdog analysis to complete.
+      #
+      # Gate config: Software Delivery → Deployment Gates → Configuration
+      #   Service: box-box-bits-ai, Env: prod
+      #   Rule 1: Monitor → query: tag:scenario:deployment-gates tag:env:prod
+      #   Rule 2: APM Faulty Deployment Detection, Duration: 900s
+      # Docs: https://docs.datadoghq.com/deployment_gates/
+      - name: Evaluate Deployment Gate
+        id: deployment_gate
+        continue-on-error: true   # allow rollback step to run on failure
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+        uses: DataDog/deployment-gate-github-action@v1.0.0
+        with:
+          service: box-box-bits-ai
+          env: prod
+          version: ${{ github.sha }}
+          timeout: '900'          # 15 min — APM faulty detection needs time
+          fail-on-error: 'false'  # timeout = pass (don't block if Datadog unreachable)
+
+      # ── 6b. Rollback on Deployment Gate failure ────────────────────────────
+      # When the Deployment Gate fails (monitor ALERT or Watchdog detects new errors),
+      # route all traffic back to the previous stable revision.
+      - name: Rollback on gate failure
+        if: steps.deployment_gate.outcome == 'failure'
+        env:
+          SHORT_SHA: ${{ github.sha }}
+        run: |
+          echo "::error::Deployment Gate FAILED for $SHORT_SHA — rolling back..."
+
+          PREV_REVISION=$(gcloud run revisions list \
+            --service=$CR_SERVICE \
+            --region=$GCP_REGION \
+            --project=$GCP_PROJECT_ID \
+            --format='value(metadata.name)' \
+            --sort-by='~metadata.creationTimestamp' \
+            --limit=5 | grep -v "${{ steps.deploy.outputs.revision }}" | head -1)
+
+          echo "Rolling back to: $PREV_REVISION"
+          gcloud run services update-traffic $CR_SERVICE \
+            --region=$GCP_REGION \
+            --project=$GCP_PROJECT_ID \
+            --to-revisions="$PREV_REVISION=100" \
+            --quiet
+
+          echo "Rollback complete. Traffic restored to $PREV_REVISION."
+          echo "::error::Deployment Gate blocked ${{ steps.deploy.outputs.revision }} — restored $PREV_REVISION"
+          exit 1
+
+      # ── 7. Run Datadog Synthetics Tests ────────────────────────────────────
+      # SECOND gate: Synthetics runs after the Deployment Gate passes.
+      # Runs all API tests tagged: service:box-box-bits-ai + env:prod + scenario:deployment-gates
+      # Created tests (tag:scenario:deployment-gates):
+      #   fum-v3s-b8r → POST /api/merch/checkout → assert status=200, body contains "success"
+      #   zgp-czb-usw → POST /api/merch/checkout → assert status≠500
+      # See: docs/synthetics-setup.md for full test list.
+      # Docs: https://docs.datadoghq.com/continuous_testing/cicd_integrations/github_actions/
+      - name: Run Datadog Synthetics Tests
+        id: synthetics
+        continue-on-error: true   # allow rollback step to run if Synthetics fail
+        uses: DataDog/synthetics-ci-github-action@v2
+        with:
+          api_key: ${{ secrets.DD_API_KEY }}
+          app_key: ${{ secrets.DD_APP_KEY }}
+          site: datadoghq.com
+          # Only run deployment-gate-tagged tests (fum-v3s-b8r, zgp-czb-usw)
+          test_search_query: "tag:service:box-box-bits-ai AND tag:env:prod AND tag:scenario:deployment-gates"
+          fail_on_critical_errors: true
+          fail_on_missing_tests: false
+          fail_on_timeout: false
+          polling_timeout: 120000          # 2 min max wait per test
+
+      # ── 7b. Rollback if Synthetics failed ──────────────────────────────────
+      # Catch any regressions missed by the Deployment Gate (e.g. functional
+      # test failures not reflected as monitor alerts yet).
+      - name: Rollback on Synthetics failure
+        if: steps.synthetics.outcome == 'failure'
+        run: |
+          echo "::error::Synthetics tests FAILED for ${{ steps.deploy.outputs.revision }} — rolling back"
+
+          PREV_REVISION=$(gcloud run revisions list \
+            --service=$CR_SERVICE \
+            --region=$GCP_REGION \
+            --project=$GCP_PROJECT_ID \
+            --format='value(metadata.name)' \
+            --sort-by='~metadata.creationTimestamp' \
+            --limit=5 | grep -v "${{ steps.deploy.outputs.revision }}" | head -1)
+
+          echo "Rolling back to: $PREV_REVISION"
+          gcloud run services update-traffic $CR_SERVICE \
+            --region=$GCP_REGION \
+            --project=$GCP_PROJECT_ID \
+            --to-revisions="$PREV_REVISION=100" \
+            --quiet
+
+          echo "Rollback complete. Synthetics caught the regression."
+          exit 1
+
+      # ── 8. All gates passed — deployment confirmed ─────────────────────────
+      - name: Deployment confirmed
+        if: steps.deployment_gate.outcome == 'success' && steps.synthetics.outcome == 'success'
+        run: |
+          echo "✅ All gates passed — ${{ steps.deploy.outputs.revision }} is stable."
+          echo "   Deployment Gate: PASSED (no monitor alerts, no Watchdog anomalies)"
+          echo "   Synthetics Gate: PASSED (all checkout tests green)"
+          echo "   Version: ${{ github.sha }}"

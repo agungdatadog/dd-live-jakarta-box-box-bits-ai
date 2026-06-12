@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bq-sink-config
+  namespace: data-pipeline
+data:
+  # Use the Internal LB IP — same advertised broker address Cloud Run uses via VPC connector.
+  # Avoids Kafka metadata redirect issues; no public IP needed.
+  KAFKA_BROKERS: "10.148.0.65:9092"
+  KAFKA_TOPIC: "limited_merch_transactions"
+  KAFKA_GROUP_ID: "bq-sink-consumer"
+  BQ_PROJECT: "datadog-ese-sandbox"
+  BQ_DATASET: "novapay_raw"
+  BQ_TABLE: "limited_merch_events"
+  # Batch settings — flush every 5 seconds or 100 messages, whichever comes first
+  BATCH_MAX_MESSAGES: "100"
+  BATCH_FLUSH_INTERVAL_MS: "5000"
+  DD_SERVICE: "bq-sink"
+  DD_ENV: "prod"
+  DD_SITE: "datadoghq.com"
+  # Data Streams Monitoring — auto-instruments KafkaJS producer/consumer
+  # Docs: https://docs.datadoghq.com/data_streams/setup/language/nodejs/
+  DD_DATA_STREAMS_ENABLED: "true"
+  # Required for correct service naming in the DSM topology map
+  DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED: "true"
+  DD_LOGS_INJECTION: "true"

@@ -13,6 +13,17 @@
 
 export const DEMO_HIGH_LATENCY = process.env.DEMO_HIGH_LATENCY === 'true';
 
+/**
+ * When true, the merch checkout API throws a NullPointerException on the
+ * THB currency handler, simulating a bug introduced in deployment v2.4.1.
+ * This creates the APM error spike that triggers Bits AI investigation in Act 3.
+ *
+ * Toggle without redeploy:
+ *   ./scripts/demo-pipeline.sh --error-inject-on
+ *   ./scripts/demo-pipeline.sh --error-inject-off
+ */
+export const DEMO_ERROR_INJECT = process.env.DEMO_ERROR_INJECT === 'true';
+
 /** Model to use depending on demo mode. */
 export const LLM_MODEL = DEMO_HIGH_LATENCY
   ? 'gemini-3.1-pro-preview'   // heaviest model — $2/1M input, $12/1M output

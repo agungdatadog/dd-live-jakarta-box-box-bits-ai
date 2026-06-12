@@ -1,0 +1,12 @@
+[
+  { "name": "event_id",     "type": "STRING",    "mode": "REQUIRED", "description": "UUID for the purchase event" },
+  { "name": "product_id",   "type": "STRING",    "mode": "REQUIRED", "description": "Merch product SKU" },
+  { "name": "user_id",      "type": "STRING",    "mode": "REQUIRED", "description": "RUM user ID" },
+  { "name": "quantity",     "type": "INTEGER",   "mode": "REQUIRED", "description": "Units purchased" },
+  { "name": "price_thb",    "type": "FLOAT64",   "mode": "REQUIRED", "description": "Unit price in THB at time of purchase" },
+  { "name": "team",         "type": "STRING",    "mode": "NULLABLE", "description": "F1 team name on the merch item" },
+  { "name": "category",     "type": "STRING",    "mode": "NULLABLE", "description": "Product category: caps | tops | jackets | accessories" },
+  { "name": "event_ts",     "type": "TIMESTAMP", "mode": "REQUIRED", "description": "Event timestamp (UTC)" },
+  { "name": "kafka_offset", "type": "INTEGER",   "mode": "NULLABLE", "description": "Kafka partition offset for audit trail" },
+  { "name": "ingested_at",  "type": "TIMESTAMP", "mode": "NULLABLE", "description": "BigQuery insert timestamp (set by bq-sink)" }
+]

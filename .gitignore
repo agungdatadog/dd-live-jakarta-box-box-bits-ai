@@ -12,3 +12,6 @@ k8s/cloudrun.yaml
 
 # Promptfoo - generated scan output, re-created on each run
 red-team/redteam.yaml
+
+# GCP service account key — created by infra/bigquery/setup.sh, stored in Secret Manager
+infra/bigquery/sa-key.json

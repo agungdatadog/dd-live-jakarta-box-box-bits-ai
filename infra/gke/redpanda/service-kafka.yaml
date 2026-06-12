@@ -1,0 +1,25 @@
+# Internal LoadBalancer — accessible only from within the VPC (no public IP).
+# Cloud Run reaches this via the VPC Access Connector (novapay-vpc-connector).
+# After deploy: get the internal IP with:
+#   kubectl get svc redpanda-kafka-lb -n data-pipeline
+# Then set REDPANDA_BROKERS=<INTERNAL_IP>:9092 in the Cloud Run service env.
+apiVersion: v1
+kind: Service
+metadata:
+  name: redpanda-kafka-lb
+  namespace: data-pipeline
+  labels:
+    app: redpanda
+  annotations:
+    # Internal LB — no public IP, VPC-only access
+    networking.gke.io/load-balancer-type: "Internal"
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  type: LoadBalancer
+  selector:
+    app: redpanda
+  ports:
+    - name: kafka
+      port: 9092
+      targetPort: 9092
+      protocol: TCP
