@@ -189,7 +189,7 @@ jobs:
         with:
           service: box-box-bits-ai
           env: prod
-          version: ${{ github.sha }}
+          version: ${{ steps.deploy.outputs.short_sha }}   # 8-char short SHA matching DD_VERSION
           timeout: '900'          # 15 min — APM faulty detection needs time
           fail-on-error: 'false'  # timeout = pass (don't block if Datadog unreachable)
 
