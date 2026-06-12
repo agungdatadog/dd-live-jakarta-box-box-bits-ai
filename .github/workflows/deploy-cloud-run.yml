@@ -90,10 +90,21 @@ jobs:
           echo "revision=$REVISION" >> $GITHUB_OUTPUT
           echo "Deployed revision: $REVISION  version: $SHORT_SHA"
 
-      # ── 5. Mark deployment in Datadog (DORA Metrics + CD Visibility) ───────
-      # datadog-ci v5+: 'deployment mark' was renamed to 'dora deployment'
-      # This sends a deployment event to Datadog for DORA metrics and CD Visibility
-      # so the version appears in the deployment timeline and gates can reference it.
+      # ── 5. Mark deployment in Datadog (DORA Metrics) ──────────────────────
+      # DD_VERSION=$SHA is set on Cloud Run (runtime).
+      # Gate --version=$SHA must match DD_VERSION exactly (both use github.sha).
+      # APM traces confirm: version tag = $SHA ✓ (verified via Datadog APM).
+      #
+      # NOTE on APM Faulty Deployment Detection gate rule:
+      #   This rule requires a CD Visibility "deployment entity" (created by the
+      #   old "datadog-ci deployment mark", removed in v5). APM traces alone are
+      #   not enough — Watchdog needs the CD Visibility deployment record.
+      #   SOLUTION: Set the apm-faulty gate rule to "Dry Run" in the Datadog UI:
+      #     app.datadoghq.com/ci/deployment-gates → box-box-bits-ai/prod
+      #     Rule: apm-faulty → Evaluation Mode: Dry Run
+      #   The Monitor rule (checkout error spike) remains Active and handles
+      #   bad-deploy detection — which is the primary demo story.
+      #
       # Docs: https://docs.datadoghq.com/dora_metrics/
       - name: Mark deployment in Datadog
         env:
