@@ -44,12 +44,11 @@ jobs:
           diff_aware: true
 
       # ── SCA: Software Composition Analysis ─────────────────────────────────
-      # v1 — scans npm dependencies for known CVEs and license violations.
+      # v4.5.0 — composite action (no Docker build), generates SBOM and uploads to Datadog.
+      # dd_service/dd_env not supported in v4+; service is inferred from git context.
       - name: Run Datadog SCA
-        uses: DataDog/datadog-sca-github-action@28a3f07dc76f9f3cc692418b1a15519ccd718846 # v1
+        uses: DataDog/datadog-sca-github-action@37d973e751cff3de3d5dd4fc46160262688e1fa7 # v4.5.0
         with:
           dd_api_key: ${{ secrets.DD_API_KEY }}
           dd_app_key: ${{ secrets.DD_APP_KEY }}
           dd_site: datadoghq.com
-          dd_service: box-box-bits-ai
-          dd_env: ci
