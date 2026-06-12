@@ -196,15 +196,16 @@ jobs:
         continue-on-error: true   # allow rollback step to run if Synthetics fail
         uses: DataDog/synthetics-ci-github-action@c84a23515bda46d8a060f77a6ad88644377f90be # v4.0.0
         with:
-          api_key: ${{ secrets.DD_API_KEY }}
-          app_key: ${{ secrets.DD_APP_KEY }}
+          api-key: ${{ secrets.DD_API_KEY }}
+          app-key: ${{ secrets.DD_APP_KEY }}
           site: datadoghq.com
           # Only run deployment-gate-tagged tests (fum-v3s-b8r, zgp-czb-usw)
-          test_search_query: "tag:service:box-box-bits-ai AND tag:env:prod AND tag:scenario:deployment-gates"
-          fail_on_critical_errors: true
-          fail_on_missing_tests: false
-          fail_on_timeout: false
-          polling_timeout: 120000          # 2 min max wait per test
+          # v4.0.0 renamed inputs from snake_case → kebab-case
+          test-search-query: "tag:service:box-box-bits-ai AND tag:env:prod AND tag:scenario:deployment-gates"
+          fail-on-critical-errors: true
+          fail-on-missing-tests: false
+          fail-on-timeout: false
+          polling-timeout: 120000          # 2 min max wait per test
 
       # ── 7b. Rollback if Synthetics failed ──────────────────────────────────
       # Catch any regressions missed by the Deployment Gate (e.g. functional
