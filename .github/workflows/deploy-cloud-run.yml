@@ -73,22 +73,37 @@ jobs:
       - name: Deploy to Cloud Run
         id: deploy
         env:
-          SHORT_SHA: ${{ github.sha }}
+          FULL_SHA: ${{ github.sha }}
           DEMO_ERROR_INJECT: ${{ github.event.inputs.demo_error_inject || 'false' }}
         run: |
+          SHORT_SHA="${FULL_SHA:0:8}"
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "Deploying: image=$FULL_SHA  DD_VERSION=$SHORT_SHA"
+
+          # Deploy new revision
           gcloud run deploy $CR_SERVICE \
-            --image="$IMAGE:$SHORT_SHA" \
+            --image="$IMAGE:$FULL_SHA" \
             --region=$GCP_REGION \
             --project=$GCP_PROJECT_ID \
             --update-env-vars "DEMO_ERROR_INJECT=$DEMO_ERROR_INJECT,DD_VERSION=$SHORT_SHA" \
             --update-secrets "BQ_SA_KEY_JSON=NOVAPAY_BQ_SA_KEY:latest" \
             --quiet
 
+          # Capture the new revision name
           REVISION=$(gcloud run services describe $CR_SERVICE \
             --region=$GCP_REGION --project=$GCP_PROJECT_ID \
             --format='value(status.latestReadyRevisionName)')
           echo "revision=$REVISION" >> $GITHUB_OUTPUT
-          echo "Deployed revision: $REVISION  version: $SHORT_SHA"
+          echo "New revision: $REVISION"
+
+          # Explicitly route 100% traffic to the new revision
+          # Prevents 0% traffic issues from concurrent deploys or previous rollbacks
+          gcloud run services update-traffic $CR_SERVICE \
+            --region=$GCP_REGION \
+            --project=$GCP_PROJECT_ID \
+            --to-latest \
+            --quiet
+          echo "Traffic: 100% → $REVISION (DD_VERSION=$SHORT_SHA)"
 
       # ── 5. Mark deployment in Datadog (DORA Metrics) ──────────────────────
       # DD_VERSION=$SHA is set on Cloud Run (runtime).
@@ -110,7 +125,8 @@ jobs:
         env:
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
           DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
-          SHORT_SHA: ${{ github.sha }}
+          FULL_SHA: ${{ github.sha }}
+          SHORT_SHA: ${{ steps.deploy.outputs.short_sha }}
         run: |
           npm install -g @datadog/datadog-ci
           datadog-ci dora deployment \
@@ -118,7 +134,7 @@ jobs:
             --env prod \
             --version "$SHORT_SHA" \
             --started-at "$(date +%s)" \
-            --git-commit-sha "$SHORT_SHA"
+            --git-commit-sha "$FULL_SHA"
 
       # ── 5b. Wait for Cloud Run revision to be fully ready ──────────────────
       - name: Wait for service warm-up and generate APM data
