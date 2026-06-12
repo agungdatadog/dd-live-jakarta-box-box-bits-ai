@@ -25,18 +25,23 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write   # for Workload Identity Federation
+      id-token: write   # required for Workload Identity Federation token exchange
 
     steps:
       # ── 1. Checkout ────────────────────────────────────────────────────────
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      # ── 2. Authenticate to GCP ─────────────────────────────────────────────
+      # ── 2. Authenticate to GCP via Workload Identity Federation ───────────
+      # Pool: github-actions-pool / provider: github-datadog
+      # Condition: assertion.repository_owner == 'DataDog'  ← matches this repo
+      # SA: nuttee-dify-sa@datadog-ese-sandbox.iam.gserviceaccount.com
+      # WIF binding: principalSet://…/attribute.repository/DataDog/dd-live-bkk-box-box-bits-ai
       - name: Authenticate to GCP
         uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: projects/449012790678/locations/global/workloadIdentityPools/github-actions-pool/providers/github-datadog
+          service_account: nuttee-dify-sa@datadog-ese-sandbox.iam.gserviceaccount.com
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
