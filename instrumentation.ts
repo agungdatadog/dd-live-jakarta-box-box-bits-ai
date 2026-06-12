@@ -25,14 +25,9 @@ export async function register() {
       // intake using DD_API_KEY. APM traces/metrics still go through serverless-init.
       agentlessEnabled: true,
     },
-    // Data Streams Monitoring — tracks end-to-end Kafka pathway latency and
-    // consumer lag from this producer through the bq-sink consumer to BigQuery.
-    // dd-trace auto-instruments KafkaJS: injects pathway context headers into
-    // every produce() call so Datadog can measure checkout → Kafka → bq-sink lag.
+    // Data Streams Monitoring is enabled via DD_DATA_STREAMS_ENABLED=true env var
+    // on Cloud Run — no tracer.init() option needed (dd-trace picks it up automatically).
     // Docs: https://docs.datadoghq.com/data_streams/nodejs/
-    dataStreams: {
-      enabled: process.env.DD_DATA_STREAMS_ENABLED !== 'false',
-    },
     experimental: {
       // Enables the Datadog Feature Flags provider wrapper around
       // @datadog/openfeature-node-server. Receives flag config via Remote
