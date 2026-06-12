@@ -29,13 +29,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       # ── SAST: Datadog Static Analysis ──────────────────────────────────────
       # Analyzes TypeScript/JavaScript for security vulnerabilities and code quality.
       # Results uploaded to Datadog — PR Gates reads these findings.
       - name: Run Datadog Static Analysis
-        uses: DataDog/datadog-static-analyzer-github-action@v1
+        uses: DataDog/datadog-static-analyzer-github-action@8340f18875fcefca86844b5f947ce2431387e552 # v3.0.0
         with:
           dd_api_key: ${{ secrets.DD_API_KEY }}
           dd_app_key: ${{ secrets.DD_APP_KEY }}
@@ -49,7 +49,7 @@ jobs:
       # Scans npm dependencies for known CVEs and license violations.
       # Results uploaded to Datadog — PR Gates SCA rule reads these.
       - name: Run Datadog SCA
-        uses: DataDog/datadog-sca-github-action@v1
+        uses: DataDog/datadog-sca-github-action@37d973e751cff3de3d5dd4fc46160262688e1fa7 # v4.5.0
         with:
           dd_api_key: ${{ secrets.DD_API_KEY }}
           dd_app_key: ${{ secrets.DD_APP_KEY }}
