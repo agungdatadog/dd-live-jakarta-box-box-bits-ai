@@ -68,16 +68,24 @@ jobs:
             .
 
       # ── 4. Deploy to Cloud Run ──────────────────────────────────────────────
-      # DD_VERSION=$SHORT_SHA is the version tag the Deployment Gate uses to
-      # correlate APM traces and monitor state to this specific deployment.
+      # DD_VERSION uses the first 8 chars of the git SHA (short SHA).
+      # This must match exactly what is passed to:
+      #   - deployment mark --revision
+      #   - dora deployment --version
+      #   - gate --version
+      # so Watchdog APM Faulty Detection can correlate APM traces to this deployment.
       - name: Deploy to Cloud Run
         id: deploy
         env:
-          SHORT_SHA: ${{ github.sha }}
+          FULL_SHA: ${{ github.sha }}
           DEMO_ERROR_INJECT: ${{ github.event.inputs.demo_error_inject || 'false' }}
         run: |
+          SHORT_SHA="${FULL_SHA:0:8}"
+          echo "Deploying version: $SHORT_SHA (full: $FULL_SHA)"
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
           gcloud run deploy $CR_SERVICE \
-            --image="$IMAGE:$SHORT_SHA" \
+            --image="$IMAGE:$FULL_SHA" \
             --region=$GCP_REGION \
             --project=$GCP_PROJECT_ID \
             --update-env-vars "DEMO_ERROR_INJECT=$DEMO_ERROR_INJECT,DD_VERSION=$SHORT_SHA" \
@@ -88,7 +96,7 @@ jobs:
             --region=$GCP_REGION --project=$GCP_PROJECT_ID \
             --format='value(status.latestReadyRevisionName)')
           echo "revision=$REVISION" >> $GITHUB_OUTPUT
-          echo "Deployed revision: $REVISION  version: $SHORT_SHA"
+          echo "Deployed revision: $REVISION  DD_VERSION=$SHORT_SHA"
 
       # ── 5. Mark deployment in Datadog ──────────────────────────────────────
       # Two deployments marks are required:
@@ -106,11 +114,13 @@ jobs:
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
           DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
           DD_BETA_COMMANDS_ENABLED: '1'
-          SHORT_SHA: ${{ github.sha }}
+          FULL_SHA: ${{ github.sha }}
+          SHORT_SHA: ${{ steps.deploy.outputs.short_sha }}
         run: |
           npm install -g @datadog/datadog-ci
 
           # a) CD Visibility deployment mark — required for APM Faulty Detection gate rule
+          # --revision must match DD_VERSION on Cloud Run (short SHA)
           echo "Marking deployment in CD Visibility (version: $SHORT_SHA)..."
           datadog-ci deployment mark \
             --service box-box-bits-ai \
@@ -125,18 +135,18 @@ jobs:
             --env prod \
             --version "$SHORT_SHA" \
             --started-at "$(date +%s)" \
-            --git-commit-sha "$SHORT_SHA"
+            --git-commit-sha "$FULL_SHA"
 
       # ── 5b. Wait for Cloud Run revision to be fully ready ──────────────────
       - name: Wait for service warm-up and generate APM data
         env:
-          SHORT_SHA: ${{ github.sha }}
+          SHORT_SHA: ${{ steps.deploy.outputs.short_sha }}
         run: |
           echo "Waiting 30s for Cloud Run to route traffic to new revision..."
           sleep 30
 
-          # Smoke-test endpoints — also seeds APM traces with DD_VERSION=$SHORT_SHA
-          # so the Deployment Gate APM Faulty Detection can find this version.
+          # Smoke-test endpoints — seeds APM traces with DD_VERSION=$SHORT_SHA (short)
+          # Watchdog APM Faulty Detection looks for this version in APM traces.
           echo "Seeding APM traces for version $SHORT_SHA..."
           for i in 1 2 3; do
             curl -sf \
@@ -181,7 +191,7 @@ jobs:
         with:
           service: box-box-bits-ai
           env: prod
-          version: ${{ github.sha }}
+          version: ${{ steps.deploy.outputs.short_sha }}   # must match DD_VERSION (short SHA)
           timeout: '900'          # 15 min — APM faulty detection needs time
           fail-on-error: 'false'  # timeout = pass (don't block if Datadog unreachable)
 
@@ -229,14 +239,12 @@ jobs:
         with:
           api-key: ${{ secrets.DD_API_KEY }}
           app-key: ${{ secrets.DD_APP_KEY }}
-          site: datadoghq.com
-          # Only run deployment-gate-tagged tests (fum-v3s-b8r, zgp-czb-usw)
-          # v4.0.0 renamed inputs from snake_case → kebab-case
+          datadog-site: datadoghq.com          # v4: renamed from 'site'
           test-search-query: "tag:service:box-box-bits-ai AND tag:env:prod AND tag:scenario:deployment-gates"
           fail-on-critical-errors: true
           fail-on-missing-tests: false
           fail-on-timeout: false
-          polling-timeout: 120000          # 2 min max wait per test
+          batch-timeout: 120000                # v4: renamed from 'polling-timeout'
 
       # ── 7b. Rollback if Synthetics failed ──────────────────────────────────
       # Catch any regressions missed by the Deployment Gate (e.g. functional
@@ -271,4 +279,4 @@ jobs:
           echo "✅ All gates passed — ${{ steps.deploy.outputs.revision }} is stable."
           echo "   Deployment Gate: PASSED (no monitor alerts, no Watchdog anomalies)"
           echo "   Synthetics Gate: PASSED (all checkout tests green)"
-          echo "   Version: ${{ github.sha }}"
+          echo "   Version: ${{ steps.deploy.outputs.short_sha }} (DD_VERSION on Cloud Run)"
