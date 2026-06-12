@@ -110,19 +110,31 @@ jobs:
             --git-commit-sha "$SHORT_SHA"
 
       # ── 5b. Wait for Cloud Run revision to be fully ready ──────────────────
-      - name: Wait for service warm-up
+      - name: Wait for service warm-up and generate APM data
+        env:
+          SHORT_SHA: ${{ github.sha }}
         run: |
           echo "Waiting 30s for Cloud Run to route traffic to new revision..."
           sleep 30
-          # Smoke-test the health endpoint before gates run
-          HEALTH=$(curl -sf \
-            "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/health" \
-            --retry 3 --retry-delay 5 --max-time 15 || echo "FAIL")
-          if echo "$HEALTH" | grep -q '"status":"ok"'; then
-            echo "Service is healthy and responding."
-          else
-            echo "::warning::Health check returned unexpected response: $HEALTH"
-          fi
+
+          # Smoke-test endpoints — also seeds APM traces with DD_VERSION=$SHORT_SHA
+          # so the Deployment Gate APM Faulty Detection can find this version.
+          echo "Seeding APM traces for version $SHORT_SHA..."
+          for i in 1 2 3; do
+            curl -sf \
+              "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/health" \
+              --max-time 10 > /dev/null && echo "  health $i OK" || echo "  health $i FAIL"
+            curl -sf \
+              "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/merch/products" \
+              --max-time 10 > /dev/null && echo "  products $i OK" || echo "  products $i FAIL"
+            curl -s -o /dev/null \
+              "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/merch/checkout" \
+              -X POST -H "Content-Type: application/json" \
+              -d '{"product_id":"rb-cap-001","quantity":1,"user_id":"ci-gate-probe","price_thb":1290}' \
+              --max-time 10 && echo "  checkout $i OK"
+            sleep 5
+          done
+          echo "APM trace seeding complete. Gate will evaluate version: $SHORT_SHA"
 
       # ── 6. Evaluate Deployment Gate ────────────────────────────────────────
       # FIRST gate: Deployment Gate runs before Synthetics.
