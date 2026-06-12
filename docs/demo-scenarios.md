@@ -566,3 +566,6 @@ Configure Workflow Automation (Service Management → Workflow Automation → Ne
 | "Data changes often, breaks stuff" | "Do you track schema changes over time?" | Lineage: `limited_merch_events` → dbt → `dynamic_pricing` |
 | "We want to get ahead of data issues" | "What tools are you using to monitor today?" | Criteria-based monitors, anomaly detection |
 | "We're scaling data ops, want governance" | "Can you track issues across teams/models?" | Ownership, incident routing, Data Catalog |
+
+
+<!-- deploy-trigger: 2026-06-12T08:21:52Z -->
