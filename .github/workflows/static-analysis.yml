@@ -33,10 +33,12 @@ jobs:
 
       # ── SAST: Datadog Static Analysis ──────────────────────────────────────
       # v2.0.0 — supports Linux/X64 runners.
-      # Note: dd_service, dd_env, fail_on_error were removed in v2+.
-      # Service/env are inferred from git context; fail behaviour via diff_aware.
+      # v2 reads DD_API_KEY/DD_APP_KEY from env vars (not inputs).
       - name: Run Datadog Static Analysis
         uses: DataDog/datadog-static-analyzer-github-action@2cc0e0621ea2863272b29d9aea230d9aad238086 # v2.0.0
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
         with:
           dd_api_key: ${{ secrets.DD_API_KEY }}
           dd_app_key: ${{ secrets.DD_APP_KEY }}

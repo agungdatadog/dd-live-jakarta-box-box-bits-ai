@@ -51,19 +51,20 @@ jobs:
         env:
           SHORT_SHA: ${{ github.sha }}
         run: |
+          # Build substitutions on one line — multi-line with leading spaces corrupts key names
+          SUBS="_IMAGE_URI=$IMAGE:$SHORT_SHA"
+          SUBS="${SUBS},_NEXT_PUBLIC_DATADOG_CLIENT_TOKEN=${{ secrets.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN }}"
+          SUBS="${SUBS},_NEXT_PUBLIC_DATADOG_APPLICATION_ID=${{ secrets.NEXT_PUBLIC_DATADOG_APPLICATION_ID }}"
+          SUBS="${SUBS},_NEXT_PUBLIC_DATADOG_SITE=datadoghq.com"
+          SUBS="${SUBS},_NEXT_PUBLIC_DATADOG_SERVICE=box-box-bits-ai-frontend"
+          SUBS="${SUBS},_NEXT_PUBLIC_DATADOG_ENV=production"
+          SUBS="${SUBS},_NEXT_PUBLIC_DD_VERSION=$SHORT_SHA"
           gcloud builds submit \
             --config=cloudbuild.yaml \
             --project=$GCP_PROJECT_ID \
             --region=$GCP_REGION \
             --machine-type=e2-highcpu-8 \
-            --substitutions="\
-              _IMAGE_URI=$IMAGE:$SHORT_SHA,\
-              _NEXT_PUBLIC_DATADOG_CLIENT_TOKEN=${{ secrets.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN }},\
-              _NEXT_PUBLIC_DATADOG_APPLICATION_ID=${{ secrets.NEXT_PUBLIC_DATADOG_APPLICATION_ID }},\
-              _NEXT_PUBLIC_DATADOG_SITE=datadoghq.com,\
-              _NEXT_PUBLIC_DATADOG_SERVICE=box-box-bits-ai-frontend,\
-              _NEXT_PUBLIC_DATADOG_ENV=production,\
-              _NEXT_PUBLIC_DD_VERSION=$SHORT_SHA" \
+            --substitutions="$SUBS" \
             .
 
       # ── 4. Deploy to Cloud Run ──────────────────────────────────────────────
