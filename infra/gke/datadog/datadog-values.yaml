@@ -58,6 +58,35 @@ datadog:
   clusterChecks:
     enabled: true
 
+  # ── Security Agent ─────────────────────────────────────────────────────────
+  # Cloud Security Management (CSM) — Misconfigurations + Compliance
+  # Docs: https://docs.datadoghq.com/security/cloud_security_management/setup/agent/
+  securityAgent:
+    compliance:
+      enabled: true
+      host_benchmarks:
+        enabled: true
+
+  # ── Software Bill of Materials (SBOM) ──────────────────────────────────────
+  # Powers Container Vulnerability Management and Host Vulnerability Management.
+  # Requires Agent 7.70+ for language-level analyzers.
+  # enrichment.usage requires Agent 7.79+ (Preview: runtime package prioritization)
+  # Docs: https://docs.datadoghq.com/security/cloud_security_management/vulnerabilities/
+  sbom:
+    containerImage:
+      enabled: true
+      analyzers:
+        - os
+        - languages
+    host:
+      enabled: true
+      analyzers:
+        - os
+        - languages
+    enrichment:
+      usage:
+        enabled: true
+
 clusterAgent:
   enabled: true
   replicas: 1
