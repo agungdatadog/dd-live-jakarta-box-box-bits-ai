@@ -1,4 +1,4 @@
-# Box Box Bits AI — Service Knowledge Base for Bits AI
+# Box Box Bits AI — NovaPay Royal Rumble 2026 Demo
 
 This file is a knowledge source for Bits AI Investigation.
 When investigating alerts or incidents in this system, use the context below to
