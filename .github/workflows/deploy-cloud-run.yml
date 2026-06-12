@@ -90,29 +90,36 @@ jobs:
           echo "revision=$REVISION" >> $GITHUB_OUTPUT
           echo "Deployed revision: $REVISION  version: $SHORT_SHA"
 
-      # ── 5. Mark deployment in Datadog (DORA Metrics) ──────────────────────
-      # DD_VERSION=$SHA is set on Cloud Run (runtime).
-      # Gate --version=$SHA must match DD_VERSION exactly (both use github.sha).
-      # APM traces confirm: version tag = $SHA ✓ (verified via Datadog APM).
+      # ── 5. Mark deployment in Datadog ──────────────────────────────────────
+      # Two deployments marks are required:
       #
-      # NOTE on APM Faulty Deployment Detection gate rule:
-      #   This rule requires a CD Visibility "deployment entity" (created by the
-      #   old "datadog-ci deployment mark", removed in v5). APM traces alone are
-      #   not enough — Watchdog needs the CD Visibility deployment record.
-      #   SOLUTION: Set the apm-faulty gate rule to "Dry Run" in the Datadog UI:
-      #     app.datadoghq.com/ci/deployment-gates → box-box-bits-ai/prod
-      #     Rule: apm-faulty → Evaluation Mode: Dry Run
-      #   The Monitor rule (checkout error spike) remains Active and handles
-      #   bad-deploy detection — which is the primary demo story.
+      # a) CD Visibility (deployment mark, beta) — creates the deployment entity
+      #    that the Deployment Gate APM Faulty Detection rule looks for.
+      #    Requires DD_BETA_COMMANDS_ENABLED=1. Only works in CI (needs provider env).
+      #    DD_VERSION=$SHA on Cloud Run = --revision=$SHA = gate --version=$SHA (all match).
+      #    Docs: https://docs.datadoghq.com/deployment_gates/setup/?tab=apmfaultydeploymentdetection
       #
-      # Docs: https://docs.datadoghq.com/dora_metrics/
+      # b) DORA Metrics (dora deployment) — change lead time, deployment frequency.
+      #    Docs: https://docs.datadoghq.com/dora_metrics/
       - name: Mark deployment in Datadog
         env:
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
           DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          DD_BETA_COMMANDS_ENABLED: '1'
           SHORT_SHA: ${{ github.sha }}
         run: |
           npm install -g @datadog/datadog-ci
+
+          # a) CD Visibility deployment mark — required for APM Faulty Detection gate rule
+          echo "Marking deployment in CD Visibility (version: $SHORT_SHA)..."
+          datadog-ci deployment mark \
+            --service box-box-bits-ai \
+            --env prod \
+            --revision "$SHORT_SHA" \
+            --no-fail
+
+          # b) DORA metrics deployment event
+          echo "Sending DORA deployment event..."
           datadog-ci dora deployment \
             --service box-box-bits-ai \
             --env prod \
@@ -169,6 +176,7 @@ jobs:
         env:
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
           DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          DD_BETA_COMMANDS_ENABLED: '1'   # required for deployment gate beta command
         uses: DataDog/deployment-gate-github-action@5ebbd9d49ccff00cdcbfb3b710a25df3b69fc959 # v2.0.0
         with:
           service: box-box-bits-ai
