@@ -97,7 +97,7 @@ case "${1:-}" in
       --secret=NUTTEE_DD_APP_KEY --project="$PROJECT" 2>/dev/null)
 
     # ── Deploy bad version to Cloud Run ───────────────────────────────────
-    echo_step "[1/4] Deploying bad revision to Cloud Run..."
+    echo_step "[1/5] Deploying bad revision to Cloud Run..."
     gcloud run services update "$CR_SERVICE" \
       --region="$REGION" \
       --project="$PROJECT" \
@@ -112,7 +112,7 @@ case "${1:-}" in
     echo ""
 
     # ── Mark deployment in Datadog DORA Metrics ────────────────────────────
-    echo_step "[2/4] Marking deployment in Datadog (DORA + CD Visibility)..."
+    echo_step "[2/5] Marking deployment in Datadog (DORA + CD Visibility)..."
     if [ -n "$DD_API_KEY" ]; then
       DD_API_KEY="$DD_API_KEY" DD_APP_KEY="$DD_APP_KEY" DD_SITE="datadoghq.com" \
         datadog-ci dora deployment \
@@ -130,7 +130,7 @@ case "${1:-}" in
     echo ""
 
     # ── Watch rollout: probe checkout until 500s are live ─────────────────
-    echo_step "[3/4] Watching rollout — probing checkout endpoint..."
+    echo_step "[3/5] Watching rollout — probing checkout endpoint..."
     CONFIRMED=false
     for attempt in $(seq 1 8); do
       # Use -s (no -f) so curl doesn't fail on 4xx/5xx — we want the status code
@@ -154,9 +154,59 @@ case "${1:-}" in
     fi
     echo ""
 
-    # ── Run Synthetics Gate — shows tests failing in CLI ──────────────────
-    echo_step "[4/4] Running Synthetics Gate (tests tagged service:$CR_SERVICE env:prod)..."
-    echo "  Tests: fum-v3s-b8r (Checkout Gate), zgp-czb-usw (Bad Deploy Detector)"
+    # ── [4/4] Deployment Gate API — polls Datadog gate policy ────────────
+    echo_step "[4/5] Evaluating Deployment Gate (service:$CR_SERVICE env:prod version:$BAD_VERSION)..."
+    GATE_EXIT=0
+    if [ -n "$DD_API_KEY" ]; then
+      GATE_RESP=$(curl -s -X POST \
+        "https://api.datadoghq.com/api/v2/deployments/gates/evaluation" \
+        -H "DD-API-KEY: $DD_API_KEY" \
+        -H "DD-APPLICATION-KEY: $DD_APP_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{\"data\":{\"type\":\"deployment_gates_evaluation_request\",\"attributes\":{\"service\":\"$CR_SERVICE\",\"env\":\"prod\",\"version\":\"$BAD_VERSION\"}}}" \
+        2>/dev/null)
+      EVAL_ID=$(echo "$GATE_RESP" | python3 -c \
+        "import sys,json; d=json.load(sys.stdin); print(d['data']['attributes']['evaluation_id'])" 2>/dev/null)
+
+      if [ -n "$EVAL_ID" ]; then
+        echo_ok "  Gate evaluation started → ID: $EVAL_ID"
+        echo "  Polling every 15s (up to 5 min)..."
+        for i in $(seq 1 20); do
+          sleep 15
+          POLL=$(curl -s \
+            "https://api.datadoghq.com/api/v2/deployments/gates/evaluation/$EVAL_ID" \
+            -H "DD-API-KEY: $DD_API_KEY" \
+            -H "DD-APPLICATION-KEY: $DD_APP_KEY" 2>/dev/null)
+          GATE_STATUS=$(echo "$POLL" | python3 -c \
+            "import sys,json; print(json.load(sys.stdin)['data']['attributes']['gate_status'])" 2>/dev/null)
+          printf "  [%3ds] Gate status: %s\n" $((i * 15)) "$GATE_STATUS"
+          if [ "$GATE_STATUS" = "pass" ]; then
+            echo_ok "  ✓ Deployment Gate PASSED"
+            break
+          elif [ "$GATE_STATUS" = "fail" ]; then
+            echo_warn "  ✗ Deployment Gate FAILED — $(echo "$POLL" | python3 -c \
+              "import sys,json; rules=json.load(sys.stdin)['data']['attributes'].get('rules',[]); [print('    rule: '+r.get('name','?')+' → '+r.get('status','?')+(' ('+r['reason'][:80]+')' if r.get('reason') else '')) for r in rules]" 2>/dev/null)"
+            GATE_EXIT=1
+            break
+          fi
+        done
+      else
+        HTTP_CODE=$(echo "$GATE_RESP" | python3 -c \
+          "import sys,json; d=json.load(sys.stdin); print(d.get('errors',[['?']])[0])" 2>/dev/null)
+        echo_warn "  No Deployment Gate configured yet for service:$CR_SERVICE env:prod"
+        echo_warn "  → Set up at: https://app.datadoghq.com/ci/deployment-gates"
+        echo_warn "    Add Rule → Monitor → query: tag:scenario:deployment-gates tag:env:prod"
+        echo_warn "    (The checkout error spike monitor will fire and block the gate)"
+      fi
+    else
+      echo_warn "  DD_API_KEY not found — skipping Deployment Gate"
+    fi
+    echo ""
+
+    # ── [5/5] Synthetics Gate — runs tests and shows assertion failures ───
+    echo_step "[5/5] Running Synthetics Gate (tests tagged service:$CR_SERVICE env:prod)..."
+    echo "  fum-v3s-b8r → Checkout API Deployment Gate (POST, asserts status=200)"
+    echo "  zgp-czb-usw → Checkout API Detects Bad Deploy (POST, asserts status≠500)"
     echo ""
     SYNTH_EXIT=0
     if [ -n "$DD_API_KEY" ]; then
@@ -168,48 +218,7 @@ case "${1:-}" in
           2>&1
       SYNTH_EXIT=$?
     else
-      echo_warn "  DD_API_KEY not found — skipping Synthetics run"
-    fi
-
-    # ── Deployment Gate API check (polls Datadog gate policy if configured) ─
-    GATE_EXIT=0
-    if [ -n "$DD_API_KEY" ]; then
-      echo ""
-      echo_step "  Checking Deployment Gate policy (service:$CR_SERVICE env:prod version:$BAD_VERSION)..."
-      GATE_RESP=$(curl -sf -X POST \
-        "https://api.datadoghq.com/api/v2/deployments/gates/evaluation" \
-        -H "DD-API-KEY: $DD_API_KEY" \
-        -H "DD-APPLICATION-KEY: $DD_APP_KEY" \
-        -H "Content-Type: application/json" \
-        -d "{\"data\":{\"type\":\"deployment_gates_evaluation_request\",\"attributes\":{\"service\":\"$CR_SERVICE\",\"env\":\"prod\",\"version\":\"$BAD_VERSION\"}}}" \
-        2>/dev/null)
-      EVAL_ID=$(echo "$GATE_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['attributes']['evaluation_id'])" 2>/dev/null)
-
-      if [ -n "$EVAL_ID" ]; then
-        echo_ok "  Gate evaluation started: $EVAL_ID"
-        echo "  Polling for result (up to 5 min)..."
-        for i in $(seq 1 20); do
-          sleep 15
-          POLL=$(curl -sf \
-            "https://api.datadoghq.com/api/v2/deployments/gates/evaluation/$EVAL_ID" \
-            -H "DD-API-KEY: $DD_API_KEY" \
-            -H "DD-APPLICATION-KEY: $DD_APP_KEY" 2>/dev/null)
-          STATUS=$(echo "$POLL" | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['attributes']['gate_status'])" 2>/dev/null)
-          printf "  [%ds] Gate status: %s\n" $((i * 15)) "$STATUS"
-          if [ "$STATUS" = "pass" ]; then
-            echo_ok "  ✓ Gate PASSED"
-            break
-          elif [ "$STATUS" = "fail" ]; then
-            echo_warn "  ✗ Gate FAILED"
-            GATE_EXIT=1
-            break
-          fi
-        done
-      else
-        echo_warn "  No Deployment Gate configured for service:$CR_SERVICE env:prod"
-        echo_warn "  → Create one at: https://app.datadoghq.com/ci/deployment-gates"
-        echo_warn "    Rule: Monitor search query = tag:scenario:deployment-gates tag:env:prod"
-      fi
+      echo_warn "  DD_API_KEY not found — skipping Synthetics"
     fi
 
     # ── Result summary ─────────────────────────────────────────────────────
