@@ -110,6 +110,172 @@ open "https://app.datadoghq.com/metric/explorer#live=true&metrics=redpanda.kafka
 
 ---
 
+## Demo Reset Guide
+
+> Run these after each recording or between takes. Each section is independent — reset only the Act you just ran.
+
+---
+
+### ☢️ FULL RESET — Run this before any new recording session
+
+```bash
+cd /path/to/dd-live-bkk-box-box-bits-ai
+
+# Step 1: Fix all pipeline issues
+./scripts/demo-pipeline.sh --fix-dbt          # restore dbt, triggers immediate BQ refresh
+./scripts/demo-issues.sh --k8s-oom-fix        # restore bq-sink memory (256Mi), rolling restart
+./scripts/demo-issues.sh --deploy-good        # ensure Cloud Run has DEMO_ERROR_INJECT=false
+./scripts/demo-issues.sh --cleanup-sec-pr     # delete demo/security-issues branch (if pushed)
+
+# Step 2: Reset traffic simulation
+./scripts/demo-pipeline.sh --traffic-normal   # 12 events/min, clean data
+./scripts/demo-pipeline.sh --dq-normal        # clear any data quality injections
+
+# Step 3: Clean BigQuery bad data rows
+./scripts/demo-data-quality.sh --fix-all      # DELETE injected zero-price, null, negative rows
+
+# Step 4: Belt-and-suspenders
+./scripts/demo-pipeline.sh --reset-all        # ensures CronJob unsuspended, error inject off
+
+# Step 5: Verify clean state
+./scripts/demo-pipeline.sh --status
+./scripts/demo-pipeline.sh --dq-status
+kubectl get pods -n data-pipeline
+```
+
+**Expected clean state:**
+
+| Component | Expected |
+|---|---|
+| `dbt-pricing` CronJob | `SUSPEND=False`, running every 5 min |
+| `bq-sink` pod | `1/1 Running`, 0 restarts, memory limit 256Mi |
+| `traffic-sim` | `1/1 Running`, `TRAFFIC_MODE=normal`, `DATA_QUALITY_MODE=normal` |
+| Cloud Run | `DEMO_ERROR_INJECT=false`, checkout → HTTP 200 |
+| BigQuery `limited_merch_events` | 0 zero-price, 0 null users, 0 negative rows |
+| BigQuery `dynamic_pricing` | freshness < 10 min (dbt ran successfully) |
+| `demo/security-issues` branch | deleted |
+
+---
+
+### Act 2 Reset — Data Observability (dbt failure + stale pricing)
+
+**What was staged:** `--fail-dbt` → broken dbt model, repeated FAILED jobs, freshness ALERT
+
+```bash
+# Fix dbt → restores healthy model + triggers immediate run
+./scripts/demo-pipeline.sh --fix-dbt
+
+# Verify: dbt runs successfully and BQ refreshes
+kubectl get jobs -n data-pipeline --sort-by=.metadata.creationTimestamp | tail -3
+# Expected: most recent job → Completed (not Error)
+
+# Check freshness recovered (wait ~3 min for dbt to finish)
+./scripts/demo-data-quality.sh --show-bad-data
+# Expected: minutes_stale < 10
+
+# Clean any injected bad data rows
+./scripts/demo-data-quality.sh --fix-all
+```
+
+**Datadog: monitors should recover automatically**
+- `[DO] Freshness - NovaPay Dynamic Pricing` → OK (after dbt succeeds)
+- `[NovaPay Demo] dbt Pricing Job FAILED` → OK / No Data
+
+---
+
+### Act 3 Reset — Bits AI (bq-sink OOMKilled)
+
+**What was staged:** `--k8s-oom-inject` → bq-sink in CrashLoopBackOff, Kafka lag building
+
+```bash
+# Restore bq-sink to production memory limits
+./scripts/demo-issues.sh --k8s-oom-fix
+
+# Verify: pod comes back healthy
+kubectl rollout status deployment/bq-sink -n data-pipeline --timeout=60s
+kubectl get pods -n data-pipeline -l app=bq-sink
+# Expected: 1/1 Running, Restart Count: 0
+
+# Check Kafka lag draining (may take a few minutes for backlog to clear)
+# Expected: kafka.consumer_lag → decreasing toward 0
+```
+
+**Datadog: monitors should recover**
+- `[NovaPay Demo] bq-sink OOMKilled` → OK (no restarts in last 5 min)
+- `[NovaPay Demo] Kafka Consumer Lag` → OK (lag < 500 after bq-sink drains backlog)
+
+> ⚠️ **Kafka backlog note:** If bq-sink was down for hours, it may take several minutes to drain the Kafka backlog after recovery. This is normal — bq-sink will catch up in batch mode.
+
+---
+
+### Act 4 Reset — Deploy with Confidence (Deployment Gates + Feature Flags)
+
+**What was staged:** `--deploy-bad` → Cloud Run with `DEMO_ERROR_INJECT=true`, APM errors
+
+```bash
+# Rollback to good revision (DEMO_ERROR_INJECT=false)
+./scripts/demo-issues.sh --deploy-good
+
+# Verify checkout is healthy
+curl -sf -X POST \
+  "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/merch/checkout" \
+  -H "Content-Type: application/json" \
+  -d '{"product_id":"rb-cap-001","quantity":1,"user_id":"reset-check","price_thb":1290}' \
+  -w "\nHTTP %{http_code}" | tail -2
+# Expected: {"success":true,...} HTTP 200
+
+# Reset Feature Flag (if canary was enabled)
+./scripts/demo-issues.sh --ff-canary-off    # prints UI steps to disable
+
+# Verify Synthetics tests are passing
+# open https://app.datadoghq.com/synthetics/details/fum-v3s-b8r
+# Expected: fum-v3s-b8r (Checkout Gate) → OK
+```
+
+**Datadog: monitors should recover**
+- `[NovaPay Demo] Checkout API Error Spike` → OK / No Data (error rate back to 0)
+
+---
+
+### Act 6 Reset — Shift Left Security (PR Gates)
+
+**What was staged:** `--create-sec-pr` → `demo/security-issues` branch pushed, GitHub Actions running SAST
+
+```bash
+# Delete the demo security branch locally and on GitHub
+./scripts/demo-issues.sh --cleanup-sec-pr
+
+# Verify
+git branch -a | grep security      # should return nothing
+```
+
+---
+
+### Quick State Check (run anytime)
+
+```bash
+# One-liner full status sweep
+./scripts/demo-pipeline.sh --status && \
+./scripts/demo-pipeline.sh --dq-status && \
+kubectl get pods -n data-pipeline && \
+curl -sf -X POST \
+  "https://box-box-bits-ai-449012790678.asia-southeast1.run.app/api/merch/checkout" \
+  -H "Content-Type: application/json" \
+  -d '{"product_id":"rb-cap-001","quantity":1,"user_id":"healthcheck","price_thb":1290}' \
+  -w "\nHTTP %{http_code}" | tail -1
+```
+
+**Green light if you see:**
+```
+DEMO_ERROR_INJECT=false
+DBT_FAIL_MODE=false
+TRAFFIC_MODE=normal  DATA_QUALITY_MODE=normal
+bq-sink → 1/1 Running
+HTTP 200
+```
+
+---
+
 ### Recovery commands (post-recording)
 
 ```bash
