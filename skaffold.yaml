@@ -10,7 +10,7 @@ build:
     useBuildkit: true
     concurrency: 1
   artifacts:
-    - image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/box-box-bits-ai
+    - image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/box-box-bits-ai/box-box-bits-ai-jakarta
       # Force linux/amd64 — Cloud Run rejects multi-arch OCI index images.
       platforms:
         - linux/amd64
@@ -88,7 +88,7 @@ profiles:
         useBuildkit: true
         concurrency: 1
       artifacts:
-        - image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/cloud-run-source-deploy/box-box-bits-ai
+        - image: asia-southeast1-docker.pkg.dev/datadog-ese-sandbox/box-box-bits-ai/box-box-bits-ai-jakarta
           platforms:
             - linux/amd64
           docker:

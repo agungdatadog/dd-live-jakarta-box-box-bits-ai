@@ -15,6 +15,7 @@
     "@datadog/openfeature-browser": "^1.1.1",
     "@google-cloud/bigquery": "^8.3.1",
     "@google/genai": "^1.17.0",
+    "@hono/node-server": "^2.0.5",
     "@hookform/resolvers": "^5.2.1",
     "@openfeature/react-sdk": "^1.2.1",
     "@openfeature/server-sdk": "^1.20.2",
