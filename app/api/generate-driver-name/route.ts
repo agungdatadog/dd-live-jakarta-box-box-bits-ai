@@ -50,7 +50,7 @@ Return ONLY valid JSON: {"driver_name": "...", "nickname": "..."}`;
             { role: 'user',   content: 'The person\'s real name (or hint) is: "{{real_name}}".\nGenerate a fun F1 driver identity as JSON: {"driver_name": "...", "nickname": "..."}' },
           ],
           variables: { real_name: realName ?? '' },
-          tags: { game: 'datadog-live-bangkok-2026' },
+          tags: { game: 'datadog-live-jakarta-2026' },
           queryVariables: ['real_name'],
         },
       },

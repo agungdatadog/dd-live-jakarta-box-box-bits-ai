@@ -595,7 +595,7 @@ function DreamTeamContent() {
           eyebrow="Lineup Builder"
           title="Dream"
           accent="Team"
-          summary="Draft a full garage, compare visible stats, then send the squad through an AI race-start simulation — your team's synergy is judged live against the Bangkok paddock."
+          summary="Draft a full garage, compare visible stats, then send the squad through an AI race-start simulation — your team's synergy is judged live against the Jakarta paddock."
           aside={
             <div className="flex flex-col gap-3">
               {/* Base score */}

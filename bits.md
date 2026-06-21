@@ -108,6 +108,6 @@ BigQuery (datadog-ese-sandbox)
 
 ## Contacts & Repositories
 
-- **GitHub repo**: `DataDog/dd-live-bkk-box-box-bits-ai` (or the user's fork)
+- **GitHub repo**: `DataDog/dd-live-jakarta-box-box-bits-ai` (or the user's fork)
 - **Cloud Run URL**: https://box-box-bits-ai-449012790678.asia-southeast1.run.app
 - **GCP Project**: `datadog-ese-sandbox`

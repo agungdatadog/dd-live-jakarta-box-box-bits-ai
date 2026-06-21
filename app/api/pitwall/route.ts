@@ -115,7 +115,7 @@ export async function POST(req: Request) {
             { role: 'user',   content: '{{message}}' },
           ],
           variables: { message: message ?? '' },
-          tags: { game: 'datadog-live-bangkok-2026', app: 'box-box-bits-ai' },
+          tags: { game: 'datadog-live-jakarta-2026', app: 'box-box-bits-ai' },
           queryVariables: ['message'],
         },
       },

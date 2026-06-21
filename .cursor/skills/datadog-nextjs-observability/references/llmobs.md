@@ -165,7 +165,7 @@ llmobs.annotate(span, {
     ],
     variables: { message: userMessage },
     queryVariables: ['message'],  // for hallucination detection
-    tags: { game: 'datadog-live-bangkok-2026' },
+    tags: { game: 'datadog-live-jakarta-2026' },
     // version: omitted → auto-versioned by hash of template content
   },
 });
@@ -234,7 +234,7 @@ llmobs.trace(
     llmobs.annotate(span, {
       inputData: [...],
       metadata: { userId, weirdness_rating: 85, conflict_index: 92 },
-      tags: { game: 'datadog-live-bangkok-2026' },
+      tags: { game: 'datadog-live-jakarta-2026' },
     });
     await runLLMSpan();
     llmobs.annotate(span, { outputData: capturedResponse });
@@ -267,7 +267,7 @@ const response = await withLlmObsSpan(
         { role: 'user',   content: '{{message}}' },
       ],
       variables: { message },
-      tags: { game: 'datadog-live-bangkok-2026' },
+      tags: { game: 'datadog-live-jakarta-2026' },
       queryVariables: ['message'],
     },
   },

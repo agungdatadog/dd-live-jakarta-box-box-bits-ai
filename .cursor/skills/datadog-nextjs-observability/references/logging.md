@@ -56,7 +56,7 @@ Set these environment variables in `service.yaml`:
 logger.info({
   event_type: 'dream_team_game_evaluation',
   timestamp: new Date().toISOString(),
-  game: 'datadog-live-bangkok-2026',
+  game: 'datadog-live-jakarta-2026',
   user: { usr_id: userId, username },
   selection: { team_principal, driver_1, driver_2 },
   scoring: {

@@ -119,7 +119,7 @@ open "https://app.datadoghq.com/metric/explorer#live=true&metrics=redpanda.kafka
 ### ☢️ FULL RESET — Run this before any new recording session
 
 ```bash
-cd /path/to/dd-live-bkk-box-box-bits-ai
+cd /path/to/dd-live-jakarta-box-box-bits-ai
 
 # Step 1: Fix all pipeline issues
 ./scripts/demo-pipeline.sh --fix-dbt          # restore dbt, triggers immediate BQ refresh

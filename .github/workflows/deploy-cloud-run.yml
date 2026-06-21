@@ -36,7 +36,7 @@ jobs:
       # Pool: github-actions-pool / provider: github-datadog
       # Condition: assertion.repository_owner == 'DataDog'  ← matches this repo
       # SA: nuttee-dify-sa@datadog-ese-sandbox.iam.gserviceaccount.com
-      # WIF binding: principalSet://…/attribute.repository/DataDog/dd-live-bkk-box-box-bits-ai
+      # WIF binding: principalSet://…/attribute.repository/DataDog/dd-live-jakarta-box-box-bits-ai
       - name: Authenticate to GCP
         uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:

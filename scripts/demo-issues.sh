@@ -373,7 +373,7 @@ VULN
     echo_ok "Branch pushed: demo/security-issues"
     echo ""
     echo_warn "DEMO FLOW — open PR now:"
-    echo "  PR URL: https://github.com/DataDog/dd-live-bkk-box-box-bits-ai/compare/main...demo/security-issues"
+    echo "  PR URL: https://github.com/DataDog/dd-live-jakarta-box-box-bits-ai/compare/main...demo/security-issues"
     echo ""
     echo "  After pushing, the GitHub Actions static-analysis.yml runs and:"
     echo "  ❌ Datadog PR Gates check: SQL injection (Critical) — BLOCKS merge"

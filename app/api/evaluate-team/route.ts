@@ -321,7 +321,7 @@ Return ONLY valid JSON with exactly these keys:
             lineup_context: lineupSummary,
             scoring_instructions: 'synergy_multiplier · weirdness_rating · conflict_index · sneak_peek · team_codename · synergy_class',
           },
-          tags: { game: 'datadog-live-bangkok-2026', task: 'dream_team_game_evaluation' },
+          tags: { game: 'datadog-live-jakarta-2026', task: 'dream_team_game_evaluation' },
           contextVariables: ['roster_context'],  // paddock roster = ground-truth context
           queryVariables: ['lineup_context'],    // selected lineup = user query
         },
@@ -388,7 +388,7 @@ Return ONLY valid JSON with exactly these keys:
     logger.info({
       event_type: 'dream_team_game_evaluation',
       timestamp: new Date().toISOString(),
-      game: 'datadog-live-bangkok-2026',
+      game: 'datadog-live-jakarta-2026',
       user: { usr_id: userId, username },
       selection: {
         team_principal: selection.team_principal,
